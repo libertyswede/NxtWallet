@@ -8,27 +8,28 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using NxtWallet.Controls;
+using NxtWallet.Views;
 
 namespace NxtWallet
 {
-    public sealed partial class AppShell : Page
+    public sealed partial class AppShell
     {
         // Declare the top level nav items
-        private List<NavMenuItem> navlist = new List<NavMenuItem>(
+        private readonly List<NavMenuItem> _navlist = new List<NavMenuItem>(
             new[]
             {
-                new NavMenuItem()
+                new NavMenuItem
                 {
-                    Symbol = Symbol.Contact,
+                    Symbol = Symbol.Home,
                     Label = "Overview",
-                    DestPage = typeof(Views.OverviewPage)
+                    DestPage = typeof(OverviewPage)
                 },
-                //new NavMenuItem()
-                //{
-                //    Symbol = Symbol.Edit,
-                //    Label = "CommandBar Page",
-                //    DestPage = typeof(CommandBarPage)
-                //},
+                new NavMenuItem
+                {
+                    Symbol = Symbol.MailForward,
+                    Label = "Send NXT",
+                    DestPage = typeof(SendMoneyPage)
+                },
                 //new NavMenuItem()
                 //{
                 //    Symbol = Symbol.Favorite,
@@ -66,7 +67,7 @@ namespace NxtWallet
 
             SystemNavigationManager.GetForCurrentView().BackRequested += SystemNavigationManager_BackRequested;
 
-            NavMenuList.ItemsSource = navlist;
+            NavMenuList.ItemsSource = _navlist;
         }
 
         public Frame AppFrame => frame;
@@ -164,14 +165,14 @@ namespace NxtWallet
         {
             if (e.NavigationMode == NavigationMode.Back)
             {
-                var item = (from p in navlist where p.DestPage == e.SourcePageType select p).SingleOrDefault();
+                var item = (from p in _navlist where p.DestPage == e.SourcePageType select p).SingleOrDefault();
                 if (item == null && AppFrame.BackStackDepth > 0)
                 {
                     // In cases where a page drills into sub-pages then we'll highlight the most recent
                     // navigation menu item that appears in the BackStack
                     foreach (var entry in AppFrame.BackStack.Reverse())
                     {
-                        item = (from p in navlist where p.DestPage == entry.SourcePageType select p).SingleOrDefault();
+                        item = (from p in _navlist where p.DestPage == entry.SourcePageType select p).SingleOrDefault();
                         if (item != null)
                             break;
                     }
