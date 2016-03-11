@@ -7,14 +7,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:NxtWallet.Model"
     mc:Ignorable="d"
-    Loading="OverviewPage_OnLoading">
-    
+    Loading="OverviewPage_OnLoading"
+    >
+
     <Page.Resources>
         <local:NxtAmountConverter x:Key="NxtAmountConverter" />
         <local:DateTimeConverter x:Key="DateTimeConverter" />
     </Page.Resources>
 
-    <Grid>
+    <Grid Background="{StaticResource NxtGradientBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
@@ -25,12 +26,6 @@
             <ColumnDefinition Width="16*"/>
             <ColumnDefinition Width="140"/>
         </Grid.ColumnDefinitions>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.7,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF0078A3" Offset="0"/>
-                <GradientStop Color="#FF002E43" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
         <StackPanel Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" >
             <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontFamily="Tw Cen MT" Foreground="White" FontSize="29.333" />
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
