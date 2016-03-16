@@ -105,6 +105,7 @@
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="NavMenuItem.cs" />
+    <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>
