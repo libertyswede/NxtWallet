@@ -22,7 +22,6 @@ namespace NxtWallet.ViewModel
             set { SetProperty(ref _transactions, value); }
         }
 
-
         private readonly NxtServer _nxtServer = new NxtServer();
 
         public OverviewViewModel()
