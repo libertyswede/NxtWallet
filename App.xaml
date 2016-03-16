@@ -6,6 +6,11 @@
     
     <Application.Resources>
         <ResourceDictionary>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Tw Cen MT" />
+                <Setter Property="Foreground" Value="White" />
+            </Style>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>

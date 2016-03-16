@@ -27,10 +27,10 @@
             <ColumnDefinition Width="140"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" >
-            <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontFamily="Tw Cen MT" Foreground="White" FontSize="29.333" />
+            <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="29.333" />
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                <TextBlock TextWrapping="NoWrap" Text="Balance:" FontFamily="Tw Cen MT" Foreground="White" FontSize="24" />
-                <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontFamily="Tw Cen MT" Foreground="White" FontSize="24" Margin="20,0,0,0" />
+                <TextBlock TextWrapping="NoWrap" Text="Balance:" FontSize="24" />
+                <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="24" Margin="20,0,0,0" />
             </StackPanel>
             <Grid Margin="12,20,12,0">
                 <Grid.ColumnDefinitions>
@@ -39,10 +39,10 @@
                     <ColumnDefinition Width="330" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Timestamp" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                <TextBlock Grid.Column="1" Text="Amount" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                <TextBlock Grid.Column="2" Text="Account" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                <TextBlock Grid.Column="3" Text="Message" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
+                <TextBlock Grid.Column="0" Text="Timestamp" FontSize="21.333" />
+                <TextBlock Grid.Column="1" Text="Amount" FontSize="21.333" />
+                <TextBlock Grid.Column="2" Text="Account" FontSize="21.333" />
+                <TextBlock Grid.Column="3" Text="Message" FontSize="21.333" />
             </Grid>
             <ListView ItemsSource="{x:Bind ViewModel.Transactions}">
                 <ListView.ItemContainerStyle>

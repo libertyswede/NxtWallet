@@ -7,6 +7,26 @@
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource NxtGradientBackground}">
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="56"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Send NXT" FontSize="29.333" />
+        <TextBlock Grid.Column="1" Grid.Row="2" Text="Pay to" />
+        <TextBox Grid.Column="2" Grid.Row="2" Width="250" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Column="1" Grid.Row="3" Text="Amount" />
+        <TextBox Grid.Column="2" Grid.Row="3" Width="250" HorizontalAlignment="Left"/>
+        <TextBlock Grid.Column="1" Grid.Row="4" Text="Message" />
+        <TextBox Grid.Column="2" Grid.Row="4" Width="250" HorizontalAlignment="Left"/>
     </Grid>
 </Page>
