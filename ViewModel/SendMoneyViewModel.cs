@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using NxtLib;
 
 namespace NxtWallet.ViewModel
 {
@@ -8,6 +11,7 @@ namespace NxtWallet.ViewModel
         private string _amount;
         private string _message;
         private ICommand _sendMoneyCommand;
+        private readonly NxtServer _nxtServer = new NxtServer();
 
         public string Recipient
         {
@@ -29,8 +33,14 @@ namespace NxtWallet.ViewModel
 
         public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
 
-        private static void SendMoney()
+        private async void SendMoney()
         {
+            await Task.Run(async () =>
+            {
+                decimal amount;
+                decimal.TryParse(Amount, out amount);
+                await _nxtServer.SendMoney(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+            });
         }
     }
 }

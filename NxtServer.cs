@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NxtLib;
+using NxtLib.Local;
+using NxtLib.Transactions;
 
 namespace NxtWallet
 {
@@ -87,6 +89,22 @@ namespace NxtWallet
                 OnlineStatus = OnlineStatus.Offline;
             }
             return transactionList;
+        }
+
+        public async Task SendMoney(Account recipient, Amount amount, string message)
+        {
+            var accountService = _serviceFactory.CreateAccountService();
+            var transactionService = _serviceFactory.CreateTransactionService();
+            var localTransactionService = new LocalTransactionService();
+
+            var publicKey = new CreateTransactionByPublicKey(1440, Amount.OneNxt, WalletSettings.NxtAccount.PublicKey);
+            if (!string.IsNullOrEmpty(message))
+            {
+                publicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);
+            }
+            var sendMoneyReply = await accountService.SendMoney(publicKey, recipient, amount);
+            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, WalletSettings.SecretPhrase);
+            var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
         }
     }
 
