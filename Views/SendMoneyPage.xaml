@@ -23,11 +23,11 @@
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Text="Send NXT" FontSize="29.333" />
         <TextBlock Grid.Column="1" Grid.Row="2" Text="Recipient" />
-        <TextBox Grid.Column="2" Grid.Row="2" Width="250" HorizontalAlignment="Left"/>
+        <TextBox Grid.Column="2" Grid.Row="2" Width="250" HorizontalAlignment="Left" Text="{x:Bind ViewModel.Recipient, Mode=TwoWay}"/>
         <TextBlock Grid.Column="1" Grid.Row="3" Text="Amount" />
-        <TextBox Grid.Column="2" Grid.Row="3" Width="250" HorizontalAlignment="Left"/>
+        <TextBox Grid.Column="2" Grid.Row="3" Width="250" HorizontalAlignment="Left" Text="{x:Bind ViewModel.Amount, Mode=TwoWay}"/>
         <TextBlock Grid.Column="1" Grid.Row="4" Text="Message" />
-        <TextBox Grid.Column="2" Grid.Row="4" Width="250" HorizontalAlignment="Left"/>
-        <Button Grid.Column="2" Grid.Row="5" Content="Send" HorizontalAlignment="Left"/>
+        <TextBox Grid.Column="2" Grid.Row="4" Width="250" HorizontalAlignment="Left" Text="{x:Bind ViewModel.Message, Mode=TwoWay}"/>
+        <Button Grid.Column="2" Grid.Row="5" Content="Send" HorizontalAlignment="Left" Command="{x:Bind ViewModel.SendMoneyCommand}"/>
     </Grid>
 </Page>

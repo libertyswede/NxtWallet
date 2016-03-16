@@ -1,10 +1,13 @@
-﻿namespace NxtWallet.ViewModel
+﻿using System.Windows.Input;
+
+namespace NxtWallet.ViewModel
 {
     public class SendMoneyViewModel : BindableBase
     {
         private string _recipient;
         private string _amount;
         private string _message;
+        private ICommand _sendMoneyCommand;
 
         public string Recipient
         {
@@ -22,6 +25,12 @@
         {
             get { return _message; }
             set { SetProperty(ref _message, value); }
+        }
+
+        public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
+
+        private static void SendMoney()
+        {
         }
     }
 }
