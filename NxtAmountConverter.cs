@@ -8,8 +8,11 @@ namespace NxtWallet
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var amount = Amount.CreateAmountFromNqt((long) value);
+            var nqtAmount = (long) value;
+            var amount = Amount.CreateAmountFromNqt(Math.Abs(nqtAmount));
             var nxt = amount.Nxt.ToString("##.#########");
+            if (nqtAmount < 0)
+                nxt = "-" + nxt;
             return nxt;
 
         }
