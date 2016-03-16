@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using NxtWallet.Model;
 
@@ -33,7 +34,8 @@ namespace NxtWallet.ViewModel
         public async Task Loading()
         {
             Balance = await _nxtServer.GetBalance();
-            Transactions = new ObservableCollection<Transaction>(await _nxtServer.GetTransactions());
+            var transactions = await _nxtServer.GetTransactions();
+            Transactions = new ObservableCollection<Transaction>(transactions.OrderByDescending(t => t.Timestamp));
         }
 
         private void NxtServer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
