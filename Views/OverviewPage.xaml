@@ -34,10 +34,10 @@
             </StackPanel>
             <Grid Margin="12,20,12,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="330" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="5*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Timestamp" FontSize="21.333" />
                 <TextBlock Grid.Column="1" Text="Amount" FontSize="21.333" />
@@ -54,15 +54,15 @@
                     <DataTemplate x:DataType="model:Transaction">
                         <Grid >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="330" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="5*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" FontFamily="Tw Cen MT" FontSize="21.333" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" FontFamily="Tw Cen MT" FontSize="21.333" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind Account}" FontFamily="Tw Cen MT" FontSize="21.333" />
-                            <TextBlock Grid.Column="3" Text="{x:Bind Message}" FontFamily="Tw Cen MT" FontSize="21.333" />
+                            <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind Account}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
