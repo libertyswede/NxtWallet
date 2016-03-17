@@ -8,7 +8,6 @@
         <ResourceDictionary>
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Tw Cen MT" />
-                <Setter Property="Foreground" Value="White" />
             </Style>
             
             <ResourceDictionary.MergedDictionaries>

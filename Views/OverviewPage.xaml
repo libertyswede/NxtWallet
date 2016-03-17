@@ -15,7 +15,7 @@
         <local:DateTimeConverter x:Key="DateTimeConverter" />
     </Page.Resources>
 
-    <Grid Background="{StaticResource NxtGradientBackground}">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
@@ -59,10 +59,10 @@
                                 <ColumnDefinition Width="330" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind Account}" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
-                            <TextBlock Grid.Column="3" Text="{x:Bind Message}" FontFamily="Tw Cen MT" Foreground="White" FontSize="21.333" />
+                            <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" FontFamily="Tw Cen MT" FontSize="21.333" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" FontFamily="Tw Cen MT" FontSize="21.333" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind Account}" FontFamily="Tw Cen MT" FontSize="21.333" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind Message}" FontFamily="Tw Cen MT" FontSize="21.333" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
