@@ -83,6 +83,7 @@ namespace NxtWallet
 
                     transactionList.Add(nxtTransaction);
                 }
+                await WalletSettings.SaveTransactions(transactionList);
             }
             catch (HttpRequestException)
             {

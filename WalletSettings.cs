@@ -6,6 +6,7 @@ using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtWallet.Model;
+using Transaction = NxtWallet.Model.Transaction;
 
 namespace NxtWallet
 {
@@ -20,12 +21,25 @@ namespace NxtWallet
         public static string SecretPhrase { get; private set; }
         public static string Balance { get; private set; }
 
-        public static async Task<IEnumerable<Model.Transaction>> GetAllTransactions()
+        public static async Task<IEnumerable<Transaction>> GetAllTransactions()
         {
             using (var context = new WalletContext())
             {
                 var transactions = await context.Transactions.ToListAsync();
                 return transactions;
+            }
+        }
+
+        public static async Task SaveTransactions(IEnumerable<Transaction> transactions)
+        {
+            using (var context = new WalletContext())
+            {
+                var existingTransactions = (await GetAllTransactions()).ToList();
+                foreach (var transaction in transactions.Where(transaction => existingTransactions.All(t => t.NxtId != transaction.NxtId)))
+                {
+                    context.Transactions.Add(transaction);
+                }
+                await context.SaveChangesAsync();
             }
         }
 
