@@ -1,13 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Store;
-using Windows.UI.Xaml;
+using GalaSoft.MvvmLight;
 using NxtWallet.Model;
 
 namespace NxtWallet.ViewModel
 {
-    public class OverviewViewModel : BindableBase
+    public class OverviewViewModel : ViewModelBase
     {
         private string _balance = "0.0";
         private readonly NxtServer _nxtServer;
@@ -18,13 +17,13 @@ namespace NxtWallet.ViewModel
         public string Balance
         {
             get { return _balance; }
-            set { SetProperty(ref _balance, value); }
+            set { Set(ref _balance, value); }
         }
 
         public ObservableCollection<Transaction> Transactions
         {
             get { return _transactions; }
-            set { SetProperty(ref _transactions, value); }
+            set { Set(ref _transactions, value); }
         }
 
         public OverviewViewModel(IWalletRepository walletRepository)

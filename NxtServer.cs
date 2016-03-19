@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using GalaSoft.MvvmLight;
 using NxtLib;
 using NxtLib.Local;
 using NxtLib.Transactions;
 
 namespace NxtWallet
 {
-    public class NxtServer : BindableBase
+    public class NxtServer : ViewModelBase
     {
         private readonly IWalletRepository _walletRepository;
         private OnlineStatus _onlineStatus;
@@ -18,7 +19,7 @@ namespace NxtWallet
         public OnlineStatus OnlineStatus
         {
             get { return _onlineStatus; }
-            set { SetProperty(ref _onlineStatus, value); }
+            set { Set(ref _onlineStatus, value); }
         }
 
         public NxtServer(IWalletRepository walletRepository)

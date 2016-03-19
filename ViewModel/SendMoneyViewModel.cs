@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
+using GalaSoft.MvvmLight;
 
 namespace NxtWallet.ViewModel
 {
-    public class SendMoneyViewModel : BindableBase
+    public class SendMoneyViewModel : ViewModelBase
     {
         private readonly NxtServer _nxtServer;
         private string _recipient;
@@ -14,19 +15,19 @@ namespace NxtWallet.ViewModel
         public string Recipient
         {
             get { return _recipient; }
-            set { SetProperty(ref _recipient, value); }
+            set { Set(ref _recipient, value); }
         }
 
         public string Amount
         {
             get { return _amount; }
-            set { SetProperty(ref _amount, value); }
+            set { Set(ref _amount, value); }
         }
 
         public string Message
         {
             get { return _message; }
-            set { SetProperty(ref _message, value); }
+            set { Set(ref _message, value); }
         }
 
         public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
