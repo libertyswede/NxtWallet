@@ -1,35 +1,38 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Store;
+using Windows.UI.Xaml;
 using NxtWallet.Model;
 
 namespace NxtWallet.ViewModel
 {
     public class OverviewViewModel : BindableBase
     {
+        private string _balance = "0.0";
+        private readonly NxtServer _nxtServer;
+        private ObservableCollection<Transaction> _transactions;
+
         public string NxtAddress { get; set; }
 
-        private string _balance = "0.0";
         public string Balance
         {
             get { return _balance; }
             set { SetProperty(ref _balance, value); }
         }
 
-        private ObservableCollection<Transaction> _transactions;
         public ObservableCollection<Transaction> Transactions
         {
             get { return _transactions; }
             set { SetProperty(ref _transactions, value); }
         }
 
-        private readonly NxtServer _nxtServer = new NxtServer();
-
-        public OverviewViewModel()
+        public OverviewViewModel(IWalletRepository walletRepository)
         {
-            NxtAddress = WalletSettings.NxtAccount.AccountRs;
-            Balance = WalletSettings.Balance;
-            var transactions = Task.Run(async () => await WalletSettings.GetAllTransactionsAsync()).Result;
+            _nxtServer = new NxtServer(walletRepository);
+            NxtAddress = walletRepository.NxtAccount.AccountRs;
+            Balance = walletRepository.Balance;
+            var transactions = Task.Run(async () => await walletRepository.GetAllTransactionsAsync()).Result;
             Transactions = new ObservableCollection<Transaction>(transactions.OrderByDescending(t => t.Timestamp));
             _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
         }

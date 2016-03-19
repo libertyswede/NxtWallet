@@ -11,6 +11,7 @@ namespace NxtWallet
 {
     public class NxtServer : BindableBase
     {
+        private readonly IWalletRepository _walletRepository;
         private OnlineStatus _onlineStatus;
         private readonly ServiceFactory _serviceFactory;
 
@@ -20,9 +21,10 @@ namespace NxtWallet
             set { SetProperty(ref _onlineStatus, value); }
         }
 
-        public NxtServer()
+        public NxtServer(IWalletRepository walletRepository)
         {
-            _serviceFactory = new ServiceFactory(WalletSettings.NxtServer);
+            _walletRepository = walletRepository;
+            _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
         public async Task<string> GetBalance()
@@ -30,8 +32,8 @@ namespace NxtWallet
             var accountService = _serviceFactory.CreateAccountService();
             try
             {
-                var balanceResult = await accountService.GetBalance(WalletSettings.NxtAccount);
-                await WalletSettings.SaveBalanceAsync(balanceResult.Balance.Nxt.ToString("##.########"));
+                var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
+                await _walletRepository.SaveBalanceAsync(balanceResult.Balance.Nxt.ToString("##.########"));
             }
             catch (HttpRequestException)
             {
@@ -43,15 +45,15 @@ namespace NxtWallet
                 {
                     throw;
                 }
-                await WalletSettings.SaveBalanceAsync("0.0");
+                await _walletRepository.SaveBalanceAsync("0.0");
             }
-            return WalletSettings.Balance;
+            return _walletRepository.Balance;
         }
 
         public async Task<IEnumerable<Model.Transaction>> GetTransactions()
         {
             var transactionService = _serviceFactory.CreateTransactionService();
-            var transactionList = (await WalletSettings.GetAllTransactionsAsync()).ToList();
+            var transactionList = (await _walletRepository.GetAllTransactionsAsync()).ToList();
             try
             {
                 var lastTimestamp = transactionList.Any()
@@ -60,7 +62,7 @@ namespace NxtWallet
 
                 //TODO: Phased transactions?
                 var transactionsReply = await transactionService.GetBlockchainTransactions(
-                    WalletSettings.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
+                    _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
 
                 foreach (var serverTransaction in transactionsReply.Transactions.Where(t => transactionList.All(t2 => t2.GetTransactionId() != t.TransactionId)))
                 {
@@ -71,18 +73,18 @@ namespace NxtWallet
                         Message = serverTransaction.Message.MessageText,
                         Timestamp = serverTransaction.Timestamp,
 
-                        NqtAmount = serverTransaction.Recipient == WalletSettings.NxtAccount.AccountId
+                        NqtAmount = serverTransaction.Recipient == _walletRepository.NxtAccount.AccountId
                             ? serverTransaction.Amount.Nqt
                             : serverTransaction.Amount.Nqt*-1,
 
-                        Account = serverTransaction.Recipient == WalletSettings.NxtAccount.AccountId
+                        Account = serverTransaction.Recipient == _walletRepository.NxtAccount.AccountId
                             ? serverTransaction.SenderRs
                             : serverTransaction.RecipientRs
                     };
 
                     transactionList.Add(nxtTransaction);
                 }
-                await WalletSettings.SaveTransactionsAsync(transactionList);
+                await _walletRepository.SaveTransactionsAsync(transactionList);
             }
             catch (HttpRequestException)
             {
@@ -97,13 +99,13 @@ namespace NxtWallet
             var transactionService = _serviceFactory.CreateTransactionService();
             var localTransactionService = new LocalTransactionService();
 
-            var publicKey = new CreateTransactionByPublicKey(1440, Amount.OneNxt, WalletSettings.NxtAccount.PublicKey);
+            var publicKey = new CreateTransactionByPublicKey(1440, Amount.OneNxt, _walletRepository.NxtAccount.PublicKey);
             if (!string.IsNullOrEmpty(message))
             {
                 publicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);
             }
             var sendMoneyReply = await accountService.SendMoney(publicKey, recipient, amount);
-            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, WalletSettings.SecretPhrase);
+            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
             var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
         }
     }

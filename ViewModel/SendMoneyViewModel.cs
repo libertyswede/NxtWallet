@@ -1,17 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
-using NxtLib;
 
 namespace NxtWallet.ViewModel
 {
     public class SendMoneyViewModel : BindableBase
     {
+        private readonly NxtServer _nxtServer;
         private string _recipient;
         private string _amount;
         private string _message;
         private ICommand _sendMoneyCommand;
-        private readonly NxtServer _nxtServer = new NxtServer();
 
         public string Recipient
         {
@@ -32,6 +30,11 @@ namespace NxtWallet.ViewModel
         }
 
         public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
+
+        public SendMoneyViewModel(IWalletRepository walletRepository)
+        {
+            _nxtServer = new NxtServer(walletRepository);
+        }
 
         private async void SendMoney()
         {

@@ -125,7 +125,7 @@
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WalletSettings.cs" />
+    <Compile Include="WalletRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

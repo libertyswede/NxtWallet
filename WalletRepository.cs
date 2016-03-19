@@ -10,18 +10,30 @@ using Transaction = NxtWallet.Model.Transaction;
 
 namespace NxtWallet
 {
-    public class WalletSettings
+    public interface IWalletRepository
+    {
+        AccountWithPublicKey NxtAccount { get; }
+        string NxtServer { get; }
+        string SecretPhrase { get; }
+        string Balance { get; }
+        Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
+        Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
+        Task SaveBalanceAsync(string balance);
+        Task LoadAsync();
+    }
+
+    public class WalletRepository : IWalletRepository
     {
         public const string SecretPhraseKey = "secretPhrase";
         public const string NxtServerKey = "nxtServer";
         public const string BalanceKey = "balance";
 
-        public static AccountWithPublicKey NxtAccount { get; private set; }
-        public static string NxtServer { get; private set; }
-        public static string SecretPhrase { get; private set; }
-        public static string Balance { get; private set; }
+        public AccountWithPublicKey NxtAccount { get; private set; }
+        public string NxtServer { get; private set; }
+        public string SecretPhrase { get; private set; }
+        public string Balance { get; private set; }
 
-        public static async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
             using (var context = new WalletContext())
             {
@@ -30,7 +42,7 @@ namespace NxtWallet
             }
         }
 
-        public static async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
             using (var context = new WalletContext())
             {
@@ -43,7 +55,7 @@ namespace NxtWallet
             }
         }
 
-        public static async Task SaveBalanceAsync(string balance)
+        public async Task SaveBalanceAsync(string balance)
         {
             using (var context = new WalletContext())
             {
@@ -61,7 +73,7 @@ namespace NxtWallet
             }
         }
 
-        public static async Task LoadAsync()
+        public async Task LoadAsync()
         {
             using (var context = new WalletContext())
             {
@@ -78,7 +90,7 @@ namespace NxtWallet
             }
         }
 
-        private static void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;
             if (Balance == null)
@@ -88,7 +100,7 @@ namespace NxtWallet
             }
         }
 
-        private static void ReadOrGenerateNxtServer(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateNxtServer(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             NxtServer = dbSettings.SingleOrDefault(s => s.Key.Equals(NxtServerKey))?.Value;
             if (NxtServer == null)
@@ -98,7 +110,7 @@ namespace NxtWallet
             }
         }
 
-        private static void ReadOrGenerateSecretPhrase(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateSecretPhrase(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             SecretPhrase = dbSettings.SingleOrDefault(s => s.Key.Equals(SecretPhraseKey))?.Value;
             if (SecretPhrase == null)
