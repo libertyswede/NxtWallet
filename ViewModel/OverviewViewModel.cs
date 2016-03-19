@@ -28,6 +28,9 @@ namespace NxtWallet.ViewModel
         public OverviewViewModel()
         {
             NxtAddress = WalletSettings.NxtAccount.AccountRs;
+            Balance = WalletSettings.Balance;
+            var transactions = Task.Run(async () => await WalletSettings.GetAllTransactionsAsync()).Result;
+            Transactions = new ObservableCollection<Transaction>(transactions.OrderByDescending(t => t.Timestamp));
             _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
         }
 

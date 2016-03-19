@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ namespace NxtWallet
             try
             {
                 var balanceResult = await accountService.GetBalance(WalletSettings.NxtAccount);
-                await WalletSettings.SetBalance(balanceResult.Balance.Nxt.ToString("##.########"));
+                await WalletSettings.SaveBalanceAsync(balanceResult.Balance.Nxt.ToString("##.########"));
             }
             catch (HttpRequestException)
             {
@@ -44,7 +43,7 @@ namespace NxtWallet
                 {
                     throw;
                 }
-                await WalletSettings.SetBalance("0.0");
+                await WalletSettings.SaveBalanceAsync("0.0");
             }
             return WalletSettings.Balance;
         }
@@ -52,7 +51,7 @@ namespace NxtWallet
         public async Task<IEnumerable<Model.Transaction>> GetTransactions()
         {
             var transactionService = _serviceFactory.CreateTransactionService();
-            var transactionList = (await WalletSettings.GetAllTransactions()).ToList();
+            var transactionList = (await WalletSettings.GetAllTransactionsAsync()).ToList();
             try
             {
                 var lastTimestamp = transactionList.Any()
@@ -83,7 +82,7 @@ namespace NxtWallet
 
                     transactionList.Add(nxtTransaction);
                 }
-                await WalletSettings.SaveTransactions(transactionList);
+                await WalletSettings.SaveTransactionsAsync(transactionList);
             }
             catch (HttpRequestException)
             {

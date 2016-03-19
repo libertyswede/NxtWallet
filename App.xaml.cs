@@ -13,7 +13,7 @@ namespace NxtWallet
             InitializeComponent();
             Suspending += OnSuspending;
             
-            WalletSettings.Load().Wait();
+            WalletSettings.LoadAsync().Wait();
         }
 
         /// <summary>

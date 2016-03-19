@@ -21,7 +21,7 @@ namespace NxtWallet
         public static string SecretPhrase { get; private set; }
         public static string Balance { get; private set; }
 
-        public static async Task<IEnumerable<Transaction>> GetAllTransactions()
+        public static async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
             using (var context = new WalletContext())
             {
@@ -30,11 +30,11 @@ namespace NxtWallet
             }
         }
 
-        public static async Task SaveTransactions(IEnumerable<Transaction> transactions)
+        public static async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
             using (var context = new WalletContext())
             {
-                var existingTransactions = (await GetAllTransactions()).ToList();
+                var existingTransactions = (await GetAllTransactionsAsync()).ToList();
                 foreach (var transaction in transactions.Where(transaction => existingTransactions.All(t => t.NxtId != transaction.NxtId)))
                 {
                     context.Transactions.Add(transaction);
@@ -43,7 +43,7 @@ namespace NxtWallet
             }
         }
 
-        public static async Task SetBalance(string balance)
+        public static async Task SaveBalanceAsync(string balance)
         {
             using (var context = new WalletContext())
             {
@@ -61,7 +61,7 @@ namespace NxtWallet
             }
         }
 
-        public static async Task Load()
+        public static async Task LoadAsync()
         {
             using (var context = new WalletContext())
             {
@@ -78,7 +78,7 @@ namespace NxtWallet
             }
         }
 
-        private static void ReadOrGenerateBalance(List<Setting> dbSettings, WalletContext context)
+        private static void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;
             if (Balance == null)
