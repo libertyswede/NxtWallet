@@ -104,6 +104,7 @@
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
+    <Compile Include="Ioc.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="Views\OverviewPage.xaml.cs">

@@ -8,13 +8,12 @@ namespace NxtWallet
 {
     sealed partial class App
     {
-        public readonly IWalletRepository WalletRepository = new WalletRepository();
-
         public App()
         {
+            var walletRepository = Ioc.WalletRepository;
             InitializeComponent();
             Suspending += OnSuspending;
-            WalletRepository.LoadAsync().Wait();
+            walletRepository.LoadAsync().Wait();
         }
 
         /// <summary>

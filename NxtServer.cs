@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,7 +11,17 @@ using NxtLib.Transactions;
 
 namespace NxtWallet
 {
-    public class NxtServer : ViewModelBase
+    public interface INxtServer
+    {
+        event PropertyChangedEventHandler PropertyChanged;
+
+        OnlineStatus OnlineStatus { get; set; }
+        Task<string> GetBalanceAsync();
+        Task<IEnumerable<Model.Transaction>> GetTransactionsAsync();
+        Task SendMoneyAsync(Account recipient, Amount amount, string message);
+    }
+
+    public class NxtServer : ViewModelBase, INxtServer
     {
         private readonly IWalletRepository _walletRepository;
         private OnlineStatus _onlineStatus;
@@ -19,7 +30,11 @@ namespace NxtWallet
         public OnlineStatus OnlineStatus
         {
             get { return _onlineStatus; }
-            set { Set(ref _onlineStatus, value); }
+            set
+            {
+                _onlineStatus = value;
+                RaisePropertyChanged();
+            }
         }
 
         public NxtServer(IWalletRepository walletRepository)
@@ -28,7 +43,7 @@ namespace NxtWallet
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
-        public async Task<string> GetBalance()
+        public async Task<string> GetBalanceAsync()
         {
             var accountService = _serviceFactory.CreateAccountService();
             try
@@ -51,7 +66,7 @@ namespace NxtWallet
             return _walletRepository.Balance;
         }
 
-        public async Task<IEnumerable<Model.Transaction>> GetTransactions()
+        public async Task<IEnumerable<Model.Transaction>> GetTransactionsAsync()
         {
             var transactionService = _serviceFactory.CreateTransactionService();
             var transactionList = (await _walletRepository.GetAllTransactionsAsync()).ToList();
@@ -94,7 +109,7 @@ namespace NxtWallet
             return transactionList;
         }
 
-        public async Task SendMoney(Account recipient, Amount amount, string message)
+        public async Task SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             var accountService = _serviceFactory.CreateAccountService();
             var transactionService = _serviceFactory.CreateTransactionService();

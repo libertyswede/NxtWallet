@@ -5,7 +5,7 @@ namespace NxtWallet.Views
 {
     public sealed partial class SendMoneyPage
     {
-        public SendMoneyViewModel ViewModel { get; } = new SendMoneyViewModel(((App)Application.Current).WalletRepository);
+        public SendMoneyViewModel ViewModel { get; } = Ioc.SendMoneyViewModel;
 
         public SendMoneyPage()
         {

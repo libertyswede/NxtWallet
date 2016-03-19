@@ -5,7 +5,7 @@ namespace NxtWallet.Views
 {
     public sealed partial class OverviewPage
     {
-        public OverviewViewModel ViewModel { get; } = new OverviewViewModel(((App)Application.Current).WalletRepository);
+        public OverviewViewModel ViewModel { get; } = Ioc.OverviewViewModel;
 
         public OverviewPage()
         {

@@ -6,7 +6,7 @@ namespace NxtWallet.ViewModel
 {
     public class SendMoneyViewModel : ViewModelBase
     {
-        private readonly NxtServer _nxtServer;
+        private readonly INxtServer _nxtServer;
         private string _recipient;
         private string _amount;
         private string _message;
@@ -15,26 +15,38 @@ namespace NxtWallet.ViewModel
         public string Recipient
         {
             get { return _recipient; }
-            set { Set(ref _recipient, value); }
+            set
+            {
+                _recipient = value;
+                RaisePropertyChanged();
+            }
         }
 
         public string Amount
         {
             get { return _amount; }
-            set { Set(ref _amount, value); }
+            set
+            {
+                _amount = value;
+                RaisePropertyChanged();
+            }
         }
 
         public string Message
         {
             get { return _message; }
-            set { Set(ref _message, value); }
+            set
+            {
+                _message = value;
+                RaisePropertyChanged();
+            }
         }
 
         public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
 
-        public SendMoneyViewModel(IWalletRepository walletRepository)
+        public SendMoneyViewModel(INxtServer nxtServer)
         {
-            _nxtServer = new NxtServer(walletRepository);
+            _nxtServer = nxtServer;
         }
 
         private async void SendMoney()
@@ -43,7 +55,7 @@ namespace NxtWallet.ViewModel
             {
                 decimal amount;
                 decimal.TryParse(Amount, out amount);
-                await _nxtServer.SendMoney(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+                await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
             });
         }
     }
