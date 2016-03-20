@@ -66,7 +66,7 @@
                 </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <Ellipse Stroke="Black" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FF00D100"/>
             <TextBlock Text="Online" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="10,0,0,0" FontSize="21.333" />
         </StackPanel>
