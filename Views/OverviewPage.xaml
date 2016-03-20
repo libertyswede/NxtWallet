@@ -35,13 +35,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="5*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Timestamp" FontSize="21.333" />
                 <TextBlock Grid.Column="1" Text="Amount" FontSize="21.333" />
-                <TextBlock Grid.Column="2" Text="Account" FontSize="21.333" />
-                <TextBlock Grid.Column="3" Text="Message" FontSize="21.333" />
+                <TextBlock Grid.Column="2" Text="Fee" FontSize="21.333" />
+                <TextBlock Grid.Column="3" Text="Account" FontSize="21.333" />
+                <TextBlock Grid.Column="4" Text="Message" FontSize="21.333" />
             </Grid>
             <ListView ItemsSource="{x:Bind ViewModel.Transactions}">
                 <ListView.ItemContainerStyle>
@@ -55,13 +57,15 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="60" />
                                 <ColumnDefinition Width="3*" />
                                 <ColumnDefinition Width="5*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind AccountFrom}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="3" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind AccountFrom}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
