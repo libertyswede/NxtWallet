@@ -56,7 +56,7 @@ namespace NxtWallet.ViewModel
             {
                 decimal amount;
                 decimal.TryParse(Amount, out amount);
-                await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+                var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
             });
         }
 

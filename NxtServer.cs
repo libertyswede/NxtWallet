@@ -18,7 +18,7 @@ namespace NxtWallet
         OnlineStatus OnlineStatus { get; set; }
         Task<string> GetBalanceAsync();
         Task<IEnumerable<Model.Transaction>> GetTransactionsAsync();
-        Task SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<Model.Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
 
     public class NxtServer : ViewModelBase, INxtServer
@@ -109,7 +109,7 @@ namespace NxtWallet
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public async Task SendMoneyAsync(Account recipient, Amount amount, string message)
+        public async Task<Model.Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             var accountService = _serviceFactory.CreateAccountService();
             var transactionService = _serviceFactory.CreateTransactionService();
@@ -123,6 +123,16 @@ namespace NxtWallet
             var sendMoneyReply = await accountService.SendMoney(publicKey, recipient, amount);
             var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
             var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
+
+            var transaction = new Model.Transaction
+            {
+                NxtId = (long) broadcastReply.TransactionId,
+                Account = recipient.AccountRs,
+                Message = message,
+                NqtAmount = amount.Nqt * -1,
+                Timestamp = sendMoneyReply.Transaction.Timestamp
+            };
+            return transaction;
         }
     }
 
