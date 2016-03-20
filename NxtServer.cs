@@ -106,7 +106,7 @@ namespace NxtWallet
             {
                 OnlineStatus = OnlineStatus.Offline;
             }
-            return transactionList;
+            return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
         public async Task SendMoneyAsync(Account recipient, Amount amount, string message)

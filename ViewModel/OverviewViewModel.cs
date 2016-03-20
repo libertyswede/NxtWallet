@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtWallet.Model;
@@ -40,7 +39,7 @@ namespace NxtWallet.ViewModel
             NxtAddress = walletRepository.NxtAccount.AccountRs;
             Balance = walletRepository.Balance;
             var transactions = Task.Run(async () => await walletRepository.GetAllTransactionsAsync()).Result;
-            Transactions = new ObservableCollection<Transaction>(transactions.OrderByDescending(t => t.Timestamp));
+            Transactions = new ObservableCollection<Transaction>(transactions);
             _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
         }
 
@@ -48,7 +47,7 @@ namespace NxtWallet.ViewModel
         {
             Balance = await _nxtServer.GetBalanceAsync();
             var transactions = await _nxtServer.GetTransactionsAsync();
-            Transactions = new ObservableCollection<Transaction>(transactions.OrderByDescending(t => t.Timestamp));
+            Transactions = new ObservableCollection<Transaction>(transactions);
         }
 
         private void NxtServer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

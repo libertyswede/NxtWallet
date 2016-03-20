@@ -37,7 +37,10 @@ namespace NxtWallet
         {
             using (var context = new WalletContext())
             {
-                var transactions = await context.Transactions.ToListAsync();
+                var transactions = await context.Transactions
+                    .OrderByDescending(t => t.Timestamp)
+                    .ToListAsync();
+
                 return transactions;
             }
         }
@@ -47,7 +50,7 @@ namespace NxtWallet
             using (var context = new WalletContext())
             {
                 var existingTransactions = (await GetAllTransactionsAsync()).ToList();
-                foreach (var transaction in transactions.Where(transaction => existingTransactions.All(t => t.NxtId != transaction.NxtId)))
+                foreach (var transaction in transactions.Except(existingTransactions))
                 {
                     context.Transactions.Add(transaction);
                 }
