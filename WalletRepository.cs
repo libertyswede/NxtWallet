@@ -17,6 +17,7 @@ namespace NxtWallet
         string SecretPhrase { get; }
         string Balance { get; }
         Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
+        Task SaveTransactionAsync(Transaction transaction);
         Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
         Task SaveBalanceAsync(string balance);
         Task LoadAsync();
@@ -42,6 +43,19 @@ namespace NxtWallet
                     .ToListAsync();
 
                 return transactions;
+            }
+        }
+
+        public async Task SaveTransactionAsync(Transaction transaction)
+        {
+            using (var context = new WalletContext())
+            {
+                var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transaction.NxtId);
+                if (existingTransaction == null)
+                {
+                    context.Transactions.Add(transaction);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
