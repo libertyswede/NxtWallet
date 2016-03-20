@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
 namespace NxtWallet.ViewModel
 {
@@ -10,7 +11,7 @@ namespace NxtWallet.ViewModel
         private string _recipient;
         private string _amount;
         private string _message;
-        private ICommand _sendMoneyCommand;
+        private RelayCommand _sendMoneyCommand;
 
         public string Recipient
         {
@@ -42,7 +43,7 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        public ICommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new CommandHandler(SendMoney, true));
+        public RelayCommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new RelayCommand(SendMoney, CanSendMoney));
 
         public SendMoneyViewModel(INxtServer nxtServer)
         {
@@ -57,6 +58,11 @@ namespace NxtWallet.ViewModel
                 decimal.TryParse(Amount, out amount);
                 await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
             });
+        }
+
+        private bool CanSendMoney()
+        {
+            return _nxtServer.OnlineStatus == OnlineStatus.Online;
         }
     }
 }
