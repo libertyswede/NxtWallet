@@ -40,8 +40,6 @@ namespace NxtWallet.ViewModel
             _nxtServer = nxtServer;
             NxtAddress = walletRepository.NxtAccount.AccountRs;
             _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
-
-            LoadFromRepository();
         }
 
         public void LoadFromRepository()
