@@ -13,6 +13,22 @@ namespace NxtWallet.Model
         public string AccountTo { get; set; }
         public string Message { get; set; }
 
+        public Transaction()
+        {
+        }
+
+        public Transaction(NxtLib.Transaction nxtTransaction)
+        {
+            // ReSharper disable once PossibleInvalidOperationException
+            NxtId = (long) nxtTransaction.TransactionId.Value;
+            Message = nxtTransaction.Message?.MessageText;
+            Timestamp = nxtTransaction.Timestamp;
+            NqtAmount = nxtTransaction.Amount.Nqt;
+            NqtFeeAmount = nxtTransaction.Fee.Nqt;
+            AccountFrom = nxtTransaction.SenderRs;
+            AccountTo = nxtTransaction.RecipientRs;
+        }
+
         public ulong GetTransactionId()
         {
             return (ulong) NxtId;
