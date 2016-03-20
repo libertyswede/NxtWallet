@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Ioc.cs" />
     <Compile Include="Migrations\20160320164743_Initial.cs" />
     <Compile Include="Migrations\20160320164743_Initial.designer.cs">
@@ -111,6 +112,7 @@
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
+    <Compile Include="ViewModel\TransactionViewModel.cs" />
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>
