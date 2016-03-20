@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
+using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtLib.Transactions;
 
@@ -18,7 +19,7 @@ namespace NxtWallet
         OnlineStatus OnlineStatus { get; set; }
 
         Task<string> GetBalanceAsync();
-        Task<IEnumerable<Model.Transaction>> GetTransactionsAsync();
+        Task<IEnumerable<Model.Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<Model.Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
 
@@ -42,11 +43,11 @@ namespace NxtWallet
 
         public async Task<string> GetBalanceAsync()
         {
-            var accountService = _serviceFactory.CreateAccountService();
             try
             {
+                var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
-                await _walletRepository.SaveBalanceAsync(balanceResult.Balance.Nxt.ToString("##.########"));
+                return balanceResult.Balance.ToFormattedString();
             }
             catch (HttpRequestException)
             {
@@ -58,42 +59,20 @@ namespace NxtWallet
                 {
                     throw;
                 }
-                await _walletRepository.SaveBalanceAsync("0.0");
             }
-            return _walletRepository.Balance;
+            return "0.0";
         }
 
-        public async Task<IEnumerable<Model.Transaction>> GetTransactionsAsync()
+        //TODO: Phased transactions?
+        public async Task<IEnumerable<Model.Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            var transactionService = _serviceFactory.CreateTransactionService();
-            var transactionList = (await _walletRepository.GetAllTransactionsAsync()).ToList();
+            var transactionList = new List<Model.Transaction>();
             try
             {
-                var lastTimestamp = transactionList.Any()
-                    ? transactionList.Max(t => t.Timestamp)
-                    : new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc);
-
-                //TODO: Phased transactions?
+                var transactionService = _serviceFactory.CreateTransactionService();
                 var transactionsReply = await transactionService.GetBlockchainTransactions(
                     _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
-
-                foreach (var serverTransaction in transactionsReply.Transactions.Where(t => transactionList.All(t2 => t2.GetTransactionId() != t.TransactionId)))
-                {
-                    var nxtTransaction = new Model.Transaction
-                    {
-                        // ReSharper disable once PossibleInvalidOperationException
-                        NxtId = (long)serverTransaction.TransactionId.Value,
-                        Message = serverTransaction.Message?.MessageText,
-                        Timestamp = serverTransaction.Timestamp,
-                        NqtAmount = serverTransaction.Amount.Nqt,
-                        NqtFeeAmount = serverTransaction.Fee.Nqt,
-                        AccountFrom = serverTransaction.SenderRs,
-                        AccountTo = serverTransaction.RecipientRs
-                    };
-
-                    transactionList.Add(nxtTransaction);
-                }
-                await _walletRepository.SaveTransactionsAsync(transactionList);
+                transactionList.AddRange(transactionsReply.Transactions.Select(serverTransaction => new Model.Transaction(serverTransaction)));
             }
             catch (HttpRequestException)
             {
@@ -108,26 +87,24 @@ namespace NxtWallet
             var transactionService = _serviceFactory.CreateTransactionService();
             var localTransactionService = new LocalTransactionService();
 
-            var publicKey = new CreateTransactionByPublicKey(1440, Amount.OneNxt, _walletRepository.NxtAccount.PublicKey);
+            var sendMoneyReply = await CreateUnsignedSendMoneyReply(recipient, amount, message, accountService);
+            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
+            await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
+
+            var transaction = new Model.Transaction(sendMoneyReply.Transaction);
+            return transaction;
+        }
+
+        private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string message,
+            IAccountService accountService)
+        {
+            var createTransactionByPublicKey = new CreateTransactionByPublicKey(1440, Amount.Zero, _walletRepository.NxtAccount.PublicKey);
             if (!string.IsNullOrEmpty(message))
             {
-                publicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);
+                createTransactionByPublicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);
             }
-            var sendMoneyReply = await accountService.SendMoney(publicKey, recipient, amount);
-            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
-            var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
-
-            var transaction = new Model.Transaction
-            {
-                NxtId = (long) broadcastReply.TransactionId,
-                AccountFrom = sendMoneyReply.Transaction.SenderRs,
-                AccountTo = recipient.AccountRs,
-                Message = message,
-                NqtAmount = amount.Nqt * -1,
-                NqtFeeAmount = sendMoneyReply.Transaction.Fee.Nqt,
-                Timestamp = sendMoneyReply.Transaction.Timestamp
-            };
-            return transaction;
+            var sendMoneyReply = await accountService.SendMoney(createTransactionByPublicKey, recipient, amount);
+            return sendMoneyReply;
         }
     }
 

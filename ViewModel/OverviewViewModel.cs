@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtWallet.Model;
@@ -47,7 +49,12 @@ namespace NxtWallet.ViewModel
         public async Task LoadFromNxtServerAsync()
         {
             Balance = await _nxtServer.GetBalanceAsync();
-            var transactions = await _nxtServer.GetTransactionsAsync();
+            await _walletRepository.SaveBalanceAsync(Balance);
+            var lastTimestamp = Transactions.Any()
+                ? Transactions.Max(t => t.Timestamp)
+                : new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc);
+            var transactions = (await _nxtServer.GetTransactionsAsync(lastTimestamp)).ToList();
+            await _walletRepository.SaveTransactionsAsync(transactions);
             Transactions = new ObservableCollection<Transaction>(transactions);
         }
 
