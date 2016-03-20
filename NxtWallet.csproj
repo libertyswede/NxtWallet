@@ -112,7 +112,7 @@
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
-    <Compile Include="ViewModel\TransactionViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelTransaction.cs" />
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>

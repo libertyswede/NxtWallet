@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:NxtWallet.Model"
+    xmlns:viewModel="using:NxtWallet.ViewModel"
     mc:Ignorable="d"
     Loading="OverviewPage_OnLoading">
 
@@ -49,7 +50,7 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Transaction">
+                    <DataTemplate x:DataType="viewModel:ViewModelTransaction">
                         <Grid >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
@@ -58,7 +59,7 @@
                                 <ColumnDefinition Width="5*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="2" Text="{x:Bind AccountFrom}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="3" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                         </Grid>

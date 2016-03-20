@@ -14,7 +14,7 @@ namespace NxtWallet.ViewModel
         private readonly INxtServer _nxtServer;
 
         private string _balance;
-        private ObservableCollection<Transaction> _transactions;
+        private ObservableCollection<ViewModelTransaction> _transactions;
 
         public string NxtAddress { get; set; }
 
@@ -24,7 +24,7 @@ namespace NxtWallet.ViewModel
             set { Set(ref _balance, value); }
         }
 
-        public ObservableCollection<Transaction> Transactions
+        public ObservableCollection<ViewModelTransaction> Transactions
         {
             get { return _transactions; }
             set { Set(ref _transactions, value); }
@@ -38,7 +38,7 @@ namespace NxtWallet.ViewModel
 
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
-            Transactions = new ObservableCollection<Transaction>();
+            Transactions = new ObservableCollection<ViewModelTransaction>();
         }
 
         public void LoadFromRepository()
@@ -50,7 +50,8 @@ namespace NxtWallet.ViewModel
 
         private void AppendTransactions(IEnumerable<Transaction> transactions)
         {
-            foreach (var transaction in transactions.Except(Transactions).OrderByDescending(t => t.Timestamp))
+            var viewModelTransactions = transactions.Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs));
+            foreach (var transaction in viewModelTransactions.Except(Transactions).OrderByDescending(t => t.Timestamp))
             {
                 Transactions.Add(transaction);
             }
@@ -65,7 +66,7 @@ namespace NxtWallet.ViewModel
                 : Constants.EpochBeginning;
 
             var transactions = (await _nxtServer.GetTransactionsAsync(lastTimestamp))
-                .Except(Transactions)
+                .Where(t => Transactions.All(t2 => t.NxtId != t2.NxtId))
                 .ToList();
             
             await _walletRepository.SaveTransactionsAsync(transactions);
