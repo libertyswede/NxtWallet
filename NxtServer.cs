@@ -86,7 +86,7 @@ namespace NxtWallet
                     {
                         // ReSharper disable once PossibleInvalidOperationException
                         NxtId = (long)serverTransaction.TransactionId.Value,
-                        Message = serverTransaction.Message.MessageText,
+                        Message = serverTransaction.Message?.MessageText,
                         Timestamp = serverTransaction.Timestamp,
 
                         NqtAmount = serverTransaction.Recipient == _walletRepository.NxtAccount.AccountId
