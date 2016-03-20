@@ -59,7 +59,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1" Text="{x:Bind NqtAmount, Converter={StaticResource NxtAmountConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind Account}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind AccountFrom}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="3" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>

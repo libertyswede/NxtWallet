@@ -8,7 +8,9 @@ namespace NxtWallet.Model
         public long NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
-        public string Account { get; set; }
+        public long NqtFeeAmount { get; set; }
+        public string AccountFrom { get; set; }
+        public string AccountTo { get; set; }
         public string Message { get; set; }
 
         public ulong GetTransactionId()

@@ -35,7 +35,11 @@ namespace NxtWallet.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Account")
+                    b.Property<string>("AccountFrom")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 25);
+
+                    b.Property<string>("AccountTo")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 25);
 
@@ -43,6 +47,8 @@ namespace NxtWallet.Migrations
                         .HasAnnotation("MaxLength", 255);
 
                     b.Property<long>("NqtAmount");
+
+                    b.Property<long>("NqtFeeAmount");
 
                     b.Property<long>("NxtId");
 

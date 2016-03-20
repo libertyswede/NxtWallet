@@ -36,7 +36,16 @@ namespace NxtWallet.Model
                 .IsRequired();
 
             modelBuilder.Entity<Transaction>()
-                .Property(t => t.Account)
+                .Property(t => t.NqtFeeAmount)
+                .IsRequired();
+
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.AccountFrom)
+                .IsRequired()
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.AccountTo)
                 .IsRequired()
                 .HasMaxLength(25);
 

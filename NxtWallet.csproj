@@ -104,16 +104,16 @@
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="Ioc.cs" />
+    <Compile Include="Migrations\20160320164743_Initial.cs" />
+    <Compile Include="Migrations\20160320164743_Initial.designer.cs">
+      <DependentUpon>20160320164743_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160225173317_Initial.cs" />
-    <Compile Include="Migrations\20160225173317_Initial.designer.cs">
-      <DependentUpon>20160225173317_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Model\Setting.cs" />
     <Compile Include="Model\Transaction.cs" />
     <Compile Include="Model\WalletContext.cs" />
@@ -166,6 +166,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

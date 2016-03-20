@@ -26,7 +26,7 @@ namespace NxtWallet
     {
         private readonly IWalletRepository _walletRepository;
         private OnlineStatus _onlineStatus;
-        private readonly ServiceFactory _serviceFactory;
+        private readonly IServiceFactory _serviceFactory;
 
         public OnlineStatus OnlineStatus
         {
@@ -85,14 +85,10 @@ namespace NxtWallet
                         NxtId = (long)serverTransaction.TransactionId.Value,
                         Message = serverTransaction.Message?.MessageText,
                         Timestamp = serverTransaction.Timestamp,
-
-                        NqtAmount = serverTransaction.Recipient == _walletRepository.NxtAccount.AccountId
-                            ? serverTransaction.Amount.Nqt
-                            : serverTransaction.Amount.Nqt*-1,
-
-                        Account = serverTransaction.Recipient == _walletRepository.NxtAccount.AccountId
-                            ? serverTransaction.SenderRs
-                            : serverTransaction.RecipientRs
+                        NqtAmount = serverTransaction.Amount.Nqt,
+                        NqtFeeAmount = serverTransaction.Fee.Nqt,
+                        AccountFrom = serverTransaction.SenderRs,
+                        AccountTo = serverTransaction.RecipientRs
                     };
 
                     transactionList.Add(nxtTransaction);
@@ -124,9 +120,11 @@ namespace NxtWallet
             var transaction = new Model.Transaction
             {
                 NxtId = (long) broadcastReply.TransactionId,
-                Account = recipient.AccountRs,
+                AccountFrom = sendMoneyReply.Transaction.SenderRs,
+                AccountTo = recipient.AccountRs,
                 Message = message,
                 NqtAmount = amount.Nqt * -1,
+                NqtFeeAmount = sendMoneyReply.Transaction.Fee.Nqt,
                 Timestamp = sendMoneyReply.Transaction.Timestamp
             };
             return transaction;
