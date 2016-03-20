@@ -2,7 +2,7 @@ using System;
 
 namespace NxtWallet.Model
 {
-    public class Transaction
+    public class Transaction : IEquatable<Transaction>
     {
         public int Id { get; set; }
         public long NxtId { get; set; }
@@ -14,6 +14,22 @@ namespace NxtWallet.Model
         public ulong GetTransactionId()
         {
             return (ulong) NxtId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var transaction = obj as Transaction;
+            return transaction != null && Equals(transaction);
+        }
+
+        public override int GetHashCode()
+        {
+            return NxtId.GetHashCode();
+        }
+
+        public bool Equals(Transaction other)
+        {
+            return other?.NxtId == NxtId;
         }
     }
 }
