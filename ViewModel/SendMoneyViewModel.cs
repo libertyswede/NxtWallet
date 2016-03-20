@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
@@ -8,47 +9,36 @@ namespace NxtWallet.ViewModel
     {
         private readonly INxtServer _nxtServer;
         private readonly IWalletRepository _walletRepository;
+        
         private string _recipient;
         private string _amount;
         private string _message;
-        private RelayCommand _sendMoneyCommand;
 
         public string Recipient
         {
             get { return _recipient; }
-            set
-            {
-                _recipient = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _recipient, value); }
         }
 
         public string Amount
         {
             get { return _amount; }
-            set
-            {
-                _amount = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _amount, value); }
         }
 
         public string Message
         {
             get { return _message; }
-            set
-            {
-                _message = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _message, value); }
         }
 
-        public RelayCommand SendMoneyCommand => _sendMoneyCommand ?? (_sendMoneyCommand = new RelayCommand(SendMoney, CanSendMoney));
+        public ICommand SendMoneyCommand { get; }
 
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
+            SendMoneyCommand = new RelayCommand(SendMoney, CanSendMoney);
         }
 
         private async void SendMoney()

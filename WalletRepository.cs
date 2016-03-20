@@ -16,23 +16,41 @@ namespace NxtWallet
         string NxtServer { get; }
         string SecretPhrase { get; }
         string Balance { get; }
+
+        Task LoadAsync();
         Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
         Task SaveTransactionAsync(Transaction transaction);
         Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
         Task SaveBalanceAsync(string balance);
-        Task LoadAsync();
     }
 
     public class WalletRepository : IWalletRepository
     {
-        public const string SecretPhraseKey = "secretPhrase";
-        public const string NxtServerKey = "nxtServer";
-        public const string BalanceKey = "balance";
+        private const string SecretPhraseKey = "secretPhrase";
+        private const string NxtServerKey = "nxtServer";
+        private const string BalanceKey = "balance";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
         public string SecretPhrase { get; private set; }
         public string Balance { get; private set; }
+
+        public async Task LoadAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                CreateAndMigrateDb(context);
+
+                var dbSettings = await context.Settings.ToListAsync();
+
+                ReadOrGenerateSecretPhrase(dbSettings, context);
+                ReadOrGenerateNxtServer(dbSettings, context);
+                ReadOrGenerateBalance(dbSettings, context);
+
+                NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
+                await context.SaveChangesAsync();
+            }
+        }
 
         public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
@@ -87,23 +105,6 @@ namespace NxtWallet
                 }
                 await context.SaveChangesAsync();
                 Balance = balance;
-            }
-        }
-
-        public async Task LoadAsync()
-        {
-            using (var context = new WalletContext())
-            {
-                CreateAndMigrateDb(context);
-
-                var dbSettings = await context.Settings.ToListAsync();
-
-                ReadOrGenerateSecretPhrase(dbSettings, context);
-                ReadOrGenerateNxtServer(dbSettings, context);
-                ReadOrGenerateBalance(dbSettings, context);
-
-                NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
-                await context.SaveChangesAsync();
             }
         }
 

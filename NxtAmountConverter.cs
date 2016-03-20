@@ -14,7 +14,6 @@ namespace NxtWallet
             if (nqtAmount < 0)
                 nxt = "-" + nxt;
             return nxt;
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

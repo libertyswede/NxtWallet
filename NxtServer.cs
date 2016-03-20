@@ -16,6 +16,7 @@ namespace NxtWallet
         event PropertyChangedEventHandler PropertyChanged;
 
         OnlineStatus OnlineStatus { get; set; }
+
         Task<string> GetBalanceAsync();
         Task<IEnumerable<Model.Transaction>> GetTransactionsAsync();
         Task<Model.Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
@@ -30,11 +31,7 @@ namespace NxtWallet
         public OnlineStatus OnlineStatus
         {
             get { return _onlineStatus; }
-            set
-            {
-                _onlineStatus = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _onlineStatus, value); }
         }
 
         public NxtServer(IWalletRepository walletRepository)

@@ -7,9 +7,10 @@ namespace NxtWallet.ViewModel
 {
     public class OverviewViewModel : ViewModelBase
     {
-        private string _balance = "0.0";
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
+
+        private string _balance;
         private ObservableCollection<Transaction> _transactions;
 
         public string NxtAddress { get; set; }
@@ -17,29 +18,23 @@ namespace NxtWallet.ViewModel
         public string Balance
         {
             get { return _balance; }
-            set
-            {
-                _balance = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _balance, value); }
         }
 
         public ObservableCollection<Transaction> Transactions
         {
             get { return _transactions; }
-            set
-            {
-                _transactions = value;
-                RaisePropertyChanged();
-            }
+            set { Set(ref _transactions, value); }
         }
 
         public OverviewViewModel(IWalletRepository walletRepository, INxtServer nxtServer)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
-            NxtAddress = walletRepository.NxtAccount.AccountRs;
             _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
+
+            Balance = "0.0";
+            NxtAddress = walletRepository.NxtAccount.AccountRs;
         }
 
         public void LoadFromRepository()
@@ -49,7 +44,7 @@ namespace NxtWallet.ViewModel
             Transactions = new ObservableCollection<Transaction>(transactions);
         }
 
-        public async Task LoadFromServerAsync()
+        public async Task LoadFromNxtServerAsync()
         {
             Balance = await _nxtServer.GetBalanceAsync();
             var transactions = await _nxtServer.GetTransactionsAsync();

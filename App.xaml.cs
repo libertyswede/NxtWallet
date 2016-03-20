@@ -3,6 +3,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet
 {
@@ -10,7 +11,9 @@ namespace NxtWallet
     {
         public App()
         {
-            var walletRepository = Ioc.WalletRepository;
+            Ioc.Register();
+            var walletRepository = ServiceLocator.Current.GetInstance<IWalletRepository>();
+
             InitializeComponent();
             Suspending += OnSuspending;
             walletRepository.LoadAsync().Wait();

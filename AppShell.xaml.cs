@@ -14,7 +14,6 @@ namespace NxtWallet
 {
     public sealed partial class AppShell
     {
-        // Declare the top level nav items
         private readonly List<NavMenuItem> _navlist = new List<NavMenuItem>(
             new[]
             {
@@ -22,20 +21,14 @@ namespace NxtWallet
                 {
                     Symbol = Symbol.Home,
                     Label = "Overview",
-                    DestPage = typeof(OverviewPage)
+                    DestPage = typeof (OverviewPage)
                 },
                 new NavMenuItem
                 {
                     Symbol = Symbol.MailForward,
                     Label = "Send NXT",
-                    DestPage = typeof(SendMoneyPage)
-                },
-                //new NavMenuItem()
-                //{
-                //    Symbol = Symbol.Favorite,
-                //    Label = "Drill In Page",
-                //    DestPage = typeof(DrillInPage)
-                //},
+                    DestPage = typeof (SendMoneyPage)
+                }
             });
 
         public static AppShell Current;
@@ -52,7 +45,6 @@ namespace NxtWallet
             Loaded += (sender, args) =>
             {
                 Current = this;
-
                 TogglePaneButton.Focus(FocusState.Programmatic);
             };
 
@@ -79,7 +71,7 @@ namespace NxtWallet
         /// <param name="e"></param>
         private void AppShell_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            FocusNavigationDirection direction = FocusNavigationDirection.None;
+            var direction = FocusNavigationDirection.None;
             switch (e.Key)
             {
                 case Windows.System.VirtualKey.Left:
@@ -145,13 +137,10 @@ namespace NxtWallet
         {
             var item = (NavMenuItem)((NavMenuListView)sender).ItemFromContainer(listViewItem);
 
-            if (item != null)
+            if (item?.DestPage != null &&
+                item.DestPage != AppFrame.CurrentSourcePageType)
             {
-                if (item.DestPage != null &&
-                    item.DestPage != AppFrame.CurrentSourcePageType)
-                {
-                    AppFrame.Navigate(item.DestPage, item.Arguments);
-                }
+                AppFrame.Navigate(item.DestPage, item.Arguments);
             }
         }
 
@@ -192,9 +181,10 @@ namespace NxtWallet
         private void OnNavigatedToPage(object sender, NavigationEventArgs e)
         {
             // After a successful navigation set keyboard focus to the loaded page
-            if (e.Content is Page && e.Content != null)
+            var page = e.Content as Page;
+            if (page != null)
             {
-                var control = (Page)e.Content;
+                var control = page;
                 control.Loaded += Page_Loaded;
             }
 
@@ -256,11 +246,7 @@ namespace NxtWallet
             }
 
             var handler = TogglePaneButtonRectChanged;
-            if (handler != null)
-            {
-                // handler(this, this.TogglePaneButtonRect);
-                handler.DynamicInvoke(this, TogglePaneButtonRect);
-            }
+            handler?.DynamicInvoke(this, TogglePaneButtonRect);
         }
 
         /// <summary>
