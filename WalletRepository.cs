@@ -20,6 +20,7 @@ namespace NxtWallet
         Task LoadAsync();
         Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
         Task SaveTransactionAsync(Transaction transaction);
+        Task UpdateTransactionAsync(Transaction transaction);
         Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
         Task SaveBalanceAsync(string balance);
     }
@@ -74,6 +75,16 @@ namespace NxtWallet
                     context.Transactions.Add(transaction);
                     await context.SaveChangesAsync();
                 }
+            }
+        }
+
+        public async Task UpdateTransactionAsync(Transaction transaction)
+        {
+            using (var context = new WalletContext())
+            {
+                context.Transactions.Attach(transaction);
+                context.Entry(transaction).State = EntityState.Modified;
+                await context.SaveChangesAsync();
             }
         }
 

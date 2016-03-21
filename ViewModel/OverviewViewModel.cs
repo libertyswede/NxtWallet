@@ -57,6 +57,25 @@ namespace NxtWallet.ViewModel
             }
         }
 
+        private void UpdateTransactionBalance(IEnumerable<Transaction> transactions)
+        {
+            var previousBalance = Transactions.Any() ? Transactions.Last().Transaction.NqtBalance : 0;
+            var modelTransactions = Transactions.Select(t => t.Transaction).ToList();
+
+            foreach (var transaction in transactions.Except(modelTransactions).OrderBy(t => t.Timestamp))
+            {
+                if (transaction.IsReceived(_walletRepository.NxtAccount.AccountRs))
+                {
+                    transaction.NqtBalance = previousBalance + transaction.NqtAmount;
+                }
+                else
+                {
+                    transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFeeAmount);
+                }
+                previousBalance = transaction.NqtBalance;
+            }
+        }
+
         public async Task LoadFromNxtServerAsync()
         {
             Balance = await _nxtServer.GetBalanceAsync();
@@ -69,6 +88,7 @@ namespace NxtWallet.ViewModel
                 .Where(t => Transactions.All(t2 => t.NxtId != t2.NxtId))
                 .ToList();
             
+            UpdateTransactionBalance(transactions);
             await _walletRepository.SaveTransactionsAsync(transactions);
             AppendTransactions(transactions);
         }

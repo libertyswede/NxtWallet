@@ -31,19 +31,19 @@
                 <TextBlock TextWrapping="NoWrap" Text="Balance:" FontSize="24" />
                 <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="24" Margin="20,0,0,0" />
             </StackPanel>
-            <Grid Margin="12,20,12,0">
+            <Grid Margin="2,20,2,0" Background="#FFD7E6E9" Padding="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="60" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Timestamp" FontSize="21.333" />
-                <TextBlock Grid.Column="1" Text="Amount" FontSize="21.333" />
-                <TextBlock Grid.Column="2" Text="Fee" FontSize="21.333" />
-                <TextBlock Grid.Column="3" Text="Account" FontSize="21.333" />
-                <TextBlock Grid.Column="4" Text="Message" FontSize="21.333" />
+                <TextBlock Grid.Column="0" Text="Message" FontSize="16" FontWeight="Bold" />
+                <TextBlock Grid.Column="1" Text="Timestamp" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="2" Text="Amount" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" Text="Fee" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="4" Text="Balance" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
             </Grid>
             <ListView ItemsSource="{x:Bind ViewModel.Transactions}">
                 <ListView.ItemContainerStyle>
@@ -55,21 +55,17 @@
                     <DataTemplate x:DataType="viewModel:ViewModelTransaction">
                         <Grid >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="100" />
                                 <ColumnDefinition Width="100" />
                                 <ColumnDefinition Width="60" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="5*" />
+                                <ColumnDefinition Width="100" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            <StackPanel Grid.Column="3" Orientation="Horizontal">
-                                <TextBlock Text="{x:Bind AccountFrom}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                                <TextBlock Text="to" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" Margin="7,0" />
-                                <TextBlock Text="{x:Bind AccountTo}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <TextBlock Grid.Column="4" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="18.667" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="13.333" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <TextBlock Grid.Column="4" Text="{x:Bind Balance}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -77,7 +73,7 @@
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <Ellipse Stroke="Black" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FF00D100"/>
-            <TextBlock Text="Online" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="10,0,0,0" FontSize="21.333" />
+            <TextBlock Text="Online" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="21.333" />
         </StackPanel>
     </Grid>
 </Page>
