@@ -19,25 +19,29 @@
     <StackPanel Orientation="Vertical">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
-                <VisualState x:Name="VisualStateMin0">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
-                    </VisualState.StateTriggers>
-                </VisualState>
-                <VisualState x:Name="VisualStateMin600">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
-                    </VisualState.StateTriggers>
-                </VisualState>
-            </VisualStateGroup>
+        		<VisualState x:Name="VisualStateMin0">
+        			<VisualState.StateTriggers>
+        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
+        			</VisualState.StateTriggers>
+        			<VisualState.Setters>
+        				<Setter Target="TimestampColumn.Width" Value="0" />
+        				<Setter Target="BalanceColumn.Width" Value="0" />
+        			</VisualState.Setters>
+        		</VisualState>
+        		<VisualState x:Name="VisualStateMin600">
+        			<VisualState.StateTriggers>
+        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
+        			</VisualState.StateTriggers>
+        		</VisualState>
+        	</VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid Margin="0,20,0,0" Background="#FFD7E6E9" Padding="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="60" />
-                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" x:Name="MessageColumn" />
+                <ColumnDefinition Width="100" x:Name="TimestampColumn" />
+                <ColumnDefinition Width="100" x:Name="AmountColumn" />
+                <ColumnDefinition Width="60" x:Name="FeeColumn" />
+                <ColumnDefinition Width="100" x:Name="BalanceColumn" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Message" FontSize="16" FontWeight="Bold" />
             <TextBlock Grid.Column="1" Text="Timestamp" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
@@ -55,14 +59,14 @@
                 <DataTemplate x:DataType="viewModel:ViewModelTransaction">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="60" />
-                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="{Binding ElementName=MessageColumn, Path=Width}" />
+                            <ColumnDefinition Width="{Binding ElementName=TimestampColumn, Path=Width}" />
+                            <ColumnDefinition Width="{Binding ElementName=AmountColumn, Path=Width}" />
+                            <ColumnDefinition Width="{Binding ElementName=FeeColumn, Path=Width}" />
+                            <ColumnDefinition Width="{Binding ElementName=BalanceColumn, Path=Width}" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="13.333" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="13.333" VerticalAlignment="Center" HorizontalAlignment="Right" />
                         <TextBlock Grid.Column="2" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
                         <TextBlock Grid.Column="3" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
                         <TextBlock Grid.Column="4" Text="{x:Bind Balance}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" />
