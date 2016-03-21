@@ -14,6 +14,7 @@ namespace NxtWallet
             SimpleIoc.Default.Register<INxtServer, NxtServer>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
+            SimpleIoc.Default.Register<TransactionListViewModel>();
         }
 
         public static void Register()

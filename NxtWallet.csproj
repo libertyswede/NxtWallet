@@ -114,6 +114,7 @@
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
+    <Compile Include="ViewModel\TransactionListViewModel.cs" />
     <Compile Include="ViewModel\ViewModelTransaction.cs" />
     <Compile Include="Views\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
@@ -130,6 +131,9 @@
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionListControl.xaml.cs">
+      <DependentUpon>TransactionListControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="WalletRepository.cs" />
   </ItemGroup>
@@ -173,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SendMoneyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TransactionListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
