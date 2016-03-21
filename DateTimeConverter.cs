@@ -8,7 +8,7 @@ namespace NxtWallet
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             var timestamp = (DateTime) value;
-            var formattedDate = timestamp.ToString("yyyy-MM-dd HH:mm:ss");
+            var formattedDate = timestamp.ToString("yyyy-MM-dd");
             return formattedDate;
         }
 
