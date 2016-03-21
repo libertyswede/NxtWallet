@@ -1,0 +1,34 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nxtWallet="using:NxtWallet"
+    x:Class="NxtWallet.Views.NetworkIndicatorControl"
+    mc:Ignorable="d"
+    d:DesignHeight="40"
+    d:DesignWidth="140">
+
+    <StackPanel Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Orientation="Horizontal">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateOnline">
+                    <VisualState.Setters>
+                        <Setter Target="ellipse.(Shape.Fill).(SolidColorBrush.Color)">
+                            <Setter.Value>
+                                <Color>#FF13D100</Color>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Target="textBlock.(TextBlock.Text)" Value="Online"/>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <nxtWallet:NetworkIndicatorTrigger IsOnline="True"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Ellipse x:Name="ellipse" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FFD13300"/>
+        <TextBlock x:Name="textBlock" Text="Offline" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="21.333" />
+    </StackPanel>
+
+</UserControl>

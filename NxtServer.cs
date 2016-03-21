@@ -16,7 +16,7 @@ namespace NxtWallet
     {
         event PropertyChangedEventHandler PropertyChanged;
 
-        OnlineStatus OnlineStatus { get; set; }
+        bool IsOnline { get; }
 
         Task<string> GetBalanceAsync();
         Task<IEnumerable<Model.Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
@@ -26,18 +26,19 @@ namespace NxtWallet
     public class NxtServer : ViewModelBase, INxtServer
     {
         private readonly IWalletRepository _walletRepository;
-        private OnlineStatus _onlineStatus;
+        private bool _isOnline;
         private readonly IServiceFactory _serviceFactory;
 
-        public OnlineStatus OnlineStatus
+        public bool IsOnline
         {
-            get { return _onlineStatus; }
-            set { Set(ref _onlineStatus, value); }
+            get { return _isOnline; }
+            set { Set(ref _isOnline, value); }
         }
 
         public NxtServer(IWalletRepository walletRepository)
         {
             _walletRepository = walletRepository;
+            IsOnline = false;
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
@@ -47,11 +48,12 @@ namespace NxtWallet
             {
                 var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
+                IsOnline = true;
                 return balanceResult.Balance.ToFormattedString();
             }
             catch (HttpRequestException)
             {
-                OnlineStatus = OnlineStatus.Offline;
+                IsOnline = false;
             }
             catch (NxtException e)
             {
@@ -73,10 +75,11 @@ namespace NxtWallet
                 var transactionsReply = await transactionService.GetBlockchainTransactions(
                     _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
                 transactionList.AddRange(transactionsReply.Transactions.Select(serverTransaction => new Model.Transaction(serverTransaction)));
+                IsOnline = true;
             }
             catch (HttpRequestException)
             {
-                OnlineStatus = OnlineStatus.Offline;
+                IsOnline = false;
             }
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
@@ -91,6 +94,7 @@ namespace NxtWallet
             var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
             await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
 
+            IsOnline = true;
             var transaction = new Model.Transaction(sendMoneyReply.Transaction);
             return transaction;
         }
@@ -106,12 +110,5 @@ namespace NxtWallet
             var sendMoneyReply = await accountService.SendMoney(createTransactionByPublicKey, recipient, amount);
             return sendMoneyReply;
         }
-    }
-
-    public enum OnlineStatus
-    {
-        Online,
-        Offline,
-        Synchronizing
     }
 }

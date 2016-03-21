@@ -54,7 +54,7 @@ namespace NxtWallet.ViewModel
 
         private bool CanSendMoney()
         {
-            return _nxtServer.OnlineStatus == OnlineStatus.Online;
+            return _nxtServer.IsOnline;
         }
     }
 }

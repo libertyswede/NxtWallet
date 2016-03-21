@@ -34,7 +34,6 @@ namespace NxtWallet.ViewModel
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
-            _nxtServer.PropertyChanged += NxtServer_PropertyChanged;
 
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
@@ -91,14 +90,6 @@ namespace NxtWallet.ViewModel
             UpdateTransactionBalance(transactions);
             await _walletRepository.SaveTransactionsAsync(transactions);
             AppendTransactions(transactions);
-        }
-
-        private void NxtServer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals(nameof(NxtServer.OnlineStatus)))
-            {
-                
-            }
         }
     }
 }

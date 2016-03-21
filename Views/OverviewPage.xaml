@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="using:NxtWallet.ViewModel"
     xmlns:controls="using:NxtWallet.Controls"
+    xmlns:views="using:NxtWallet.Views"
     mc:Ignorable="d"
     Loading="OverviewPage_OnLoading">
 
@@ -71,9 +72,6 @@
                 </ListView.ItemTemplate>
             </controls:AlternatingRowListView>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-            <Ellipse Stroke="Black" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FF00D100"/>
-            <TextBlock Text="Online" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="21.333" />
-        </StackPanel>
+        <views:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
     </Grid>
 </Page>
