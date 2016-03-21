@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:NxtWallet.Model"
     xmlns:viewModel="using:NxtWallet.ViewModel"
+    xmlns:controls="using:NxtWallet.Controls"
     mc:Ignorable="d"
     Loading="OverviewPage_OnLoading">
 
@@ -31,7 +32,7 @@
                 <TextBlock TextWrapping="NoWrap" Text="Balance:" FontSize="24" />
                 <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="24" Margin="20,0,0,0" />
             </StackPanel>
-            <Grid Margin="2,20,2,0" Background="#FFD7E6E9" Padding="10">
+            <Grid Margin="0,20,0,0" Background="#FFD7E6E9" Padding="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="100" />
@@ -45,7 +46,7 @@
                 <TextBlock Grid.Column="3" Text="Fee" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
                 <TextBlock Grid.Column="4" Text="Balance" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
             </Grid>
-            <ListView ItemsSource="{x:Bind ViewModel.Transactions}">
+            <controls:AlternatingRowListView ItemsSource="{x:Bind ViewModel.Transactions}" EvenRowBackground="#FFF4F4F4" OddRowBackground="White">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -53,7 +54,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="viewModel:ViewModelTransaction">
-                        <Grid >
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="100" />
@@ -69,7 +70,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </controls:AlternatingRowListView>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <Ellipse Stroke="Black" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FF00D100"/>
