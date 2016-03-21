@@ -17,6 +17,20 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Vertical">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin600">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <Grid Margin="0,20,0,0" Background="#FFD7E6E9" Padding="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

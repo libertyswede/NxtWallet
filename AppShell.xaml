@@ -32,7 +32,7 @@
             <VisualStateGroup>
                 <VisualState x:Name="VisualStateMin800">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="800" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin800}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RootSplitView.DisplayMode" Value="CompactInline"/>
@@ -41,7 +41,7 @@
                 </VisualState>
                 <VisualState x:Name="VisualStateMin600">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="600" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RootSplitView.DisplayMode" Value="CompactOverlay"/>
@@ -49,7 +49,7 @@
                 </VisualState>
                 <VisualState x:Name="VisualStateMin0">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RootSplitView.DisplayMode" Value="Overlay"/>

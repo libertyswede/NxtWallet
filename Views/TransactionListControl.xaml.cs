@@ -6,7 +6,7 @@ namespace NxtWallet.Views
 {
     public sealed partial class TransactionListControl
     {
-        public TransactionListViewModel ViewModel { get; } = SimpleIoc.Default.GetInstance<TransactionListViewModel>();
+        public TransactionListViewModel ViewModel { get; } = Ioc.TransactionListViewModel;
 
         public TransactionListControl()
         {
