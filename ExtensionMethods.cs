@@ -6,7 +6,7 @@ namespace NxtWallet
     {
         public static string ToFormattedString(this Amount amount)
         {
-            var formatted = amount.Nxt.ToString("##.#########");
+            var formatted = amount.Nxt.ToString("##.00#######");
             return formatted;
         }
     }
