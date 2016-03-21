@@ -9,6 +9,7 @@ namespace NxtWallet.Model
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
         public long NqtFeeAmount { get; set; }
+        public long NqtBalance { get; set; }
         public string AccountFrom { get; set; }
         public string AccountTo { get; set; }
         public string Message { get; set; }
@@ -24,9 +25,15 @@ namespace NxtWallet.Model
             Message = nxtTransaction.Message?.MessageText;
             Timestamp = nxtTransaction.Timestamp;
             NqtAmount = nxtTransaction.Amount.Nqt;
+            NqtBalance = 0;
             NqtFeeAmount = nxtTransaction.Fee.Nqt;
             AccountFrom = nxtTransaction.SenderRs;
             AccountTo = nxtTransaction.RecipientRs;
+        }
+
+        public bool IsReceived(string yourAddressRs)
+        {
+            return AccountTo.Equals(yourAddressRs);
         }
 
         public ulong GetTransactionId()
