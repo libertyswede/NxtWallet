@@ -9,6 +9,26 @@
     Loading="OverviewPage_OnLoading">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="textBlock.(TextBlock.FontSize)" Value="18.667"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin600">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="textBlock.(TextBlock.FontSize)" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
@@ -19,7 +39,7 @@
             <ColumnDefinition Width="140"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,0,15,10" >
-            <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" />
+            <TextBlock x:Name="textBlock" TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" />
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0" Padding="0,0,0,10" BorderBrush="AliceBlue" BorderThickness="0,0,0,2">
                 <TextBlock TextWrapping="NoWrap" Text="Balance:" FontSize="21.333" />
                 <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="21.333" Margin="20,0,0,0" />
