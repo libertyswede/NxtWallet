@@ -48,6 +48,8 @@ namespace NxtWallet.Migrations
 
                     b.Property<long>("NqtAmount");
 
+                    b.Property<long>("NqtBalance");
+
                     b.Property<long>("NqtFeeAmount");
 
                     b.Property<long>("NxtId");

@@ -36,6 +36,10 @@ namespace NxtWallet.Model
                 .IsRequired();
 
             modelBuilder.Entity<Transaction>()
+                .Property(t => t.NqtBalance)
+                .IsRequired();
+
+            modelBuilder.Entity<Transaction>()
                 .Property(t => t.NqtFeeAmount)
                 .IsRequired();
 

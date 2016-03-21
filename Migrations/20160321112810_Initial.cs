@@ -31,6 +31,7 @@ namespace NxtWallet.Migrations
                     AccountTo = table.Column<string>(nullable: false),
                     Message = table.Column<string>(nullable: true),
                     NqtAmount = table.Column<long>(nullable: false),
+                    NqtBalance = table.Column<long>(nullable: false),
                     NqtFeeAmount = table.Column<long>(nullable: false),
                     NxtId = table.Column<long>(nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: false)

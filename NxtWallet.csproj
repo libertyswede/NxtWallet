@@ -105,9 +105,9 @@
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Ioc.cs" />
-    <Compile Include="Migrations\20160320164743_Initial.cs" />
-    <Compile Include="Migrations\20160320164743_Initial.designer.cs">
-      <DependentUpon>20160320164743_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160321112810_Initial.cs" />
+    <Compile Include="Migrations\20160321112810_Initial.designer.cs">
+      <DependentUpon>20160321112810_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="NavMenuItem.cs" />
