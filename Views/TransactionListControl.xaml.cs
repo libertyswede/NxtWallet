@@ -1,5 +1,5 @@
 ﻿using Windows.UI.Xaml;
-using GalaSoft.MvvmLight.Ioc;
+using Windows.UI.Xaml.Controls;
 using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
@@ -7,6 +7,9 @@ namespace NxtWallet.Views
     public sealed partial class TransactionListControl
     {
         public TransactionListViewModel ViewModel { get; } = new Ioc().TransactionListViewModel;
+
+        public delegate void NavigationEventHandler(object source, SelectionChangedEventArgs e);
+        public event NavigationEventHandler OnNavigateParentReady;
 
         public TransactionListControl()
         {
@@ -19,6 +22,11 @@ namespace NxtWallet.Views
             Bindings.Update();
             await ViewModel.LoadFromNxtServerAsync();
             Bindings.Update();
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            OnNavigateParentReady?.Invoke(this, e);
         }
     }
 }

@@ -61,7 +61,8 @@
             <TextBlock Grid.Column="4" Text="Fee" x:Name="FeeHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
             <TextBlock Grid.Column="5" Text="Balance" x:Name="BalanceHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
         </Grid>
-        <controls:AlternatingRowListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.Transactions}" EvenRowBackground="#FFF4F4F4" OddRowBackground="White">
+        <controls:AlternatingRowListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.Transactions}" EvenRowBackground="#FFF4F4F4" OddRowBackground="White"
+                                         SelectionChanged="Selector_OnSelectionChanged">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml;
+﻿using System.Linq;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.Practices.ServiceLocation;
 using NxtWallet.ViewModel;
@@ -12,6 +14,7 @@ namespace NxtWallet.Views
         public OverviewPage()
         {
             InitializeComponent();
+            TransactionList.OnNavigateParentReady += TransactionListOnOnNavigateParentReady;
         }
 
         private async void OverviewPage_OnLoading(FrameworkElement sender, object args)
@@ -24,6 +27,14 @@ namespace NxtWallet.Views
         {
             ViewModel.LoadFromRepository();
             Bindings.Update();
+        }
+
+        private void TransactionListOnOnNavigateParentReady(object source, SelectionChangedEventArgs selectionChangedEventArgs)
+        {
+            if (selectionChangedEventArgs.AddedItems.Any())
+            {
+                Frame.Navigate(typeof(TransactionDetailPage), selectionChangedEventArgs.AddedItems.Single());
+            }
         }
     }
 }

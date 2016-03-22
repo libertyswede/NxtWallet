@@ -52,7 +52,7 @@
                 <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="21.333" Margin="20,0,0,0" />
             </StackPanel>
             <TextBlock Grid.Row="2" Text="Transactions" FontSize="21.333" Margin="0,30,0,0" />
-            <views:TransactionListControl Grid.Row="3" />
+            <views:TransactionListControl Grid.Row="3" x:Name="TransactionList" />
         </Grid>
         <views:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
     </Grid>
