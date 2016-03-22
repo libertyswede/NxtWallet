@@ -23,13 +23,16 @@
         			<VisualState.StateTriggers>
         				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
         			</VisualState.StateTriggers>
-        			<VisualState.Setters>
-        				<Setter Target="FeeColumn.Width" Value="0" />
-        				<Setter Target="BalanceColumn.Width" Value="0" />
-                        <Setter Target="MessageHeader.FontSize" Value="12" />
-                        <Setter Target="TimestampHeader.FontSize" Value="12" />
+                    <VisualState.Setters>
+                        <Setter Target="MessageHeader.(UIElement.Visibility)" Value="Collapsed"/>
+                        <Setter Target="MessageColumn.Width" Value="0" />
+                        <Setter Target="AltMessageHeader.(UIElement.Visibility)" Value="Visible"/>
+                        <Setter Target="AltMessageColumn.Width" Value="*" />
+                        <Setter Target="TimestampHeader.(UIElement.Visibility)" Value="Collapsed"/>
                         <Setter Target="AmountHeader.FontSize" Value="12" />
-        			</VisualState.Setters>
+                        <Setter Target="FeeColumn.Width" Value="0" />
+        				<Setter Target="BalanceColumn.Width" Value="0" />
+                    </VisualState.Setters>
         		</VisualState>
         		<VisualState x:Name="VisualStateMin600">
         			<VisualState.StateTriggers>
@@ -41,16 +44,18 @@
         <Grid Margin="0,20,0,0" Background="#FFD7E6E9" Padding="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" x:Name="MessageColumn" />
+                <ColumnDefinition Width="0" x:Name="AltMessageColumn" />
                 <ColumnDefinition Width="100" x:Name="TimestampColumn" />
                 <ColumnDefinition Width="100" x:Name="AmountColumn" />
                 <ColumnDefinition Width="60" x:Name="FeeColumn" />
                 <ColumnDefinition Width="100" x:Name="BalanceColumn" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Message" x:Name="MessageHeader" FontSize="16" FontWeight="Bold" />
-            <TextBlock Grid.Column="1" Text="Timestamp" x:Name="TimestampHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
-            <TextBlock Grid.Column="2" Text="Amount" x:Name="AmountHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
-            <TextBlock Grid.Column="3" Text="Fee" x:Name="FeeHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
-            <TextBlock Grid.Column="4" Text="Balance" x:Name="BalanceHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Text="Message" x:Name="MessageHeader" FontSize="16" FontWeight="Bold" Visibility="Visible" />
+            <TextBlock Grid.Column="1" Text="Message" x:Name="AltMessageHeader" FontSize="12" FontWeight="Bold" Visibility="Visible" />
+            <TextBlock Grid.Column="2" Text="Timestamp" x:Name="TimestampHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
+            <TextBlock Grid.Column="3" Text="Amount" x:Name="AmountHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
+            <TextBlock Grid.Column="4" Text="Fee" x:Name="FeeHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
+            <TextBlock Grid.Column="5" Text="Balance" x:Name="BalanceHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
         </Grid>
         <controls:AlternatingRowListView ItemsSource="{x:Bind ViewModel.Transactions}" EvenRowBackground="#FFF4F4F4" OddRowBackground="White">
             <ListView.ItemContainerStyle>
@@ -63,16 +68,25 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{Binding ElementName=MessageColumn, Path=Width}" />
+                            <ColumnDefinition Width="{Binding ElementName=AltMessageColumn, Path=Width}" />
                             <ColumnDefinition Width="{Binding ElementName=TimestampColumn, Path=Width}" />
                             <ColumnDefinition Width="{Binding ElementName=AmountColumn, Path=Width}" />
                             <ColumnDefinition Width="{Binding ElementName=FeeColumn, Path=Width}" />
                             <ColumnDefinition Width="{Binding ElementName=BalanceColumn, Path=Width}" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=MessageHeader, Path=FontSize}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=TimestampHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <TextBlock Grid.Column="2" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=AmountHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <TextBlock Grid.Column="3" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=FeeHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <TextBlock Grid.Column="4" Text="{x:Bind Balance}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=BalanceHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="0" Text="{x:Bind Message}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=MessageHeader, Path=FontSize}" VerticalAlignment="Center"
+                                   Visibility="{Binding ElementName=MessageHeader, Path=Visibility}"/>
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock Text="{x:Bind Message}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="13.333" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
+                            <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" 
+                                   FontSize="{Binding ElementName=TimestampHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=TimestampHeader, Path=Visibility}" />
+                        <TextBlock Grid.Column="3" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=AmountHeader, Path=FontSize}" 
+                                   VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=AmountHeader, Path=Visibility}" />
+                        <TextBlock Grid.Column="4" Text="{x:Bind Fee}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=FeeHeader, Path=FontSize}" 
+                                   VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=FeeHeader, Path=Visibility}" />
+                        <TextBlock Grid.Column="5" Text="{x:Bind Balance}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=BalanceHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
