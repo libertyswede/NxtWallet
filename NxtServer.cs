@@ -19,7 +19,7 @@ namespace NxtWallet
 
         bool IsOnline { get; }
 
-        Task<string> GetBalanceAsync();
+        Task<Result<string>> GetBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
@@ -43,14 +43,14 @@ namespace NxtWallet
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
-        public async Task<string> GetBalanceAsync()
+        public async Task<Result<string>> GetBalanceAsync()
         {
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
                 IsOnline = true;
-                return balanceResult.Balance.ToFormattedString();
+                return new Result<string>(balanceResult.Balance.ToFormattedString());
             }
             catch (HttpRequestException)
             {
@@ -63,7 +63,7 @@ namespace NxtWallet
                     throw;
                 }
             }
-            return "0.0";
+            return new Result<string>(string.Empty, false);
         }
 
         //TODO: Phased transactions?
@@ -117,9 +117,9 @@ namespace NxtWallet
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public bool IsOnline { get; set; }
-        public Task<string> GetBalanceAsync()
+        public Task<Result<string>> GetBalanceAsync()
         {
-            return Task.FromResult("0.0");
+            return Task.FromResult(new Result<string>("34.56"));
         }
 
         public Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)

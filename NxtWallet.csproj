@@ -113,6 +113,7 @@
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
     <Compile Include="ViewModel\ViewModelTransaction.cs" />

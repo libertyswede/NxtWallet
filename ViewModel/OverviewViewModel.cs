@@ -34,8 +34,12 @@ namespace NxtWallet.ViewModel
 
         public async Task LoadFromNxtServerAsync()
         {
-            Balance = await _nxtServer.GetBalanceAsync();
-            await _walletRepository.SaveBalanceAsync(Balance);
+            var balanceResult = await _nxtServer.GetBalanceAsync();
+            if (balanceResult.Success)
+            {
+                Balance = balanceResult.Value;
+                await _walletRepository.SaveBalanceAsync(Balance);
+            }
         }
     }
 }
