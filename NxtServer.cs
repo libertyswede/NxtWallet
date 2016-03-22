@@ -9,6 +9,7 @@ using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtLib.Transactions;
+using NxtWallet.Model;
 using Transaction = NxtWallet.Model.Transaction;
 
 namespace NxtWallet
@@ -20,8 +21,8 @@ namespace NxtWallet
         bool IsOnline { get; }
 
         Task<Result<string>> GetBalanceAsync();
-        Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
-        Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
 
     public class NxtServer : ViewModelBase, INxtServer
@@ -67,7 +68,7 @@ namespace NxtWallet
         }
 
         //TODO: Phased transactions?
-        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
+        public async Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
             var transactionList = new List<Transaction>();
             try
@@ -85,7 +86,7 @@ namespace NxtWallet
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public async Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public async Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             var accountService = _serviceFactory.CreateAccountService();
             var transactionService = _serviceFactory.CreateTransactionService();
@@ -122,14 +123,14 @@ namespace NxtWallet
             return Task.FromResult(new Result<string>("34.56"));
         }
 
-        public Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
+        public Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
+            return Task.FromResult(new List<ITransaction>().AsEnumerable());
         }
 
-        public Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            return Task.FromResult(new Transaction());
+            return Task.FromResult((ITransaction)new Transaction());
         }
     }
 }

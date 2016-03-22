@@ -2,7 +2,26 @@ using System;
 
 namespace NxtWallet.Model
 {
-    public class Transaction : IEquatable<Transaction>
+    public interface ITransaction
+    {
+        int Id { get; set; }
+        long NxtId { get; set; }
+        DateTime Timestamp { get; set; }
+        long NqtAmount { get; set; }
+        long NqtFeeAmount { get; set; }
+        long NqtBalance { get; set; }
+        string AccountFrom { get; set; }
+        string AccountTo { get; set; }
+        string Message { get; set; }
+
+        bool IsReceived(string yourAddressRs);
+        ulong GetTransactionId();
+        bool Equals(object obj);
+        int GetHashCode();
+        bool Equals(ITransaction other);
+    }
+
+    public class Transaction : IEquatable<ITransaction>, ITransaction
     {
         public int Id { get; set; }
         public long NxtId { get; set; }
@@ -52,7 +71,7 @@ namespace NxtWallet.Model
             return NxtId.GetHashCode();
         }
 
-        public bool Equals(Transaction other)
+        public bool Equals(ITransaction other)
         {
             return other?.NxtId == NxtId;
         }

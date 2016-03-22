@@ -126,12 +126,14 @@
     <Compile Include="Model\Setting.cs" />
     <Compile Include="Model\Transaction.cs" />
     <Compile Include="Model\WalletContext.cs" />
-    <Compile Include="NxtAmountConverter.cs" />
     <Compile Include="NxtServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionDetailPage.xaml.cs">
+      <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TransactionListControl.xaml.cs">
       <DependentUpon>TransactionListControl.xaml</DependentUpon>
@@ -178,6 +180,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SendMoneyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TransactionDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

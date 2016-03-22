@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
-using NxtLib.Local;
 using NxtWallet.Model;
 
 namespace NxtWallet.ViewModel
@@ -33,7 +33,7 @@ namespace NxtWallet.ViewModel
             AppendTransactions(transactions);
         }
 
-        private void AppendTransactions(IEnumerable<Transaction> transactions)
+        private void AppendTransactions(IEnumerable<ITransaction> transactions)
         {
             var viewModelTransactions = transactions.Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs));
             foreach (var transaction in viewModelTransactions.Except(Transactions).OrderByDescending(t => t.Timestamp))
@@ -46,7 +46,7 @@ namespace NxtWallet.ViewModel
         {
             var lastTimestamp = Transactions.Any()
                 ? Transactions.Max(t => t.Timestamp)
-                : Constants.EpochBeginning;
+                : new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc);
 
             var transactions = (await _nxtServer.GetTransactionsAsync(lastTimestamp))
                 .Where(t => Transactions.All(t2 => t.NxtId != t2.NxtId))
@@ -57,7 +57,7 @@ namespace NxtWallet.ViewModel
             AppendTransactions(transactions);
         }
 
-        private void UpdateTransactionBalance(IEnumerable<Transaction> transactions)
+        private void UpdateTransactionBalance(IEnumerable<ITransaction> transactions)
         {
             var previousBalance = Transactions.Any() ? Transactions.Last().Transaction.NqtBalance : 0;
             var modelTransactions = Transactions.Select(t => t.Transaction).ToList();

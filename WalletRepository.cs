@@ -18,10 +18,10 @@ namespace NxtWallet
         string Balance { get; }
 
         Task LoadAsync();
-        Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
-        Task SaveTransactionAsync(Transaction transaction);
-        Task UpdateTransactionAsync(Transaction transaction);
-        Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
+        Task<IEnumerable<ITransaction>> GetAllTransactionsAsync();
+        Task SaveTransactionAsync(ITransaction transaction);
+        Task UpdateTransactionAsync(ITransaction transaction);
+        Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions);
         Task SaveBalanceAsync(string balance);
     }
 
@@ -53,7 +53,7 @@ namespace NxtWallet
             }
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<ITransaction>> GetAllTransactionsAsync()
         {
             using (var context = new WalletContext())
             {
@@ -65,37 +65,37 @@ namespace NxtWallet
             }
         }
 
-        public async Task SaveTransactionAsync(Transaction transaction)
+        public async Task SaveTransactionAsync(ITransaction transaction)
         {
             using (var context = new WalletContext())
             {
                 var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transaction.NxtId);
                 if (existingTransaction == null)
                 {
-                    context.Transactions.Add(transaction);
+                    context.Transactions.Add((Transaction)transaction);
                     await context.SaveChangesAsync();
                 }
             }
         }
 
-        public async Task UpdateTransactionAsync(Transaction transaction)
+        public async Task UpdateTransactionAsync(ITransaction transaction)
         {
             using (var context = new WalletContext())
             {
-                context.Transactions.Attach(transaction);
+                context.Transactions.Attach((Transaction)transaction);
                 context.Entry(transaction).State = EntityState.Modified;
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        public async Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions)
         {
             using (var context = new WalletContext())
             {
                 var existingTransactions = (await GetAllTransactionsAsync()).ToList();
                 foreach (var transaction in transactions.Except(existingTransactions))
                 {
-                    context.Transactions.Add(transaction);
+                    context.Transactions.Add((Transaction)transaction);
                 }
                 await context.SaveChangesAsync();
             }
@@ -168,22 +168,22 @@ namespace NxtWallet
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        public Task<IEnumerable<ITransaction>> GetAllTransactionsAsync()
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
+            return Task.FromResult(new List<ITransaction>().AsEnumerable());
         }
 
-        public Task SaveTransactionAsync(Transaction transaction)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateTransactionAsync(Transaction transaction)
+        public Task SaveTransactionAsync(ITransaction transaction)
         {
             return Task.CompletedTask;
         }
 
-        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        public Task UpdateTransactionAsync(ITransaction transaction)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions)
         {
             return Task.CompletedTask;
         }

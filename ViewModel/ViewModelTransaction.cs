@@ -15,15 +15,16 @@ namespace NxtWallet.ViewModel
         public string OtherAccount { get; set; }
         public string Message { get; set; }
         public bool UserIsRecipient { get; set; }
-        public Transaction Transaction { get; set; }
+        public ITransaction Transaction { get; set; }
 
-        public ViewModelTransaction(Model.Transaction transaction, string myAccountRs)
+        public ViewModelTransaction(ITransaction transaction, string myAccountRs)
         {
             UserIsRecipient = myAccountRs.Equals(transaction.AccountTo);
             NxtId = transaction.NxtId;
             Timestamp = transaction.Timestamp;
-            Amount = NxtLib.Amount.CreateAmountFromNqt(transaction.NqtAmount).ToFormattedString();
-            Balance = NxtLib.Amount.CreateAmountFromNqt(transaction.NqtBalance).ToFormattedString();
+            Amount = (transaction.NqtAmount/(decimal) 100000000).ToFormattedString();
+            Balance = (transaction.NqtBalance/(decimal) 100000000).ToFormattedString();
+            Fee = (transaction.NqtFeeAmount/(decimal) 100000000).ToFormattedString();
             Message = transaction.Message;
             AccountFrom = UserIsRecipient ? transaction.AccountFrom : "you";
             AccountTo = UserIsRecipient ? "you" : transaction.AccountTo;
@@ -32,13 +33,12 @@ namespace NxtWallet.ViewModel
 
             if (UserIsRecipient)
             {
-                Amount = NxtLib.Amount.CreateAmountFromNqt(transaction.NqtAmount).ToFormattedString();
                 Fee = string.Empty;
             }
             else
             {
-                Amount = "-" + NxtLib.Amount.CreateAmountFromNqt(transaction.NqtAmount).ToFormattedString();
-                Fee = "-" + NxtLib.Amount.CreateAmountFromNqt(transaction.NqtFeeAmount).ToFormattedString();
+                Amount = "-" + Amount;
+                Fee = "-" + Fee;
             }
         }
 
