@@ -15,13 +15,14 @@ namespace NxtWallet
             if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
             {
                 SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
+                SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
             }
             else
             {
                 SimpleIoc.Default.Register<INxtServer, NxtServer>();
+                SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
             }
 
-            SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();

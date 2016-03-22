@@ -155,4 +155,42 @@ namespace NxtWallet
             context.Database.Migrate();
         }
     }
+
+    public class FakeWalletRepository : IWalletRepository
+    {
+        public AccountWithPublicKey NxtAccount { get; set; }
+        public string NxtServer { get; set; }
+        public string SecretPhrase { get; set; }
+        public string Balance { get; set; }
+
+        public Task LoadAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        {
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
+        }
+
+        public Task SaveTransactionAsync(Transaction transaction)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateTransactionAsync(Transaction transaction)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SaveBalanceAsync(string balance)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }
