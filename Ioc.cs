@@ -12,8 +12,16 @@ namespace NxtWallet
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
+            if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
+            {
+                SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
+            }
+            else
+            {
+                SimpleIoc.Default.Register<INxtServer, NxtServer>();
+            }
+
             SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
-            SimpleIoc.Default.Register<INxtServer, NxtServer>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();
