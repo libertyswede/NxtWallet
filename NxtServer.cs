@@ -51,7 +51,7 @@ namespace NxtWallet
                 var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
                 IsOnline = true;
-                return new Result<string>(balanceResult.Balance.ToFormattedString());
+                return new Result<string>(balanceResult.Balance.Nxt.ToFormattedString());
             }
             catch (HttpRequestException)
             {
