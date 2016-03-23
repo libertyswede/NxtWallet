@@ -35,6 +35,11 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
                     </VisualState.StateTriggers>
                 </VisualState>
+                <VisualState x:Name="VisualStateMin540">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
