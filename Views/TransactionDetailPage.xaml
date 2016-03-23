@@ -9,49 +9,60 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,40,0,20">
-            <TextBlock Text="Transaction Id:" />
-            <TextBlock Text="{x:Bind Path=ViewModel.Transaction.NxtId}" Margin="5,0,0,0" />
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="0" Grid.Column="1" >
-                <Run Text="{x:Bind ViewModel.Transaction.AmountAbsolute}" />
-                <Run Text="NXT" />
-            </TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="1" Grid.Column="1" >
-                <Run Text="{x:Bind ViewModel.Transaction.FeeAbsolute}" />
-                <Run Text="NXT" />
-            </TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="2" Grid.Column="1" >
-                <Run Text="{x:Bind ViewModel.Transaction.Balance}" />
-                <Run Text="NXT" />
-            </TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" />
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountTo}" />
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Sender:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountFrom}" />
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="Message:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
-            <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Message}" />
-        </Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,40,0,20" FontSize="21.333" >
+            <Run Text="Transaction:" />
+            <Run Text="{x:Bind Path=ViewModel.Transaction.NxtId}" />
+        </TextBlock>
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" FontSize="16" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
+                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" >
+                    <Run Text="{x:Bind ViewModel.Transaction.AmountAbsolute}" />
+                    <Run Text="NXT" />
+                </TextBlock>
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" >
+                    <Run Text="{x:Bind ViewModel.Transaction.FeeAbsolute}" />
+                    <Run Text="NXT" />
+                </TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" >
+                    <Run Text="{x:Bind ViewModel.Transaction.Balance}" />
+                    <Run Text="NXT" />
+                </TextBlock>
+                <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Sender:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountFrom}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountTo}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" />
+                <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" 
+                           VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="16" />
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Message}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="16" />
+            </Grid>
+        </Border>
     </Grid>
 </Page>
