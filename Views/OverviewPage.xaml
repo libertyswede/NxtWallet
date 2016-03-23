@@ -19,9 +19,9 @@
                         <Setter Target="TextBlock.(TextBlock.FontSize)" Value="18.667"/>
                     </VisualState.Setters>
                 </VisualState>
-                <VisualState x:Name="VisualStateMin600">
+                <VisualState x:Name="VisualStateMin540">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="TextBlock.(TextBlock.FontSize)" Value="24"/>

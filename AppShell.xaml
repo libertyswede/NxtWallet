@@ -30,18 +30,18 @@
         <!-- Adaptive triggers -->
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
-                <VisualState x:Name="VisualStateMin800">
+                <VisualState x:Name="VisualStateMin720">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin800}" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin720}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RootSplitView.DisplayMode" Value="CompactInline"/>
                         <Setter Target="RootSplitView.IsPaneOpen" Value="True"/>
                     </VisualState.Setters>
                 </VisualState>
-                <VisualState x:Name="VisualStateMin600">
+                <VisualState x:Name="VisualStateMin540">
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}" />
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="RootSplitView.DisplayMode" Value="CompactOverlay"/>
@@ -61,7 +61,7 @@
         <!-- Top-level navigation menu + app content -->
         <SplitView x:Name="RootSplitView"
                    DisplayMode="Inline"
-                   OpenPaneLength="256"
+                   OpenPaneLength="160"
                    IsTabStop="False">
             <SplitView.Pane>
                 <!-- A custom ListView to display the items in the pane.  The automation Name is set in the ContainerContentChanging event. -->

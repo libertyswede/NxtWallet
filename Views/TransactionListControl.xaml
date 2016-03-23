@@ -34,9 +34,9 @@
         				<Setter Target="BalanceColumn.Width" Value="0" />
                     </VisualState.Setters>
         		</VisualState>
-        		<VisualState x:Name="VisualStateMin600">
+        		<VisualState x:Name="VisualStateMin540">
         			<VisualState.StateTriggers>
-        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin600}"/>
+        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
         			</VisualState.StateTriggers>
         		</VisualState>
         	</VisualStateGroup>
