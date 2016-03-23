@@ -1,10 +1,13 @@
 ﻿using Windows.UI.Xaml.Navigation;
+using GalaSoft.MvvmLight.Ioc;
 using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
 {
     public sealed partial class TransactionDetailPage
     {
+        public TransactionDetailViewModel ViewModel { get; } = SimpleIoc.Default.GetInstance<TransactionDetailViewModel>();
+
         public TransactionDetailPage()
         {
             InitializeComponent();
@@ -12,7 +15,7 @@ namespace NxtWallet.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var transaction = (ViewModelTransaction) e.Parameter;
+            ViewModel.Transaction = (ViewModelTransaction) e.Parameter;
         }
     }
 }

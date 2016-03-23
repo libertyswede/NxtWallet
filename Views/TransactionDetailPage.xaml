@@ -2,12 +2,56 @@
     x:Class="NxtWallet.Views.TransactionDetailPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:NxtWallet.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="400">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,40,0,20">
+            <TextBlock Text="Transaction Id:" />
+            <TextBlock Text="{x:Bind Path=ViewModel.Transaction.NxtId}" Margin="5,0,0,0" />
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="0" Grid.Column="1" >
+                <Run Text="{x:Bind ViewModel.Transaction.AmountAbsolute}" />
+                <Run Text="NXT" />
+            </TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="1" Grid.Column="1" >
+                <Run Text="{x:Bind ViewModel.Transaction.FeeAbsolute}" />
+                <Run Text="NXT" />
+            </TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="2" Grid.Column="1" >
+                <Run Text="{x:Bind ViewModel.Transaction.Balance}" />
+                <Run Text="NXT" />
+            </TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" />
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountTo}" />
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Sender:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountFrom}" />
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Message:" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,10,0" />
+            <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Message}" />
+        </Grid>
     </Grid>
 </Page>

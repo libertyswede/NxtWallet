@@ -5,10 +5,12 @@ namespace NxtWallet.ViewModel
 {
     public class ViewModelTransaction : IEquatable<ViewModelTransaction>
     {
-        public long NxtId { get; set; }
+        public ulong NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public string Amount { get; set; }
+        public string AmountAbsolute { get; set; }
         public string Fee { get; set; }
+        public string FeeAbsolute { get; set; }
         public string Balance { get; set; }
         public string AccountFrom { get; set; }
         public string AccountTo { get; set; }
@@ -20,11 +22,11 @@ namespace NxtWallet.ViewModel
         public ViewModelTransaction(ITransaction transaction, string myAccountRs)
         {
             UserIsRecipient = myAccountRs.Equals(transaction.AccountTo);
-            NxtId = transaction.NxtId;
+            NxtId = (ulong)transaction.NxtId;
             Timestamp = transaction.Timestamp;
-            Amount = (transaction.NqtAmount/(decimal) 100000000).ToFormattedString();
+            AmountAbsolute = Amount = (transaction.NqtAmount/(decimal) 100000000).ToFormattedString();
             Balance = (transaction.NqtBalance/(decimal) 100000000).ToFormattedString();
-            Fee = (transaction.NqtFeeAmount/(decimal) 100000000).ToFormattedString();
+            FeeAbsolute = Fee = (transaction.NqtFeeAmount/(decimal) 100000000).ToFormattedString();
             Message = transaction.Message;
             AccountFrom = UserIsRecipient ? transaction.AccountFrom : "you";
             AccountTo = UserIsRecipient ? "you" : transaction.AccountTo;

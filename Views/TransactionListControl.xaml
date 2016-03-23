@@ -6,15 +6,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:NxtWallet.Controls"
     xmlns:viewModel="using:NxtWallet.ViewModel"
-    xmlns:nxtWallet="using:NxtWallet"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="700"
     Loading="TransactionListControl_OnLoading">
 
-    <UserControl.Resources>
-        <nxtWallet:DateTimeConverter x:Key="DateTimeConverter" />
-    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -83,9 +79,9 @@
                                    Visibility="{Binding ElementName=MessageHeader, Path=Visibility}"/>
                         <StackPanel Grid.Column="1" Orientation="Vertical">
                             <TextBlock Text="{x:Bind Message}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="13.333" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
-                            <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
+                            <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
                         </StackPanel>
-                        <TextBlock Grid.Column="2" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" 
+                        <TextBlock Grid.Column="2" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" 
                                    FontSize="{Binding ElementName=TimestampHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=TimestampHeader, Path=Visibility}" />
                         <TextBlock Grid.Column="3" Text="{x:Bind Amount}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=AmountHeader, Path=FontSize}" 
                                    VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=AmountHeader, Path=Visibility}" />

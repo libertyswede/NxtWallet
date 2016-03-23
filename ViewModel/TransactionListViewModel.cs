@@ -49,7 +49,7 @@ namespace NxtWallet.ViewModel
                 : new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc);
 
             var transactions = (await _nxtServer.GetTransactionsAsync(lastTimestamp))
-                .Where(t => Transactions.All(t2 => t.NxtId != t2.NxtId))
+                .Where(t => Transactions.All(modelTransaction => t.NxtId != (long)modelTransaction.NxtId))
                 .ToList();
 
             UpdateTransactionBalance(transactions);

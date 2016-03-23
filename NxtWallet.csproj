@@ -115,6 +115,7 @@
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
+    <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
     <Compile Include="ViewModel\ViewModelTransaction.cs" />
     <Compile Include="Views\NetworkIndicatorControl.xaml.cs">
