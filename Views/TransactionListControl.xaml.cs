@@ -8,8 +8,8 @@ namespace NxtWallet.Views
     {
         public TransactionListViewModel ViewModel { get; } = new Ioc().TransactionListViewModel;
 
-        public delegate void NavigationEventHandler(object source, SelectionChangedEventArgs e);
-        public event NavigationEventHandler OnNavigateParentReady;
+        public delegate void SelectedTransactionChangedHandler(object source, SelectionChangedEventArgs e);
+        public event SelectedTransactionChangedHandler SelectedTransactionChanged;
 
         public TransactionListControl()
         {
@@ -26,7 +26,7 @@ namespace NxtWallet.Views
 
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            OnNavigateParentReady?.Invoke(this, e);
+            SelectedTransactionChanged?.Invoke(this, e);
         }
     }
 }

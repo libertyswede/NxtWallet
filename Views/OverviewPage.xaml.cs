@@ -14,7 +14,7 @@ namespace NxtWallet.Views
         public OverviewPage()
         {
             InitializeComponent();
-            TransactionList.OnNavigateParentReady += TransactionListOnOnNavigateParentReady;
+            TransactionList.SelectedTransactionChanged += OnSelectedTransactionChanged;
         }
 
         private async void OverviewPage_OnLoading(FrameworkElement sender, object args)
@@ -29,7 +29,7 @@ namespace NxtWallet.Views
             Bindings.Update();
         }
 
-        private void TransactionListOnOnNavigateParentReady(object source, SelectionChangedEventArgs selectionChangedEventArgs)
+        private void OnSelectedTransactionChanged(object source, SelectionChangedEventArgs selectionChangedEventArgs)
         {
             if (selectionChangedEventArgs.AddedItems.Any())
             {
