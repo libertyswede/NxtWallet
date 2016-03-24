@@ -25,7 +25,7 @@ namespace NxtWallet
         Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
 
-    public class NxtServer : ViewModelBase, INxtServer
+    public class NxtServer : ObservableObject, INxtServer
     {
         private readonly IWalletRepository _walletRepository;
         private bool _isOnline;
