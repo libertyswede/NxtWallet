@@ -117,7 +117,7 @@ namespace NxtWallet
     public class FakeNxtServer : INxtServer
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public bool IsOnline { get; set; }
+        public bool IsOnline { get; set; } = true;
         public Task<Result<string>> GetBalanceAsync()
         {
             return Task.FromResult(new Result<string>("34.56"));

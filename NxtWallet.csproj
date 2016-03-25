@@ -106,7 +106,9 @@
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
+    <Compile Include="Model\IWalletRepository.cs" />
     <Compile Include="Migrations\20160321112810_Initial.cs" />
     <Compile Include="Migrations\20160321112810_Initial.designer.cs">
       <DependentUpon>20160321112810_Initial.cs</DependentUpon>
@@ -140,7 +142,7 @@
     <Compile Include="Views\TransactionListControl.xaml.cs">
       <DependentUpon>TransactionListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WalletRepository.cs" />
+    <Compile Include="Model\WalletRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

@@ -2,14 +2,13 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Microsoft.Practices.ServiceLocation;
 using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
 {
     public sealed partial class OverviewPage
     {
-        public OverviewViewModel ViewModel { get; } = ServiceLocator.Current.GetInstance<OverviewViewModel>();
+        private OverviewViewModel ViewModel => (OverviewViewModel) DataContext;
 
         public OverviewPage()
         {

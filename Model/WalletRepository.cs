@@ -5,26 +5,9 @@ using Microsoft.Data.Entity;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
-using NxtWallet.Model;
-using Transaction = NxtWallet.Model.Transaction;
 
-namespace NxtWallet
+namespace NxtWallet.Model
 {
-    public interface IWalletRepository
-    {
-        AccountWithPublicKey NxtAccount { get; }
-        string NxtServer { get; }
-        string SecretPhrase { get; }
-        string Balance { get; }
-
-        Task LoadAsync();
-        Task<IEnumerable<ITransaction>> GetAllTransactionsAsync();
-        Task SaveTransactionAsync(ITransaction transaction);
-        Task UpdateTransactionAsync(ITransaction transaction);
-        Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions);
-        Task SaveBalanceAsync(string balance);
-    }
-
     public class WalletRepository : IWalletRepository
     {
         private const string SecretPhraseKey = "secretPhrase";
@@ -153,44 +136,6 @@ namespace NxtWallet
         private static void CreateAndMigrateDb(WalletContext context)
         {
             context.Database.Migrate();
-        }
-    }
-
-    public class FakeWalletRepository : IWalletRepository
-    {
-        public AccountWithPublicKey NxtAccount { get; set; }
-        public string NxtServer { get; set; }
-        public string SecretPhrase { get; set; }
-        public string Balance { get; set; }
-
-        public Task LoadAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<IEnumerable<ITransaction>> GetAllTransactionsAsync()
-        {
-            return Task.FromResult(new List<ITransaction>().AsEnumerable());
-        }
-
-        public Task SaveTransactionAsync(ITransaction transaction)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateTransactionAsync(ITransaction transaction)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task SaveBalanceAsync(string balance)
-        {
-            return Task.CompletedTask;
         }
     }
 }

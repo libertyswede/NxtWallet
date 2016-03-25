@@ -1,12 +1,11 @@
 ﻿using Windows.UI.Xaml.Navigation;
-using GalaSoft.MvvmLight.Ioc;
 using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
 {
     public sealed partial class TransactionDetailPage
     {
-        public TransactionDetailViewModel ViewModel { get; } = SimpleIoc.Default.GetInstance<TransactionDetailViewModel>();
+        private TransactionDetailViewModel ViewModel => (TransactionDetailViewModel) DataContext;
 
         public TransactionDetailPage()
         {

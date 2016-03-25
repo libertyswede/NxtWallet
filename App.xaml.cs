@@ -4,6 +4,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.Practices.ServiceLocation;
+using NxtWallet.Model;
 
 namespace NxtWallet
 {

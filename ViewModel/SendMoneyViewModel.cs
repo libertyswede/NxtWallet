@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
+using NxtWallet.Model;
 
 namespace NxtWallet.ViewModel
 {
@@ -41,14 +42,13 @@ namespace NxtWallet.ViewModel
 
         public RelayCommand SendMoneyCommand { get; }
 
-        [PreferredConstructor]
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository)
         {
             IsSendingMoney = false;
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
-            SendMoneyCommand = new RelayCommand(SendMoney, () => nxtServer.IsOnline);
-            nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
+            SendMoneyCommand = new RelayCommand(SendMoney);
+            nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.CanExecute(_nxtServer.IsOnline);
         }
 
         private async void SendMoney()

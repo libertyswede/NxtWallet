@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:NxtWallet.Views"
     mc:Ignorable="d"
-    Loading="OverviewPage_OnLoading">
+    Loading="OverviewPage_OnLoading"
+    DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -45,7 +46,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <!-- ReSharper disable once NotAccessedField.Local -->
             <TextBlock Grid.Row="0" x:Name="TextBlock" TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" Margin="0,10,0,0" />
             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,20,0,0" Padding="0,0,0,10" BorderBrush="AliceBlue" BorderThickness="0,0,0,2">
                 <TextBlock TextWrapping="NoWrap" Text="Balance:" FontSize="21.333" />

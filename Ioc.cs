@@ -1,13 +1,16 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using NxtWallet.Model;
 using NxtWallet.ViewModel;
 
 namespace NxtWallet
 {
     public class Ioc
     {
-        public TransactionListViewModel TransactionListViewModel { get; } = SimpleIoc.Default.GetInstance<TransactionListViewModel>();
-        public SendMoneyViewModel SendMoneyViewModel { get; } = SimpleIoc.Default.GetInstance<SendMoneyViewModel>();
+        public OverviewViewModel OverviewViewModel => SimpleIoc.Default.GetInstance<OverviewViewModel>();
+        public SendMoneyViewModel SendMoneyViewModel => SimpleIoc.Default.GetInstance<SendMoneyViewModel>();
+        public TransactionDetailViewModel TransactionDetailViewModel => SimpleIoc.Default.GetInstance<TransactionDetailViewModel>();
+        public TransactionListViewModel TransactionListViewModel => SimpleIoc.Default.GetInstance<TransactionListViewModel>();
 
         static Ioc()
         {

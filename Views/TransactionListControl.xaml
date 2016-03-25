@@ -9,8 +9,8 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="700"
-    Loading="TransactionListControl_OnLoading">
-
+    Loading="TransactionListControl_OnLoading"
+    DataContext="{Binding Path=TransactionListViewModel, Source={StaticResource Ioc}}">
 
     <Grid>
         <Grid.RowDefinitions>

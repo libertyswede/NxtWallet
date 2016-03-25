@@ -6,10 +6,10 @@ namespace NxtWallet.Views
 {
     public sealed partial class TransactionListControl
     {
-        public TransactionListViewModel ViewModel { get; } = new Ioc().TransactionListViewModel;
-
         public delegate void SelectedTransactionChangedHandler(object source, SelectionChangedEventArgs e);
         public event SelectedTransactionChangedHandler SelectedTransactionChanged;
+
+        private TransactionListViewModel ViewModel => (TransactionListViewModel) DataContext;
 
         public TransactionListControl()
         {
