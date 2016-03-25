@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:NxtWallet.Views"
+    xmlns:controls="using:NxtWallet.Controls"
     mc:Ignorable="d"
     Loading="OverviewPage_OnLoading"
     DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
@@ -52,8 +53,8 @@
                 <TextBlock TextWrapping="NoWrap" Text="{x:Bind ViewModel.Balance}" FontSize="21.333" Margin="20,0,0,0" />
             </StackPanel>
             <TextBlock Grid.Row="2" Text="Transactions" FontSize="21.333" Margin="0,30,0,0" />
-            <views:TransactionListControl Grid.Row="3" x:Name="TransactionList" />
+            <controls:TransactionListControl Grid.Row="3" x:Name="TransactionList" />
         </Grid>
-        <views:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
+        <controls:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
     </Grid>
 </Page>

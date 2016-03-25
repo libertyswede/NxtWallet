@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Ioc;
+using NxtWallet.Controls;
 using NxtWallet.Model;
+using NxtWallet.Views;
 
 namespace NxtWallet.ViewModel
 {
@@ -10,11 +11,11 @@ namespace NxtWallet.ViewModel
     {
         private readonly INxtServer _nxtServer;
         private readonly IWalletRepository _walletRepository;
+        private readonly ISendMoneyDialog _sendMoneyDialog;
 
         private string _recipient;
         private string _amount;
         private string _message;
-        private bool _isSendingMoney;
 
         public string Recipient
         {
@@ -34,35 +35,29 @@ namespace NxtWallet.ViewModel
             set { Set(ref _message, value); }
         }
 
-        public bool IsSendingMoney
-        {
-            get { return _isSendingMoney; }
-            set { Set(ref _isSendingMoney, value); }
-        }
-
         public RelayCommand SendMoneyCommand { get; }
 
-        public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository)
+        public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository, ISendMoneyDialog sendMoneyDialog)
         {
-            IsSendingMoney = false;
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
+            _sendMoneyDialog = sendMoneyDialog;
             SendMoneyCommand = new RelayCommand(SendMoney);
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.CanExecute(_nxtServer.IsOnline);
         }
 
         private async void SendMoney()
         {
-            IsSendingMoney = true;
+            var ignore = _sendMoneyDialog.ShowAsync();
             await Task.Run(async () =>
             {
                 decimal amount;
                 decimal.TryParse(Amount, out amount);
-                var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
-                await _walletRepository.SaveTransactionAsync(transaction);
-                //await Task.Delay(5000); // For testing purposes
+                //var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+                //await _walletRepository.SaveTransactionAsync(transaction);
+                await Task.Delay(5000); // For testing purposes
             });
-            IsSendingMoney = false;
+            _sendMoneyDialog.Hide();
         }
     }
 }

@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:nxtWallet="using:NxtWallet"
-    x:Class="NxtWallet.Views.NetworkIndicatorControl"
+    x:Class="NxtWallet.Controls.NetworkIndicatorControl"
     mc:Ignorable="d"
     d:DesignHeight="40"
     d:DesignWidth="140">

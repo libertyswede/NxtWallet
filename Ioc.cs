@@ -1,7 +1,10 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using NxtWallet.Controls;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
+using NxtWallet.Views;
+using SendMoneyDialog = NxtWallet.Controls.SendMoneyDialog;
 
 namespace NxtWallet
 {
@@ -27,6 +30,7 @@ namespace NxtWallet
                 SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
             }
 
+            SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();

@@ -2,7 +2,7 @@
 using Windows.UI.Xaml.Controls;
 using NxtWallet.ViewModel;
 
-namespace NxtWallet.Views
+namespace NxtWallet.Controls
 {
     public sealed partial class TransactionListControl
     {

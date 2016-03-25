@@ -101,7 +101,6 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BoolToVisibilityConverter.cs" />
     <Compile Include="Controls\AlternatingRowListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
@@ -121,7 +120,8 @@
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
     <Compile Include="ViewModel\ViewModelTransaction.cs" />
-    <Compile Include="Views\NetworkIndicatorControl.xaml.cs">
+    <Compile Include="IDialog.cs" />
+    <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\OverviewPage.xaml.cs">
@@ -133,13 +133,16 @@
     <Compile Include="NxtServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\OverviewViewModel.cs" />
+    <Compile Include="Controls\SendMoneyDialog.xaml.cs">
+      <DependentUpon>SendMoneyDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TransactionDetailPage.xaml.cs">
       <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TransactionListControl.xaml.cs">
+    <Compile Include="Controls\TransactionListControl.xaml.cs">
       <DependentUpon>TransactionListControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\WalletRepository.cs" />
@@ -171,7 +174,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NetworkIndicatorControl.xaml">
+    <Page Include="Controls\NetworkIndicatorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -183,6 +186,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\SendMoneyDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SendMoneyPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -191,7 +198,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TransactionListControl.xaml">
+    <Page Include="Controls\TransactionListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

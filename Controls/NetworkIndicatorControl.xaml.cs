@@ -1,4 +1,4 @@
-﻿namespace NxtWallet.Views
+﻿namespace NxtWallet.Controls
 {
     public sealed partial class NetworkIndicatorControl
     {
