@@ -7,6 +7,7 @@ namespace NxtWallet
     public class Ioc
     {
         public TransactionListViewModel TransactionListViewModel { get; } = SimpleIoc.Default.GetInstance<TransactionListViewModel>();
+        public SendMoneyViewModel SendMoneyViewModel { get; } = SimpleIoc.Default.GetInstance<SendMoneyViewModel>();
 
         static Ioc()
         {

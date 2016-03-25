@@ -10,7 +10,9 @@
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Tw Cen MT" />
             </Style>
+            
             <nxtWallet:DateTimeConverter x:Key="DateTimeConverter" />
+            <nxtWallet:Ioc x:Key="Ioc" />
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/Styles.xaml" />
