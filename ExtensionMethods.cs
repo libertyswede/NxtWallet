@@ -1,6 +1,4 @@
-﻿using NxtLib;
-
-namespace NxtWallet
+﻿namespace NxtWallet
 {
     public static class ExtensionMethods
     {

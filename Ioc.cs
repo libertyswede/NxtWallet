@@ -3,7 +3,6 @@ using Microsoft.Practices.ServiceLocation;
 using NxtWallet.Controls;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
-using NxtWallet.Views;
 using SendMoneyDialog = NxtWallet.Controls.SendMoneyDialog;
 
 namespace NxtWallet

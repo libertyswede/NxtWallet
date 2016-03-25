@@ -14,12 +14,12 @@
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateOnline">
                     <VisualState.Setters>
-                        <Setter Target="ellipse.(Shape.Fill).(SolidColorBrush.Color)">
+                        <Setter Target="Ellipse.(Shape.Fill).(SolidColorBrush.Color)">
                             <Setter.Value>
                                 <Color>#FF13D100</Color>
                             </Setter.Value>
                         </Setter>
-                        <Setter Target="textBlock.(TextBlock.Text)" Value="Online"/>
+                        <Setter Target="TextBlock.(TextBlock.Text)" Value="Online"/>
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <nxtWallet:NetworkIndicatorTrigger IsOnline="True"/>
@@ -27,8 +27,8 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Ellipse x:Name="ellipse" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FFD13300"/>
-        <TextBlock x:Name="textBlock" Text="Offline" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="21.333" />
+        <Ellipse x:Name="Ellipse" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FFD13300"/>
+        <TextBlock x:Name="TextBlock" Text="Offline" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="21.333" />
     </StackPanel>
 
 </UserControl>

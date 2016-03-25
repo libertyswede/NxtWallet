@@ -62,7 +62,7 @@ namespace NxtWallet
             NavMenuList.ItemsSource = _navlist;
         }
 
-        public Frame AppFrame => frame;
+        public Frame AppFrame => Frame;
 
         /// <summary>
         /// Default keyboard focus movement for any unhandled keyboarding
@@ -257,7 +257,7 @@ namespace NxtWallet
         /// <param name="args"></param>
         private void NavMenuItemContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
-            if (!args.InRecycleQueue && args.Item != null && args.Item is NavMenuItem)
+            if (!args.InRecycleQueue && args.Item is NavMenuItem)
             {
                 args.ItemContainer.SetValue(AutomationProperties.NameProperty, ((NavMenuItem)args.Item).Label);
             }

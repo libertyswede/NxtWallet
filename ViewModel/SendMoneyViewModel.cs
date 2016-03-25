@@ -3,7 +3,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using NxtWallet.Controls;
 using NxtWallet.Model;
-using NxtWallet.Views;
 
 namespace NxtWallet.ViewModel
 {
@@ -53,9 +52,9 @@ namespace NxtWallet.ViewModel
             {
                 decimal amount;
                 decimal.TryParse(Amount, out amount);
-                //var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
-                //await _walletRepository.SaveTransactionAsync(transaction);
-                await Task.Delay(5000); // For testing purposes
+                var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+                await _walletRepository.SaveTransactionAsync(transaction);
+                //await Task.Delay(5000); // For testing purposes
             });
             _sendMoneyDialog.Hide();
         }
