@@ -120,7 +120,7 @@ namespace NxtWallet
         public bool IsOnline { get; set; } = true;
         public Task<Result<string>> GetBalanceAsync()
         {
-            return Task.FromResult(new Result<string>("34.56"));
+            return Task.FromResult(new Result<string>("11.00"));
         }
 
         public Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
