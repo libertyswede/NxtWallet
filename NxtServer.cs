@@ -22,6 +22,7 @@ namespace NxtWallet
 
         Task<Result<string>> GetBalanceAsync();
         Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<IEnumerable<ITransaction>> GetTransactionsAsync();
         Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message);
     }
 
@@ -68,6 +69,7 @@ namespace NxtWallet
         }
 
         //TODO: Phased transactions?
+        //TODO: Make multiple calls to get ALL transactions
         public async Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
             var transactionList = new List<Transaction>();
@@ -84,6 +86,11 @@ namespace NxtWallet
                 IsOnline = false;
             }
             return transactionList.OrderByDescending(t => t.Timestamp);
+        }
+
+        public Task<IEnumerable<ITransaction>> GetTransactionsAsync()
+        {
+            return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
 
         public async Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)
@@ -126,6 +133,11 @@ namespace NxtWallet
         public Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
             return Task.FromResult(new List<ITransaction>().AsEnumerable());
+        }
+
+        public Task<IEnumerable<ITransaction>> GetTransactionsAsync()
+        {
+            return GetTransactionsAsync(DateTime.UtcNow);
         }
 
         public Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)

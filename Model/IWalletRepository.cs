@@ -14,8 +14,9 @@ namespace NxtWallet.Model
         Task LoadAsync();
         Task<IEnumerable<ITransaction>> GetAllTransactionsAsync();
         Task SaveTransactionAsync(ITransaction transaction);
-        Task UpdateTransactionAsync(ITransaction transaction);
+        Task UpdateTransactionsAsync(IEnumerable<ITransaction> transactions);
         Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions);
         Task SaveBalanceAsync(string balance);
+        Task<ITransaction> GetLatestTransactionAsync();
     }
 }

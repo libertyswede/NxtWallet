@@ -11,7 +11,7 @@ namespace NxtWallet.ViewModel
         public string AmountAbsolute { get; set; }
         public string Fee { get; set; }
         public string FeeAbsolute { get; set; }
-        public string Balance { get; set; }
+        public string Balance { get; private set; }
         public string AccountFrom { get; set; }
         public string AccountTo { get; set; }
         public string OtherAccount { get; set; }
@@ -42,6 +42,12 @@ namespace NxtWallet.ViewModel
                 Amount = "-" + Amount;
                 Fee = "-" + Fee;
             }
+        }
+
+        public void SetBalance(long balance)
+        {
+            Transaction.NqtBalance = balance;
+            Balance = (balance / (decimal)100000000).ToFormattedString();
         }
 
         public override bool Equals(object obj)

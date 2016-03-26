@@ -48,6 +48,18 @@ namespace NxtWallet.Model
             }
         }
 
+        public async Task<ITransaction> GetLatestTransactionAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                var transaction = await context.Transactions
+                    .OrderByDescending(t => t.Timestamp)
+                    .FirstOrDefaultAsync();
+
+                return transaction;
+            }
+        }
+
         public async Task SaveTransactionAsync(ITransaction transaction)
         {
             using (var context = new WalletContext())
@@ -61,12 +73,15 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task UpdateTransactionAsync(ITransaction transaction)
+        public async Task UpdateTransactionsAsync(IEnumerable<ITransaction> transactions)
         {
             using (var context = new WalletContext())
             {
-                context.Transactions.Attach((Transaction)transaction);
-                context.Entry(transaction).State = EntityState.Modified;
+                foreach (var transaction in transactions)
+                {
+                    context.Transactions.Attach((Transaction)transaction);
+                    context.Entry(transaction).State = EntityState.Modified;
+                }
                 await context.SaveChangesAsync();
             }
         }

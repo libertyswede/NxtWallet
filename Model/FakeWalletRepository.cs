@@ -65,7 +65,7 @@ namespace NxtWallet.Model
             return Task.CompletedTask;
         }
 
-        public Task UpdateTransactionAsync(ITransaction transaction)
+        public Task UpdateTransactionsAsync(IEnumerable<ITransaction> transactions)
         {
             return Task.CompletedTask;
         }
@@ -78,6 +78,11 @@ namespace NxtWallet.Model
         public Task SaveBalanceAsync(string balance)
         {
             return Task.CompletedTask;
+        }
+
+        public Task<ITransaction> GetLatestTransactionAsync()
+        {
+            return Task.FromResult(GetAllTransactionsAsync().Result.Last());
         }
     }
 }
