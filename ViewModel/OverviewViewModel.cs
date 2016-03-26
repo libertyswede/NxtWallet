@@ -10,8 +10,13 @@ namespace NxtWallet.ViewModel
         private readonly INxtServer _nxtServer;
 
         private string _balance;
+        private string _nxtAddress;
 
-        public string NxtAddress { get; set; }
+        public string NxtAddress
+        {
+            get { return _nxtAddress; }
+            set { Set(ref _nxtAddress, value); }
+        }
 
         public string Balance
         {
