@@ -30,6 +30,13 @@ namespace NxtWallet.Controls
             {
                 var index = IndexFromContainer(element);
                 listViewItem.Background = (index + 1) % 2 == 1 ? OddRowBackground : EvenRowBackground;
+
+                for (index++; index < Items.Count; index++)
+                {
+                    listViewItem = ContainerFromIndex(index) as ListViewItem;
+                    if (listViewItem != null)
+                        listViewItem.Background = (index + 1) % 2 == 1 ? OddRowBackground : EvenRowBackground;
+                }
             }
         }
     }
