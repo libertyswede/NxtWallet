@@ -117,7 +117,8 @@ namespace NxtWallet.Model
             NxtServer = dbSettings.SingleOrDefault(s => s.Key.Equals(NxtServerKey))?.Value;
             if (NxtServer == null)
             {
-                NxtServer = Constants.DefaultNxtUrl;
+                //NxtServer = Constants.DefaultNxtUrl;
+                NxtServer = Constants.TestnetNxtUrl;
                 context.Settings.Add(new Setting {Key = NxtServerKey, Value = NxtServer});
             }
         }
