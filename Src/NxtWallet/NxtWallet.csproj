@@ -121,6 +121,7 @@
     <Compile Include="NavMenuItem.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
+    <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
