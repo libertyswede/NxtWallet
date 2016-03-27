@@ -13,6 +13,7 @@ namespace NxtWallet.Model
         string AccountFrom { get; set; }
         string AccountTo { get; set; }
         string Message { get; set; }
+        bool IsConfirmed { get; set; }
 
         bool IsReceived(string yourAddressRs);
         ulong GetTransactionId();
@@ -32,6 +33,7 @@ namespace NxtWallet.Model
         public string AccountFrom { get; set; }
         public string AccountTo { get; set; }
         public string Message { get; set; }
+        public bool IsConfirmed { get; set; }
 
         public Transaction()
         {
@@ -58,6 +60,7 @@ namespace NxtWallet.Model
             NqtFeeAmount = nxtTransaction.Fee.Nqt;
             AccountFrom = nxtTransaction.SenderRs;
             AccountTo = nxtTransaction.RecipientRs;
+            IsConfirmed = nxtTransaction.Confirmations.HasValue && nxtTransaction.Confirmations.Value > 0;
         }
 
         public bool IsReceived(string yourAddressRs)

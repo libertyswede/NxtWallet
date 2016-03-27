@@ -56,6 +56,10 @@ namespace NxtWallet.Model
             modelBuilder.Entity<Transaction>()
                 .Property(t => t.Message)
                 .HasMaxLength(255);
+
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.IsConfirmed)
+                .HasDefaultValue(true);
         }
     }
 }
