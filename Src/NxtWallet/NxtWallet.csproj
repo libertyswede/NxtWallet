@@ -110,6 +110,12 @@
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FakeNxtServer.cs" />
+    <Compile Include="BalanceCalculator.cs" />
+    <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.cs" />
+    <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.designer.cs">
+      <DependentUpon>20160327165305_Transaction_IsConfirmed.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
