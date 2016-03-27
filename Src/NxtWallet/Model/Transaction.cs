@@ -37,10 +37,20 @@ namespace NxtWallet.Model
         {
         }
 
-        public Transaction(NxtLib.Transaction nxtTransaction)
+        public Transaction(NxtLib.Transaction nxtTransaction, long? transactionId = null)
         {
-            // ReSharper disable once PossibleInvalidOperationException
-            NxtId = (long) nxtTransaction.TransactionId.Value;
+            if (transactionId.HasValue)
+            {
+                NxtId = transactionId.Value;
+            }
+            else if (nxtTransaction.TransactionId.HasValue)
+            {
+                NxtId = (long)nxtTransaction.TransactionId.Value;
+            }
+            else
+            {
+                throw new ArgumentException("Transaction id must be set either explicitly or on Transaction object.", nameof(transactionId));
+            }
             Message = nxtTransaction.Message?.MessageText;
             Timestamp = nxtTransaction.Timestamp;
             NqtAmount = nxtTransaction.Amount.Nqt;

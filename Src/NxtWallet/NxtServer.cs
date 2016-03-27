@@ -101,10 +101,10 @@ namespace NxtWallet
 
             var sendMoneyReply = await CreateUnsignedSendMoneyReply(recipient, amount, message, accountService);
             var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
-            await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
+            var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
 
             IsOnline = true;
-            var transaction = new Transaction(sendMoneyReply.Transaction);
+            var transaction = new Transaction(sendMoneyReply.Transaction, (long)broadcastReply.TransactionId);
             return transaction;
         }
 
