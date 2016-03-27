@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="3b0c5bef-2379-4b95-a29d-869d3e97e3dd" Publisher="CN=Daniel" Version="1.0.0.0" />
+  <Identity Name="3b0c5bef-2379-4b95-a29d-869d3e97e3de" Publisher="CN=Daniel" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="3b0c5bef-2379-4b95-a29d-869d3e97e3dc" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>NxtWallet</DisplayName>
