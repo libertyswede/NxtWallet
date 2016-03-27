@@ -77,7 +77,7 @@
             <!-- OnNavigatingToPage we synchronize the selected item in the nav menu with the current page.
                  OnNavigatedToPage we move keyboard focus to the first item on the page after it's loaded and update the Back button. -->
             <SplitView.Content>
-                <Frame x:Name="Frame"
+                <Frame x:Name="MainFrame"
                        Navigating="OnNavigatingToPage"
                        Navigated="OnNavigatedToPage">
                     <Frame.ContentTransitions>

@@ -62,7 +62,7 @@ namespace NxtWallet
             NavMenuList.ItemsSource = _navlist;
         }
 
-        public Frame AppFrame => Frame;
+        public Frame AppFrame => MainFrame;
 
         /// <summary>
         /// Default keyboard focus movement for any unhandled keyboarding
