@@ -17,10 +17,14 @@ namespace NxtWallet
         {
             if (!GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
             {
-                SetActive(true);
                 var nxtServer = ServiceLocator.Current.GetInstance<INxtServer>();
                 IsOnline = nxtServer.IsOnline;
-                nxtServer.PropertyChanged += (sender, args) => IsOnline = nxtServer.IsOnline;
+                SetActive(IsOnline);
+                nxtServer.PropertyChanged += (sender, args) =>
+                {
+                    IsOnline = nxtServer.IsOnline;
+                    SetActive(IsOnline);
+                };
             }
         }
     }

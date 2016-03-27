@@ -25,6 +25,11 @@
                         <nxtWallet:NetworkIndicatorTrigger IsOnline="True"/>
                     </VisualState.StateTriggers>
                 </VisualState>
+                <VisualState x:Name="VisualStateOffline">
+                    <VisualState.StateTriggers>
+                        <nxtWallet:NetworkIndicatorTrigger IsOnline="False"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Ellipse x:Name="Ellipse" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Fill="#FFD13300"/>
