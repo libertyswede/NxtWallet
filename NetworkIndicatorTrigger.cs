@@ -1,5 +1,5 @@
 ﻿using Windows.UI.Xaml;
-using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet
 {
@@ -18,7 +18,7 @@ namespace NxtWallet
             if (!GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
             {
                 SetActive(true);
-                var nxtServer = SimpleIoc.Default.GetInstance<INxtServer>();
+                var nxtServer = ServiceLocator.Current.GetInstance<INxtServer>();
                 IsOnline = nxtServer.IsOnline;
                 nxtServer.PropertyChanged += (sender, args) => IsOnline = nxtServer.IsOnline;
             }
