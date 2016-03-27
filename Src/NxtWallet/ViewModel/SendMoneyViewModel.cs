@@ -36,7 +36,8 @@ namespace NxtWallet.ViewModel
 
         public RelayCommand SendMoneyCommand { get; }
 
-        public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository, ISendMoneyDialog sendMoneyDialog)
+        public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository,
+            ISendMoneyDialog sendMoneyDialog)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
@@ -51,25 +52,23 @@ namespace NxtWallet.ViewModel
             var ignore = _sendMoneyDialog.ShowAsync();
             await Task.Run(async () =>
             {
-                decimal amount;
-                decimal.TryParse(Amount, out amount);
+                var amount = decimal.Parse(Amount);
                 var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
+                SetBalance(transaction);
                 await _walletRepository.SaveTransactionAsync(transaction);
-                var balance = CalculateNewBalance(transaction);
-                await _walletRepository.SaveBalanceAsync(balance);
+                await _walletRepository.SaveBalanceAsync((transaction.NqtBalance/100000000M).ToFormattedString());
                 //await Task.Delay(5000); // For testing purposes
             });
             _sendMoneyDialog.Hide();
         }
 
-        private string CalculateNewBalance(ITransaction transaction)
+        private void SetBalance(ITransaction transaction)
         {
             // TODO: Could be a problem with different decimal separator signs in different regions
             var currentBalanceNxt = decimal.Parse(_walletRepository.Balance);
-            var currentBalanceNqt = currentBalanceNxt*100000000;
+            var currentBalanceNqt = (long)currentBalanceNxt *100000000;
             var newBalanceNqt = currentBalanceNqt - transaction.NqtAmount - transaction.NqtFeeAmount;
-            var newBalanceNxt = newBalanceNqt/100000000M;
-            return newBalanceNxt.ToFormattedString();
+            transaction.NqtBalance = newBalanceNqt;
         }
     }
 }
