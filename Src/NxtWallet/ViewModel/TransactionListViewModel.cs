@@ -26,7 +26,7 @@ namespace NxtWallet.ViewModel
             Transactions = new ObservableCollection<ViewModelTransaction>();
         }
 
-        public void LoadFromRepository()
+        public void LoadTransactionsFromRepository()
         {
             var transactions = Task.Run(async () => await _walletRepository.GetAllTransactionsAsync()).Result;
             InsertTransactions(transactions.Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs)));

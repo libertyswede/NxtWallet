@@ -18,7 +18,7 @@ namespace NxtWallet.Controls
 
         private async void TransactionListControl_OnLoading(FrameworkElement sender, object args)
         {
-            ViewModel.LoadFromRepository();
+            ViewModel.LoadTransactionsFromRepository();
             Bindings.Update();
             await ViewModel.LoadFromNxtServerAsync();
             Bindings.Update();
