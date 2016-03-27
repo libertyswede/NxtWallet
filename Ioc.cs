@@ -9,10 +9,10 @@ namespace NxtWallet
 {
     public class Ioc
     {
-        public OverviewViewModel OverviewViewModel => SimpleIoc.Default.GetInstance<OverviewViewModel>();
-        public SendMoneyViewModel SendMoneyViewModel => SimpleIoc.Default.GetInstance<SendMoneyViewModel>();
-        public TransactionDetailViewModel TransactionDetailViewModel => SimpleIoc.Default.GetInstance<TransactionDetailViewModel>();
-        public TransactionListViewModel TransactionListViewModel => SimpleIoc.Default.GetInstance<TransactionListViewModel>();
+        public OverviewViewModel OverviewViewModel => ServiceLocator.Current.GetInstance<OverviewViewModel>();
+        public SendMoneyViewModel SendMoneyViewModel => ServiceLocator.Current.GetInstance<SendMoneyViewModel>();
+        public TransactionDetailViewModel TransactionDetailViewModel => ServiceLocator.Current.GetInstance<TransactionDetailViewModel>();
+        public TransactionListViewModel TransactionListViewModel => ServiceLocator.Current.GetInstance<TransactionListViewModel>();
 
         static Ioc()
         {
