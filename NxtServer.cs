@@ -121,10 +121,16 @@ namespace NxtWallet
         }
     }
 
-    public class FakeNxtServer : INxtServer
+    public class FakeNxtServer : ObservableObject, INxtServer
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public bool IsOnline { get; set; } = true;
+        private bool _isOnline = true;
+
+        public bool IsOnline
+        {
+            get { return _isOnline; }
+            set { Set(ref _isOnline, value); }
+        }
+
         public Task<Result<string>> GetBalanceAsync()
         {
             return Task.FromResult(new Result<string>("11.00"));
