@@ -30,6 +30,7 @@ namespace NxtWallet
             }
 
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
+            SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();

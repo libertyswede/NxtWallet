@@ -11,6 +11,7 @@ namespace NxtWallet.ViewModel
     {
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
+        private readonly IBalanceCalculator _balanceCalculator;
         private ObservableCollection<ViewModelTransaction> _transactions;
 
         public ObservableCollection<ViewModelTransaction> Transactions
@@ -19,10 +20,11 @@ namespace NxtWallet.ViewModel
             set { Set(ref _transactions, value); }
         }
 
-        public TransactionListViewModel(IWalletRepository walletRepository, INxtServer nxtServer)
+        public TransactionListViewModel(IWalletRepository walletRepository, INxtServer nxtServer, IBalanceCalculator balanceCalculator)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
+            _balanceCalculator = balanceCalculator;
             Transactions = new ObservableCollection<ViewModelTransaction>();
         }
 
@@ -64,48 +66,11 @@ namespace NxtWallet.ViewModel
 
             if (newTransactions.Any())
             {
-                var firstNewTransaction = newTransactions.OrderBy(t => t.Timestamp).First();
-
                 InsertTransactions(newTransactions);
-                UpdateTransactionBalance(firstNewTransaction);
-                var updatedTransactions = UpdateSubsequentTransactionBalances(firstNewTransaction);
-                updatedTransactions = updatedTransactions.Except(newTransactions.Select(t => t.Transaction));
+                var updatedTransactions = _balanceCalculator.Calculate(newTransactions, Transactions);
                 await _walletRepository.SaveTransactionsAsync(newTransactions.Select(t => t.Transaction));
                 await _walletRepository.UpdateTransactionsAsync(updatedTransactions);
             }
-        }
-
-        private IEnumerable<ITransaction> UpdateSubsequentTransactionBalances(ViewModelTransaction viewModelTransaction)
-        {
-            var updatedTransactions = new HashSet<ITransaction>();
-            
-            foreach (var subsequentTransaction in GetSubsequentTransactions(viewModelTransaction))
-            {
-                UpdateTransactionBalance(subsequentTransaction);
-                updatedTransactions.Add(subsequentTransaction.Transaction);
-            }
-
-            return updatedTransactions;
-        }
-
-        private void UpdateTransactionBalance(ViewModelTransaction viewModelTransaction)
-        {
-            var previousBalance = GetPreviousTransaction(viewModelTransaction)?.Transaction?.NqtBalance ?? 0;
-            var transaction = viewModelTransaction.Transaction;
-
-            if (transaction.IsReceived(_walletRepository.NxtAccount.AccountRs))
-            {
-                viewModelTransaction.SetBalance(previousBalance + transaction.NqtAmount);
-            }
-            else
-            {
-                viewModelTransaction.SetBalance(previousBalance - (transaction.NqtAmount + transaction.NqtFeeAmount));
-            }
-        }
-
-        private IEnumerable<ViewModelTransaction> GetSubsequentTransactions(ViewModelTransaction transaction)
-        {
-            return Transactions.Where(t => t.Timestamp.CompareTo(transaction.Timestamp) > 0).ToList();
         }
 
         private ViewModelTransaction GetPreviousTransaction(ViewModelTransaction transaction)
