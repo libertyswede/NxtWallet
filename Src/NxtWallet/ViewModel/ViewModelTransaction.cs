@@ -1,10 +1,13 @@
 ﻿using System;
+using GalaSoft.MvvmLight;
 using NxtWallet.Model;
 
 namespace NxtWallet.ViewModel
 {
-    public class ViewModelTransaction : IEquatable<ViewModelTransaction>
+    public class ViewModelTransaction : ObservableObject, IEquatable<ViewModelTransaction>
     {
+        private bool _isConfirmed;
+
         public ulong NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public string Amount { get; set; }
@@ -17,6 +20,13 @@ namespace NxtWallet.ViewModel
         public string OtherAccount { get; set; }
         public string Message { get; set; }
         public bool UserIsRecipient { get; set; }
+
+        public bool IsConfirmed
+        {
+            get { return _isConfirmed; }
+            set { Set(ref _isConfirmed, value); }
+        }
+
         public ITransaction Transaction { get; set; }
 
         public ViewModelTransaction(ITransaction transaction, string myAccountRs)
@@ -31,6 +41,7 @@ namespace NxtWallet.ViewModel
             AccountFrom = UserIsRecipient ? transaction.AccountFrom : "you";
             AccountTo = UserIsRecipient ? "you" : transaction.AccountTo;
             OtherAccount = UserIsRecipient ? transaction.AccountFrom : transaction.AccountTo;
+            IsConfirmed = transaction.IsConfirmed;
             Transaction = transaction;
 
             if (UserIsRecipient)
