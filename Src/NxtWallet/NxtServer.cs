@@ -52,7 +52,7 @@ namespace NxtWallet
                 var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
                 IsOnline = true;
-                return new Result<string>(balanceResult.Balance.Nxt.ToFormattedString());
+                return new Result<string>(balanceResult.UnconfirmedBalance.Nxt.ToFormattedString());
             }
             catch (HttpRequestException)
             {
@@ -78,7 +78,10 @@ namespace NxtWallet
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactionsReply = await transactionService.GetBlockchainTransactions(
                     _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
+                var unconfirmedReply = await transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
+
                 transactionList.AddRange(transactionsReply.Transactions.Select(serverTransaction => new Transaction(serverTransaction)));
+                transactionList.AddRange(unconfirmedReply.UnconfirmedTransactions.Select(serverTransaction => new Transaction(serverTransaction)));
                 IsOnline = true;
             }
             catch (HttpRequestException)
