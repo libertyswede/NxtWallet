@@ -1,4 +1,5 @@
 ﻿using Windows.UI.Xaml;
+using GalaSoft.MvvmLight.Threading;
 using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet
@@ -22,8 +23,11 @@ namespace NxtWallet
                 SetActive(IsOnline);
                 nxtServer.PropertyChanged += (sender, args) =>
                 {
-                    IsOnline = nxtServer.IsOnline;
-                    SetActive(IsOnline);
+                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    {
+                        IsOnline = nxtServer.IsOnline;
+                        SetActive(IsOnline);
+                    });
                 };
             }
         }

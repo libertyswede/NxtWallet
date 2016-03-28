@@ -3,6 +3,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
+using GalaSoft.MvvmLight.Threading;
 using Microsoft.Practices.ServiceLocation;
 using NxtWallet.Model;
 
@@ -61,6 +62,7 @@ namespace NxtWallet
             }
             // Ensure the current window is active
             Window.Current.Activate();
+            DispatcherHelper.Initialize();
         }
 
         /// <summary>
