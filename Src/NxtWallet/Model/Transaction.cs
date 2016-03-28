@@ -1,4 +1,5 @@
 using System;
+using NxtWallet.ViewModel;
 
 namespace NxtWallet.Model
 {
@@ -56,11 +57,25 @@ namespace NxtWallet.Model
             Message = nxtTransaction.Message?.MessageText;
             Timestamp = nxtTransaction.Timestamp;
             NqtAmount = nxtTransaction.Amount.Nqt;
-            NqtBalance = 0;
             NqtFeeAmount = nxtTransaction.Fee.Nqt;
+            NqtBalance = 0;
             AccountFrom = nxtTransaction.SenderRs;
             AccountTo = nxtTransaction.RecipientRs;
             IsConfirmed = nxtTransaction.Confirmations.HasValue && nxtTransaction.Confirmations.Value > 0;
+        }
+
+        public Transaction(ViewModelTransaction transaction)
+        {
+            Id = transaction.Id;
+            NxtId = (long)transaction.NxtId;
+            Timestamp = transaction.Timestamp;
+            NqtAmount = transaction.NqtAmount;
+            NqtBalance = transaction.NqtBalance;
+            NqtFeeAmount = transaction.NqtFee;
+            AccountFrom = transaction.AccountFrom;
+            AccountTo = transaction.AccountTo;
+            Message = transaction.Message;
+            IsConfirmed = transaction.IsConfirmed;
         }
 
         public bool IsReceived(string yourAddressRs)

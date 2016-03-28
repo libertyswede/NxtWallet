@@ -8,18 +8,23 @@ namespace NxtWallet.ViewModel
     {
         private bool _isConfirmed;
 
-        public ulong NxtId { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Amount { get; set; }
-        public string AmountAbsolute { get; set; }
-        public string Fee { get; set; }
-        public string FeeAbsolute { get; set; }
-        public string Balance { get; private set; }
-        public string AccountFrom { get; set; }
-        public string AccountTo { get; set; }
-        public string OtherAccount { get; set; }
-        public string Message { get; set; }
-        public bool UserIsRecipient { get; set; }
+        public int Id { get; }
+        public ulong NxtId { get; }
+        public DateTime Timestamp { get; }
+        public long NqtAmount { get; }
+        public string FormattedAmount { get; }
+        public string FormattedAmountAbsolute { get; private set; }
+        public long NqtFee { get; }
+        public string FormattedFee { get; }
+        public string FormattedFeeAbsolute { get; private set; }
+        public long NqtBalance { get; private set; }
+        public string FormattedBalance { get; private set; }
+        public string AccountFrom { get; }
+        public string ContactListAccountFrom { get; }
+        public string AccountTo { get; }
+        public string ContactListAccountTo { get; }
+        public string Message { get; }
+        public bool UserIsRecipient { get; }
 
         public bool IsConfirmed
         {
@@ -27,38 +32,40 @@ namespace NxtWallet.ViewModel
             set { Set(ref _isConfirmed, value); }
         }
 
-        public ITransaction Transaction { get; set; }
-
         public ViewModelTransaction(ITransaction transaction, string myAccountRs)
         {
             UserIsRecipient = myAccountRs.Equals(transaction.AccountTo);
+            Id = transaction.Id;
             NxtId = (ulong)transaction.NxtId;
             Timestamp = transaction.Timestamp;
-            AmountAbsolute = Amount = (transaction.NqtAmount/(decimal) 100000000).ToFormattedString();
-            Balance = (transaction.NqtBalance/(decimal) 100000000).ToFormattedString();
-            FeeAbsolute = Fee = (transaction.NqtFeeAmount/(decimal) 100000000).ToFormattedString();
+            NqtAmount = transaction.NqtAmount;
+            NqtBalance = transaction.NqtBalance;
+            NqtFee = transaction.NqtFeeAmount;
+            FormattedAmountAbsolute = FormattedAmount = (NqtAmount/(decimal) 100000000).ToFormattedString();
+            FormattedBalance = (NqtBalance/(decimal) 100000000).ToFormattedString();
+            FormattedFeeAbsolute = FormattedFee = (NqtFee/(decimal) 100000000).ToFormattedString();
             Message = transaction.Message;
-            AccountFrom = UserIsRecipient ? transaction.AccountFrom : "you";
-            AccountTo = UserIsRecipient ? "you" : transaction.AccountTo;
-            OtherAccount = UserIsRecipient ? transaction.AccountFrom : transaction.AccountTo;
+            AccountFrom = transaction.AccountFrom;
+            ContactListAccountFrom = UserIsRecipient ? transaction.AccountFrom : "you";
+            AccountTo = transaction.AccountTo;
+            ContactListAccountTo = UserIsRecipient ? "you" : transaction.AccountTo;
             IsConfirmed = transaction.IsConfirmed;
-            Transaction = transaction;
 
             if (UserIsRecipient)
             {
-                Fee = string.Empty;
+                FormattedFee = string.Empty;
             }
             else
             {
-                Amount = "-" + Amount;
-                Fee = "-" + Fee;
+                FormattedAmount = "-" + FormattedAmount;
+                FormattedFee = "-" + FormattedFee;
             }
         }
 
         public void SetBalance(long balance)
         {
-            Transaction.NqtBalance = balance;
-            Balance = (balance / (decimal)100000000).ToFormattedString();
+            NqtBalance = balance;
+            FormattedBalance = (balance / (decimal)100000000).ToFormattedString();
         }
 
         public override bool Equals(object obj)
@@ -75,6 +82,11 @@ namespace NxtWallet.ViewModel
         public bool Equals(ViewModelTransaction other)
         {
             return other?.NxtId == NxtId;
+        }
+
+        public bool IsReceived(string yourAccountRs)
+        {
+            return AccountTo == yourAccountRs;
         }
     }
 }

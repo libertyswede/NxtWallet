@@ -25,7 +25,7 @@ namespace NxtWallet
             var firstNewTransaction = newTransactions.OrderBy(t => t.Timestamp).First();
             UpdateTransactionBalance(firstNewTransaction, allTransactions);
             var updatedTransactions = UpdateSubsequentTransactionBalances(firstNewTransaction, allTransactions);
-            updatedTransactions = updatedTransactions.Except(newTransactions.Select(t => t.Transaction));
+            updatedTransactions = updatedTransactions.Except(newTransactions);
             return updatedTransactions;
         }
 
@@ -41,24 +41,23 @@ namespace NxtWallet
             foreach (var subsequentTransaction in GetSubsequentTransactions(viewModelTransaction, allTransactions))
             {
                 UpdateTransactionBalance(subsequentTransaction, allTransactions);
-                updatedTransactions.Add(subsequentTransaction.Transaction);
+                updatedTransactions.Add(new Transaction(subsequentTransaction));
             }
 
             return updatedTransactions;
         }
 
-        private void UpdateTransactionBalance(ViewModelTransaction viewModelTransaction, IEnumerable<ViewModelTransaction> allTransactions)
+        private void UpdateTransactionBalance(ViewModelTransaction transaction, IEnumerable<ViewModelTransaction> allTransactions)
         {
-            var previousBalance = GetPreviousTransaction(viewModelTransaction, allTransactions)?.Transaction?.NqtBalance ?? 0;
-            var transaction = viewModelTransaction.Transaction;
+            var previousBalance = GetPreviousTransaction(transaction, allTransactions)?.NqtBalance ?? 0;
 
             if (transaction.IsReceived(_walletRepository.NxtAccount.AccountRs))
             {
-                viewModelTransaction.SetBalance(previousBalance + transaction.NqtAmount);
+                transaction.SetBalance(previousBalance + transaction.NqtAmount);
             }
             else
             {
-                viewModelTransaction.SetBalance(previousBalance - (transaction.NqtAmount + transaction.NqtFeeAmount));
+                transaction.SetBalance(previousBalance - (transaction.NqtAmount + transaction.NqtFee));
             }
         }
 
