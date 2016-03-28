@@ -73,25 +73,25 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="AmountLabelTextBlock" Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" FontSize="{StaticResource TextBlockFontNormalSize}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
                 <TextBlock x:Name="AmountValueTextBlock" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.Transaction.AmountAbsolute}" />
+                    <Run Text="{x:Bind ViewModel.Transaction.FormattedAmountAbsolute}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
                 <TextBlock x:Name="FeeLabelTextBlock" Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.Transaction.FeeAbsolute}" />
+                    <Run Text="{x:Bind ViewModel.Transaction.FormattedFeeAbsolute}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <TextBlock x:Name="BalanceLabelTextBlock" Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="BalanceValueTextBlock" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.Transaction.Balance}" />
+                    <Run Text="{x:Bind ViewModel.Transaction.FormattedBalance}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
                 <TextBlock x:Name="SenderLabelTextBlock" Grid.Row="3" Grid.Column="0" Text="Sender:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="SenderValueTextBlock" Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountFrom}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="SenderValueTextBlock" Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.ContactListAccountFrom}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="RecipientLabelTextBlock" Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="RecipientValueTextBlock" Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.AccountTo}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="RecipientValueTextBlock" Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.ContactListAccountTo}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
                 <TextBlock x:Name="TimestampLabelTextBlock" Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="TimestampValueTextBlock" Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.Transaction.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" 

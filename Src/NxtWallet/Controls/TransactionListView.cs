@@ -39,23 +39,46 @@ namespace NxtWallet.Controls
         public TransactionListView()
         {
             Loaded += OnLoaded;
+            Unloaded += OnUnloaded;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
             var source = (ObservableCollection<ViewModelTransaction>)ItemsSource;
             source.CollectionChanged += Source_CollectionChanged;
+
+            foreach (var viewModelTransaction in source)
+            {
+                viewModelTransaction.PropertyChanged += TransactionOnPropertyChanged;
+            }
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            var source = (ObservableCollection<ViewModelTransaction>)ItemsSource;
+            source.CollectionChanged -= Source_CollectionChanged;
+
+            foreach (var viewModelTransaction in source)
+            {
+                viewModelTransaction.PropertyChanged -= TransactionOnPropertyChanged;
+            }
         }
 
         private void Source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (var newTransaction in e.NewItems.Cast<ViewModelTransaction>())
+            if (e.NewItems != null)
             {
-                newTransaction.PropertyChanged += TransactionOnPropertyChanged;
+                foreach (var newTransaction in e.NewItems?.Cast<ViewModelTransaction>())
+                {
+                    newTransaction.PropertyChanged += TransactionOnPropertyChanged;
+                }
             }
-            foreach (var oldTransaction in e.OldItems.Cast<ViewModelTransaction>())
+            if (e.OldItems != null)
             {
-                oldTransaction.PropertyChanged -= TransactionOnPropertyChanged;
+                foreach (var oldTransaction in e.OldItems.Cast<ViewModelTransaction>())
+                {
+                    oldTransaction.PropertyChanged -= TransactionOnPropertyChanged;
+                }
             }
         }
 

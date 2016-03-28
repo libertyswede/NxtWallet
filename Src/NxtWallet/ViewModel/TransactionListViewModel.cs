@@ -59,16 +59,30 @@ namespace NxtWallet.ViewModel
 
         public async Task LoadFromNxtServerAsync()
         {
-            var newTransactions = (await _nxtServer.GetTransactionsAsync())
+            var transactions = (await _nxtServer.GetTransactionsAsync())
                 .Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs))
-                .Except(Transactions)
                 .ToList();
+
+            var newTransactions = transactions.Except(Transactions).ToList();
+            var previouslyUnconfirmedTransactions = transactions
+                .Except(Transactions.Where(t => t.IsConfirmed).Union(newTransactions))
+                .ToList();
+
+            var updatedConfirmed = new List<ITransaction>();
+
+            foreach (var previouslyUnconfirmedTransaction in previouslyUnconfirmedTransactions.Where(t => t.IsConfirmed))
+            {
+                var existing = Transactions.Single(t => t.NxtId == previouslyUnconfirmedTransaction.NxtId);
+                existing.IsConfirmed = true;
+                updatedConfirmed.Add(new Transaction(existing));
+            }
+            await _walletRepository.UpdateTransactionsAsync(updatedConfirmed);
 
             if (newTransactions.Any())
             {
                 InsertTransactions(newTransactions);
                 var updatedTransactions = _balanceCalculator.Calculate(newTransactions, Transactions);
-                await _walletRepository.SaveTransactionsAsync(newTransactions.Select(t => t.Transaction));
+                await _walletRepository.SaveTransactionsAsync(newTransactions.Select(t => new Transaction(t)));
                 await _walletRepository.UpdateTransactionsAsync(updatedTransactions);
             }
         }
