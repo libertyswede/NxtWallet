@@ -10,8 +10,6 @@ namespace NxtWallet.ViewModel
     public class TransactionListViewModel : ViewModelBase
     {
         private readonly IWalletRepository _walletRepository;
-        private readonly INxtServer _nxtServer;
-        private readonly IBalanceCalculator _balanceCalculator;
         private ObservableCollection<ViewModelTransaction> _transactions;
 
         public ObservableCollection<ViewModelTransaction> Transactions
@@ -20,11 +18,24 @@ namespace NxtWallet.ViewModel
             set { Set(ref _transactions, value); }
         }
 
-        public TransactionListViewModel(IWalletRepository walletRepository, INxtServer nxtServer, IBalanceCalculator balanceCalculator)
+        public TransactionListViewModel(IWalletRepository walletRepository, IBackgroundRunner backgroundRunner)
         {
+            backgroundRunner.TransactionAdded += (sender, transaction) =>
+            {
+                InsertTransaction(new ViewModelTransaction(transaction, walletRepository.NxtAccount.AccountRs));
+            };
+            backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
+            {
+                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.GetTransactionId());
+                existingTransaction.SetBalance(transaction.NqtBalance);
+            };
+            backgroundRunner.TransactionConfirmationUpdated += (sender, transaction) =>
+            {
+                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.GetTransactionId());
+                existingTransaction.IsConfirmed = transaction.IsConfirmed;
+            };
+
             _walletRepository = walletRepository;
-            _nxtServer = nxtServer;
-            _balanceCalculator = balanceCalculator;
             Transactions = new ObservableCollection<ViewModelTransaction>();
         }
 
@@ -38,52 +49,27 @@ namespace NxtWallet.ViewModel
         {
             foreach (var transaction in transactions.Except(Transactions))
             {
-                if (!Transactions.Any())
-                {
-                    Transactions.Add(transaction);
-                }
-                else
-                {
-                    var index = GetPreviousTransactionIndex(transaction);
-                    if (index.HasValue)
-                    {
-                        Transactions.Insert(index.Value, transaction);
-                    }
-                    else
-                    {
-                        Transactions.Add(transaction);
-                    }
-                }
+                InsertTransaction(transaction);
             }
         }
 
-        public async Task LoadFromNxtServerAsync()
+        private void InsertTransaction(ViewModelTransaction transaction)
         {
-            var transactions = (await _nxtServer.GetTransactionsAsync())
-                .Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs))
-                .ToList();
-
-            var newTransactions = transactions.Except(Transactions).ToList();
-            var previouslyUnconfirmedTransactions = transactions
-                .Except(Transactions.Where(t => t.IsConfirmed).Union(newTransactions))
-                .ToList();
-
-            var updatedConfirmed = new List<ITransaction>();
-
-            foreach (var previouslyUnconfirmedTransaction in previouslyUnconfirmedTransactions.Where(t => t.IsConfirmed))
+            if (!Transactions.Any())
             {
-                var existing = Transactions.Single(t => t.NxtId == previouslyUnconfirmedTransaction.NxtId);
-                existing.IsConfirmed = true;
-                updatedConfirmed.Add(new Transaction(existing));
+                Transactions.Add(transaction);
             }
-            await _walletRepository.UpdateTransactionsAsync(updatedConfirmed);
-
-            if (newTransactions.Any())
+            else
             {
-                InsertTransactions(newTransactions);
-                var updatedTransactions = _balanceCalculator.Calculate(newTransactions, Transactions);
-                await _walletRepository.SaveTransactionsAsync(newTransactions.Select(t => new Transaction(t)));
-                await _walletRepository.UpdateTransactionsAsync(updatedTransactions);
+                var index = GetPreviousTransactionIndex(transaction);
+                if (index.HasValue)
+                {
+                    Transactions.Insert(index.Value, transaction);
+                }
+                else
+                {
+                    Transactions.Add(transaction);
+                }
             }
         }
 

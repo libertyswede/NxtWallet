@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
 
@@ -13,7 +12,7 @@ namespace NxtWallet.Test
         [TestInitialize]
         public void TestInitialize()
         {
-            _viewmodel = new TransactionListViewModel(new FakeWalletRepository(), new FakeNxtServer(), new BalanceCalculator(new FakeWalletRepository()));
+            _viewmodel = new TransactionListViewModel(new FakeWalletRepository(), new FakeBackgroundRunner());
         }
 
         [TestMethod]

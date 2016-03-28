@@ -106,10 +106,12 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BackgroundRunner.cs" />
     <Compile Include="Controls\TransactionListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FakeBackgroundRunner.cs" />
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.cs" />

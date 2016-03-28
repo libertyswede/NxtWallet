@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -11,6 +13,8 @@ namespace NxtWallet
 {
     sealed partial class App
     {
+        private CancellationTokenSource _cancellationTokenSource;
+
         public App()
         {
             Ioc.Register();
@@ -63,6 +67,10 @@ namespace NxtWallet
             // Ensure the current window is active
             Window.Current.Activate();
             DispatcherHelper.Initialize();
+            _cancellationTokenSource = new CancellationTokenSource();
+            var token = _cancellationTokenSource.Token;
+            var runner = ServiceLocator.Current.GetInstance<IBackgroundRunner>();
+            Task.Factory.StartNew(() => runner.Run(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
         /// <summary>
@@ -86,6 +94,14 @@ namespace NxtWallet
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
+            try
+            {
+                _cancellationTokenSource.Cancel();
+            }
+            catch (Exception)
+            {
+                
+            }
             deferral.Complete();
         }
     }
