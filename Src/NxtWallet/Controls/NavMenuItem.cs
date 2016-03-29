@@ -1,14 +1,15 @@
 ﻿using System;
-using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
-namespace NxtWallet
+namespace NxtWallet.Controls
 {
     public class NavMenuItem
     {
         public string Label { get; set; }
-        public Symbol Symbol { get; set; }
-        public char SymbolAsChar => (char)Symbol;
+        public string ImageSource { get; set; }
         public Type DestPage { get; set; }
+        public int Width { get; set; } = 20;
+        public int Height { get; set; } = 20;
         public object Arguments { get; set; }
     }
 }

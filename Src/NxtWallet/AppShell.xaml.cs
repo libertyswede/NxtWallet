@@ -19,14 +19,36 @@ namespace NxtWallet
             {
                 new NavMenuItem
                 {
-                    Symbol = Symbol.Home,
+                    ImageSource = "Assets\\Menu\\home-48x48.png",
                     Label = "Overview",
                     DestPage = typeof (OverviewPage)
                 },
                 new NavMenuItem
                 {
-                    Symbol = Symbol.MailForward,
+                    ImageSource = "Assets\\Menu\\send-money-48x48.png",
                     Label = "Send NXT",
+                    Height = 22,
+                    Width = 22,
+                    DestPage = typeof (SendMoneyPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\receive-money-48x48.png",
+                    Label = "Receive NXT",
+                    Height = 22,
+                    Width = 22,
+                    DestPage = typeof (SendMoneyPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\contacts-48x48.png",
+                    Label = "Contacts",
+                    DestPage = typeof (SendMoneyPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\settings-48x48.png",
+                    Label = "Settings",
                     DestPage = typeof (SendMoneyPage)
                 }
             });

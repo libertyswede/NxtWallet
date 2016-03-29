@@ -2,7 +2,6 @@
     x:Class="NxtWallet.AppShell"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:NxtWallet"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:NxtWallet.Controls"
@@ -10,7 +9,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="NavMenuItemTemplate" x:DataType="local:NavMenuItem">
+        <DataTemplate x:Key="NavMenuItemTemplate" x:DataType="controls:NavMenuItem">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="48" />
@@ -20,8 +19,8 @@
                      It appears when the user hovers over the icon, but not the label which provides
                      value when the SplitView is 'Compact' while reducing the likelihood of showing
                      redundant information when the label is shown.-->
-                <FontIcon x:Name="Glyph" FontSize="16" Glyph="{x:Bind SymbolAsChar}" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTipService.ToolTip="{x:Bind Label}"/>
-                <TextBlock x:Name="Text" Grid.Column="1" Text="{x:Bind Label}" />
+                <Image Source="{x:Bind ImageSource}" Width="{x:Bind Width}" Height="{x:Bind Height}" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTipService.ToolTip="{x:Bind Label}"/>
+                <TextBlock Grid.Column="1" Text="{x:Bind Label}" />
             </Grid>
         </DataTemplate>
     </Page.Resources>

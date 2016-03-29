@@ -126,7 +126,7 @@
       <DependentUpon>20160321112810_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
-    <Compile Include="NavMenuItem.cs" />
+    <Compile Include="Controls\NavMenuItem.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
@@ -167,6 +167,11 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Menu\contacts-48x48.png" />
+    <Content Include="Assets\Menu\home-48x48.png" />
+    <Content Include="Assets\Menu\receive-money-48x48.png" />
+    <Content Include="Assets\Menu\send-money-48x48.png" />
+    <Content Include="Assets\Menu\settings-48x48.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-100.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
