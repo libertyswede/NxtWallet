@@ -49,7 +49,7 @@ namespace NxtWallet
                 {
                     ImageSource = "Assets\\Menu\\settings-48x48.png",
                     Label = "Settings",
-                    DestPage = typeof (SendMoneyPage)
+                    DestPage = typeof (SettingsPage)
                 }
             });
 

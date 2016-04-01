@@ -18,5 +18,6 @@ namespace NxtWallet.Model
         Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions);
         Task SaveBalanceAsync(string balance);
         Task<ITransaction> GetLatestTransactionAsync();
+        Task UpdateNxtServer(string newServerAddress);
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
+using Newtonsoft.Json;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
@@ -23,14 +24,15 @@ namespace NxtWallet
         Task<Result<string>> GetBalanceAsync();
         Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<ITransaction>> GetTransactionsAsync();
-        Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<Result<ITransaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
+        void UpdateNxtServer(string newServerAddress);
     }
 
     public class NxtServer : ObservableObject, INxtServer
     {
         private readonly IWalletRepository _walletRepository;
         private bool _isOnline;
-        private readonly IServiceFactory _serviceFactory;
+        private IServiceFactory _serviceFactory;
 
         public bool IsOnline
         {
@@ -45,6 +47,7 @@ namespace NxtWallet
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
+        //TODO: Scrap Result class and instead cast one Exception type, wrapping the caught exception
         public async Task<Result<string>> GetBalanceAsync()
         {
             try
@@ -55,6 +58,10 @@ namespace NxtWallet
                 return new Result<string>(balanceResult.UnconfirmedBalance.Nxt.ToFormattedString());
             }
             catch (HttpRequestException)
+            {
+                IsOnline = false;
+            }
+            catch (JsonReaderException)
             {
                 IsOnline = false;
             }
@@ -69,7 +76,6 @@ namespace NxtWallet
         }
 
         //TODO: Phased transactions?
-        //TODO: Make multiple calls to get ALL transactions
         public async Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
             var transactionList = new List<Transaction>();
@@ -78,13 +84,22 @@ namespace NxtWallet
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactionsReply = await transactionService.GetBlockchainTransactions(
                     _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
-                var unconfirmedReply = await transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
+                var unconfirmedReply =
+                    await
+                        transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
 
-                transactionList.AddRange(transactionsReply.Transactions.Select(serverTransaction => new Transaction(serverTransaction)));
-                transactionList.AddRange(unconfirmedReply.UnconfirmedTransactions.Select(serverTransaction => new Transaction(serverTransaction)));
+                transactionList.AddRange(
+                    transactionsReply.Transactions.Select(serverTransaction => new Transaction(serverTransaction)));
+                transactionList.AddRange(
+                    unconfirmedReply.UnconfirmedTransactions.Select(
+                        serverTransaction => new Transaction(serverTransaction)));
                 IsOnline = true;
             }
             catch (HttpRequestException)
+            {
+                IsOnline = false;
+            }
+            catch (JsonReaderException)
             {
                 IsOnline = false;
             }
@@ -96,19 +111,36 @@ namespace NxtWallet
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
 
-        public async Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public async Task<Result<ITransaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            var accountService = _serviceFactory.CreateAccountService();
-            var transactionService = _serviceFactory.CreateTransactionService();
-            var localTransactionService = new LocalTransactionService();
+            try
+            {
+                var accountService = _serviceFactory.CreateAccountService();
+                var transactionService = _serviceFactory.CreateTransactionService();
+                var localTransactionService = new LocalTransactionService();
 
-            var sendMoneyReply = await CreateUnsignedSendMoneyReply(recipient, amount, message, accountService);
-            var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
-            var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
+                var sendMoneyReply = await CreateUnsignedSendMoneyReply(recipient, amount, message, accountService);
+                var signedTransaction = localTransactionService.SignTransaction(sendMoneyReply, _walletRepository.SecretPhrase);
+                var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
 
-            IsOnline = true;
-            var transaction = new Transaction(sendMoneyReply.Transaction, (long)broadcastReply.TransactionId);
-            return transaction;
+                IsOnline = true;
+                var transaction = new Transaction(sendMoneyReply.Transaction, (long)broadcastReply.TransactionId);
+                return new Result<ITransaction>(transaction);
+            }
+            catch (HttpRequestException)
+            {
+                IsOnline = false;
+            }
+            catch (JsonReaderException)
+            {
+                IsOnline = false;
+            }
+            return new Result<ITransaction>();
+        }
+
+        public void UpdateNxtServer(string newServerAddress)
+        {
+            _serviceFactory = new ServiceFactory(newServerAddress);
         }
 
         private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string message,

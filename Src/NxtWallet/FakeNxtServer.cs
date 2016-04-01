@@ -34,9 +34,13 @@ namespace NxtWallet
             return GetTransactionsAsync(DateTime.UtcNow);
         }
 
-        public Task<ITransaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<Result<ITransaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            return Task.FromResult((ITransaction)new Transaction());
+            return Task.FromResult(new Result<ITransaction>(new Transaction()));
+        }
+
+        public void UpdateNxtServer(string newServerAddress)
+        {
         }
     }
 }

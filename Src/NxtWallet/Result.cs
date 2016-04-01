@@ -5,8 +5,9 @@ namespace NxtWallet
         public bool Success { get; set; }
         public T Value { get; set; }
 
-        public Result()
+        public Result(bool success = false)
         {
+            Success = success;
         }
 
         public Result(T value, bool success = true)

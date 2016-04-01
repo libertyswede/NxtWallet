@@ -84,5 +84,10 @@ namespace NxtWallet.Model
         {
             return Task.FromResult(GetAllTransactionsAsync().Result.Last());
         }
+
+        public Task UpdateNxtServer(string newServerAddress)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

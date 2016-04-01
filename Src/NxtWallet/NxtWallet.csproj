@@ -131,6 +131,7 @@
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
+    <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
     <Compile Include="ViewModel\ViewModelTransaction.cs" />
@@ -152,6 +153,9 @@
     </Compile>
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TransactionDetailPage.xaml.cs">
       <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
@@ -221,6 +225,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SendMoneyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

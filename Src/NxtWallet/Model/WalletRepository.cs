@@ -117,6 +117,16 @@ namespace NxtWallet.Model
             }
         }
 
+        public async Task UpdateNxtServer(string newServerAddress)
+        {
+            using (var context = new WalletContext())
+            {
+                var setting = context.Settings.Single(s => s.Key == NxtServerKey);
+                setting.Value = newServerAddress;
+                await context.SaveChangesAsync();
+            }
+        }
+
         private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;
