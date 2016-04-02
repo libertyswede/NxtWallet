@@ -131,6 +131,7 @@
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
+    <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
@@ -151,6 +152,9 @@
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="Controls\SendMoneyDialog.xaml.cs">
       <DependentUpon>SendMoneyDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReceiveMoneyPage.xaml.cs">
+      <DependentUpon>ReceiveMoneyPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SendMoneyPage.xaml.cs">
       <DependentUpon>SendMoneyPage.xaml</DependentUpon>
@@ -222,6 +226,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SendMoneyDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReceiveMoneyPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

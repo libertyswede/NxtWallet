@@ -37,7 +37,7 @@ namespace NxtWallet
                     Label = "Receive NXT",
                     Height = 22,
                     Width = 22,
-                    DestPage = typeof (SendMoneyPage)
+                    DestPage = typeof (ReceiveMoneyPage)
                 },
                 new NavMenuItem
                 {
