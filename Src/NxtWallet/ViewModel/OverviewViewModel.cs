@@ -11,6 +11,7 @@ namespace NxtWallet.ViewModel
 
         private string _balance;
         private string _nxtAddress;
+        private bool _showAddress;
 
         public string NxtAddress
         {
@@ -24,6 +25,12 @@ namespace NxtWallet.ViewModel
             set { Set(ref _balance, value); }
         }
 
+        public bool ShowAddress
+        {
+            get { return _showAddress; }
+            set { Set(ref _showAddress, value); }
+        }
+
         public OverviewViewModel(IWalletRepository walletRepository, INxtServer nxtServer)
         {
             _walletRepository = walletRepository;
@@ -31,6 +38,7 @@ namespace NxtWallet.ViewModel
 
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
+            ShowAddress = walletRepository.BackupCompleted;
         }
 
         public void LoadFromRepository()

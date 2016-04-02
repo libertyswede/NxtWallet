@@ -11,12 +11,14 @@ namespace NxtWallet.Model
     public class WalletRepository : IWalletRepository
     {
         private const string SecretPhraseKey = "secretPhrase";
+        private const string BackupCompletedKey = "backupCompleted";
         private const string NxtServerKey = "nxtServer";
         private const string BalanceKey = "balance";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
         public string SecretPhrase { get; private set; }
+        public bool BackupCompleted { get; private set; }
         public string Balance { get; private set; }
 
         public async Task LoadAsync()
@@ -30,6 +32,7 @@ namespace NxtWallet.Model
                 ReadOrGenerateSecretPhrase(dbSettings, context);
                 ReadOrGenerateNxtServer(dbSettings, context);
                 ReadOrGenerateBalance(dbSettings, context);
+                ReadOrGenerateBackupCompleted(dbSettings, context);
 
                 NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
                 await context.SaveChangesAsync();
@@ -134,6 +137,20 @@ namespace NxtWallet.Model
             {
                 Balance = "0.0";
                 context.Settings.Add(new Setting {Key = BalanceKey, Value = Balance});
+            }
+        }
+
+        private void ReadOrGenerateBackupCompleted(IEnumerable<Setting> dbSettings, WalletContext context)
+        {
+            var backupCompleted = dbSettings.SingleOrDefault(s => s.Key.Equals(BackupCompletedKey))?.Value;
+            if (backupCompleted == null)
+            {
+                BackupCompleted = false;
+                context.Settings.Add(new Setting {Key = BackupCompletedKey, Value = BackupCompleted.ToString()});
+            }
+            else
+            {
+                BackupCompleted = bool.Parse(backupCompleted);
             }
         }
 

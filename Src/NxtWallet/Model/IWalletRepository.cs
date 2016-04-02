@@ -10,6 +10,7 @@ namespace NxtWallet.Model
         string NxtServer { get; }
         string SecretPhrase { get; }
         string Balance { get; }
+        bool BackupCompleted { get; }
 
         Task LoadAsync();
         Task<IEnumerable<ITransaction>> GetAllTransactionsAsync();

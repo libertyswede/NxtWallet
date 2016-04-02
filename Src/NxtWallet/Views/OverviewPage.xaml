@@ -5,9 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:NxtWallet.Controls"
+    xmlns:nxtWallet="using:NxtWallet"
     mc:Ignorable="d"
     Loading="OverviewPage_OnLoading"
     DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
+    <Page.Resources>
+        <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisibilityConverter" />
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -18,9 +22,9 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="TextBlock.(TextBlock.FontSize)" Value="18.667"/>
-                        <Setter Target="TextBlock.(FrameworkElement.Margin)">
+                        <Setter Target="InnerGrid.(FrameworkElement.Margin)">
                             <Setter.Value>
-                                <Thickness>0,10,0,0</Thickness>
+                                <Thickness>15,10,15,0</Thickness>
                             </Setter.Value>
                         </Setter>
                         <Setter Target="BalanceTextBlock.(TextBlock.FontSize)" Value="16"/>
@@ -46,14 +50,15 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="140"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,0,15,10" >
+        <Grid x:Name="InnerGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,-30,15,10" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" x:Name="TextBlock" TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" Margin="0,-20,0,0" Grid.ColumnSpan="2" />
+            <TextBlock Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="0" x:Name="TextBlock" 
+                       TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" Grid.ColumnSpan="2" />
             <Border Grid.Row="1" Margin="0,5,0,0" Padding="0,0,0,10" BorderBrush="AliceBlue" BorderThickness="0,0,0,2">
                 <TextBlock x:Name="BalanceTextBlock" TextWrapping="NoWrap" FontSize="21.333">
                     <Run Text="Balance:" />
