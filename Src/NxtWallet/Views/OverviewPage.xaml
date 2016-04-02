@@ -24,7 +24,7 @@
                         <Setter Target="TextBlock.(TextBlock.FontSize)" Value="18.667"/>
                         <Setter Target="InnerGrid.(FrameworkElement.Margin)">
                             <Setter.Value>
-                                <Thickness>15,10,15,0</Thickness>
+                                <Thickness>15,50,15,0</Thickness>
                             </Setter.Value>
                         </Setter>
                         <Setter Target="BalanceTextBlock.(TextBlock.FontSize)" Value="16"/>
@@ -50,7 +50,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="140"/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="InnerGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,-30,15,10" >
+        <Grid x:Name="InnerGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="15,10,15,10" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
