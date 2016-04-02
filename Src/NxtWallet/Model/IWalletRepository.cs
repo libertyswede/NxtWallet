@@ -20,5 +20,6 @@ namespace NxtWallet.Model
         Task SaveBalanceAsync(string balance);
         Task<ITransaction> GetLatestTransactionAsync();
         Task UpdateNxtServer(string newServerAddress);
+        Task<bool> HasOutgoingTransaction();
     }
 }

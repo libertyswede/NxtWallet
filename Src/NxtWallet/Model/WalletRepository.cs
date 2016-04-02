@@ -130,6 +130,15 @@ namespace NxtWallet.Model
             }
         }
 
+        public async Task<bool> HasOutgoingTransaction()
+        {
+            using (var context = new WalletContext())
+            {
+                var anyTransaction = await context.Transactions.AnyAsync(t => t.AccountFrom == NxtAccount.AccountRs);
+                return anyTransaction;
+            }
+        }
+
         private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
         {
             Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;

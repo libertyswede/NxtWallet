@@ -90,5 +90,10 @@ namespace NxtWallet.Model
         {
             return Task.CompletedTask;
         }
+
+        public Task<bool> HasOutgoingTransaction()
+        {
+            return Task.FromResult(true);
+        }
     }
 }
