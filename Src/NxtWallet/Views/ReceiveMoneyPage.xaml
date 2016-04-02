@@ -10,6 +10,7 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <TextBlock Text="{x:Bind ViewModel.NxtAddress}" Margin="10,10,-10,-10"/>
         <TextBlock Text="{x:Bind ViewModel.PublicKey}" Margin="10,38,-10,-38"/>
+        <Image Source="{x:Bind ViewModel.NxtAddressQr}" Margin="10,80,0,0" Width="200" Height="200" />
 
     </Grid>
 </Page>
