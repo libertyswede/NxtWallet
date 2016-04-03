@@ -15,6 +15,7 @@ namespace NxtWallet
         public TransactionListViewModel TransactionListViewModel => ServiceLocator.Current.GetInstance<TransactionListViewModel>();
         public SettingsViewModel SettingsViewModel => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public ReceiveMoneyViewModel ReceiveMoneyViewModel => ServiceLocator.Current.GetInstance<ReceiveMoneyViewModel>();
+        public ContactsViewModel ContactsViewModel => ServiceLocator.Current.GetInstance<ContactsViewModel>();
 
         static Ioc()
         {
@@ -40,6 +41,7 @@ namespace NxtWallet
             SimpleIoc.Default.Register<TransactionDetailViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<ReceiveMoneyViewModel>();
+            SimpleIoc.Default.Register<ContactsViewModel>();
         }
 
         public static void Register()

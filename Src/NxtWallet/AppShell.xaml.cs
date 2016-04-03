@@ -43,7 +43,7 @@ namespace NxtWallet
                 {
                     ImageSource = "Assets\\Menu\\contacts-48x48.png",
                     Label = "Contacts",
-                    DestPage = typeof (SendMoneyPage)
+                    DestPage = typeof (ContactsPage)
                 },
                 new NavMenuItem
                 {

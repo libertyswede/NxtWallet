@@ -131,6 +131,7 @@
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
+    <Compile Include="ViewModel\ContactsViewModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
@@ -140,6 +141,9 @@
     <Compile Include="IDialog.cs" />
     <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContactsPage.xaml.cs">
+      <DependentUpon>ContactsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
@@ -214,6 +218,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\NetworkIndicatorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ContactsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
