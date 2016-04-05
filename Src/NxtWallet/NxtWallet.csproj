@@ -119,6 +119,10 @@
     <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.designer.cs">
       <DependentUpon>20160327165305_Transaction_IsConfirmed.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20160405092302_Contacts.cs" />
+    <Compile Include="Migrations\20160405092302_Contacts.designer.cs">
+      <DependentUpon>20160405092302_Contacts.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\Contact.cs" />
     <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
