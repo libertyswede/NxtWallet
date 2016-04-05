@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
@@ -137,6 +138,19 @@ namespace NxtWallet.Model
                 var anyTransaction = await context.Transactions.AnyAsync(t => t.AccountFrom == NxtAccount.AccountRs);
                 return anyTransaction;
             }
+        }
+
+        public Task<IEnumerable<Contact>> GetAllContacts()
+        {
+            var contacts = new List<Contact>
+            {
+                new Contact {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
+                new Contact {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},
+                new Contact {Name = "EvilDave", NxtAddressRs = "NXT-BNZB-9V8M-XRPW-3S3WD"},
+                new Contact {Name = "coretechs", NxtAddressRs = "NXT-WY9K-ZMTT-QQTT-3NBL7"},
+                new Contact {Name = "Damelon", NxtAddressRs = "NXT-D6K7-MLY6-98FM-FLL5T"}
+            };
+            return Task.FromResult(contacts.AsEnumerable());
         }
 
         private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)

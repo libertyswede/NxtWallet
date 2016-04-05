@@ -119,6 +119,7 @@
     <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.designer.cs">
       <DependentUpon>20160327165305_Transaction_IsConfirmed.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Contact.cs" />
     <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
@@ -128,6 +129,7 @@
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />
+    <Compile Include="Model\WalletRepository.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
@@ -172,7 +174,6 @@
     <Compile Include="Controls\TransactionListControl.xaml.cs">
       <DependentUpon>TransactionListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\WalletRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

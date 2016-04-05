@@ -7,7 +7,17 @@
     mc:Ignorable="d"
     DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Margin="253,254,0,0" TextWrapping="Wrap" Text="Contacts page" />
+        <ListView ItemsSource="{x:Bind ViewModel.Contacts}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,5">
+                        <TextBlock Text="{Binding Name}" FontSize="30" />
+                        <TextBlock Text="{Binding NxtAddressRs}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!--<TextBlock Margin="253,254,0,0" TextWrapping="Wrap" Text="Contacts page" />-->
 
     </Grid>
 </Page>

@@ -21,5 +21,6 @@ namespace NxtWallet.Model
         Task<ITransaction> GetLatestTransactionAsync();
         Task UpdateNxtServer(string newServerAddress);
         Task<bool> HasOutgoingTransaction();
+        Task<IEnumerable<Contact>>  GetAllContacts();
     }
 }
