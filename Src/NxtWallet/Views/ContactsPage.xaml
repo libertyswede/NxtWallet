@@ -8,17 +8,45 @@
     mc:Ignorable="d"
     DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="model:Contact">
-                    <StackPanel Margin="0,5">
-                        <TextBlock Text="{x:Bind Name}" FontSize="24" />
-                        <TextBlock Text="{x:Bind NxtAddressRs}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <!--<TextBlock Margin="253,254,0,0" TextWrapping="Wrap" Text="Contacts page" />-->
-
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.Setters>
+                        <Setter Target="RelativePanel.(FrameworkElement.Margin)">
+                            <Setter.Value>
+                                <Thickness>10,50,10,10</Thickness>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Target="DetailsColumn.Width" Value="Auto" />
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin0}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin540">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin540}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" x:Name="MasterColumn"/>
+            <ColumnDefinition Width="*" x:Name="DetailsColumn"/>
+        </Grid.ColumnDefinitions>
+        <RelativePanel x:Name="RelativePanel" Margin="10">
+            <TextBlock x:Name="HeaderText" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
+            <ListView RelativePanel.Below="HeaderText" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" 
+                      RelativePanel.AlignBottomWithPanel="True" ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Contact">
+                        <StackPanel Margin="0,5">
+                            <TextBlock Text="{x:Bind Name}" FontSize="24" />
+                            <TextBlock Text="{x:Bind NxtAddressRs}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </RelativePanel>
     </Grid>
 </Page>
