@@ -4,15 +4,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:NxtWallet.Model"
     mc:Ignorable="d"
     DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView ItemsSource="{x:Bind ViewModel.Contacts}">
+        <ListView ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single">
             <ListView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="model:Contact">
                     <StackPanel Margin="0,5">
-                        <TextBlock Text="{Binding Name}" FontSize="30" />
-                        <TextBlock Text="{Binding NxtAddressRs}" />
+                        <TextBlock Text="{x:Bind Name}" FontSize="24" />
+                        <TextBlock Text="{x:Bind NxtAddressRs}" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
