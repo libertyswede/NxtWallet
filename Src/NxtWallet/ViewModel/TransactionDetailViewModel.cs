@@ -5,9 +5,9 @@ namespace NxtWallet.ViewModel
 {
     public class TransactionDetailViewModel : ViewModelBase
     {
-        private TransactionModel _transaction;
+        private Transaction _transaction;
 
-        public TransactionModel Transaction
+        public Transaction Transaction
         {
             get { return _transaction; }
             set { Set(ref _transaction, value); }

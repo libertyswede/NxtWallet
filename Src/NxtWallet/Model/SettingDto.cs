@@ -1,6 +1,9 @@
-﻿namespace NxtWallet.Model
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NxtWallet.Model
 {
-    public class Setting
+    [Table("Setting")]
+    public class SettingDto
     {
         public int Id { get; set; }
         public string Key { get; set; }

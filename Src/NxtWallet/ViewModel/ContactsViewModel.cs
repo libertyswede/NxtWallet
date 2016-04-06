@@ -10,17 +10,17 @@ namespace NxtWallet.ViewModel
 {
     public class ContactsViewModel : ViewModelBase
     {
-        private readonly IWalletRepository _walletRepository;
-        private ObservableCollection<ContactModel> _contacts;
-        private ContactModel _selectedContact;
+        private readonly IContactRepository _contactRepository;
+        private ObservableCollection<Contact> _contacts;
+        private Contact _selectedContact;
 
-        public ObservableCollection<ContactModel> Contacts
+        public ObservableCollection<Contact> Contacts
         {
             get { return _contacts; }
             set { Set(ref _contacts, value); }
         }
 
-        public ContactModel SelectedContact
+        public Contact SelectedContact
         {
             get { return _selectedContact; }
             set { Set(ref _selectedContact, value); }
@@ -28,17 +28,17 @@ namespace NxtWallet.ViewModel
 
         public ICommand SaveSelectedContact { get; }
 
-        public ContactsViewModel(IWalletRepository walletRepository)
+        public ContactsViewModel(IContactRepository contactRepository)
         {
-            _walletRepository = walletRepository;
+            _contactRepository = contactRepository;
             SaveSelectedContact = new RelayCommand(SaveContact);
             LoadContacts();
         }
 
         private async void LoadContacts()
         {
-            var contacts = await _walletRepository.GetAllContacts();
-            Contacts = new ObservableCollection<ContactModel>(contacts.OrderBy(c => c.Name));
+            var contacts = await _contactRepository.GetAllContacts();
+            Contacts = new ObservableCollection<Contact>(contacts.OrderBy(c => c.Name));
         }
 
         private async void SaveContact()

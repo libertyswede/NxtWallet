@@ -3,7 +3,7 @@ using GalaSoft.MvvmLight;
 
 namespace NxtWallet.ViewModel.Model
 {
-    public class TransactionModel : ObservableObject, IEquatable<TransactionModel>
+    public class Transaction : ObservableObject, IEquatable<Transaction>
     {
         private bool _isConfirmed;
 
@@ -33,7 +33,7 @@ namespace NxtWallet.ViewModel.Model
 
         public override bool Equals(object obj)
         {
-            var transaction = obj as TransactionModel;
+            var transaction = obj as Transaction;
             return transaction != null && Equals(transaction);
         }
 
@@ -42,7 +42,7 @@ namespace NxtWallet.ViewModel.Model
             return NxtId.GetHashCode();
         }
 
-        public bool Equals(TransactionModel other)
+        public bool Equals(Transaction other)
         {
             return other?.NxtId == NxtId;
         }

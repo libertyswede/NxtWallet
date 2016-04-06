@@ -15,7 +15,7 @@ namespace NxtWallet.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348");
 
-            modelBuilder.Entity("NxtWallet.Model.Contact", b =>
+            modelBuilder.Entity("NxtWallet.Model.ContactDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -29,9 +29,11 @@ namespace NxtWallet.Migrations
                         .HasAnnotation("MaxLength", 30);
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "Contact");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.Setting", b =>
+            modelBuilder.Entity("NxtWallet.Model.SettingDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -44,9 +46,11 @@ namespace NxtWallet.Migrations
                         .HasAnnotation("MaxLength", 255);
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "Setting");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.Transaction", b =>
+            modelBuilder.Entity("NxtWallet.Model.TransactionDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -77,6 +81,8 @@ namespace NxtWallet.Migrations
                     b.Property<DateTime>("Timestamp");
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "Transaction");
                 });
         }
     }

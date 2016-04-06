@@ -15,16 +15,16 @@ namespace NxtWallet
 
             _configuration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Contact, ContactModel>();
-                cfg.CreateMap<ContactModel, Contact>();
-                cfg.CreateMap<Transaction, TransactionModel>()
+                cfg.CreateMap<ContactDto, Contact>();
+                cfg.CreateMap<Contact, ContactDto>();
+                cfg.CreateMap<TransactionDto, Transaction>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (ulong)src.NxtId))
                     .AfterMap((src, dest) => dest.UserIsRecipient = repo.NxtAccount.AccountRs.Equals(dest.AccountTo));
 
-                cfg.CreateMap<TransactionModel, Transaction>()
+                cfg.CreateMap<Transaction, TransactionDto>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long)src.NxtId));
 
-                cfg.CreateMap<NxtLib.Transaction, TransactionModel>()
+                cfg.CreateMap<NxtLib.Transaction, Transaction>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.TransactionId ?? 0))
                     .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message != null ? src.Message.MessageText : null))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Amount.Nqt))

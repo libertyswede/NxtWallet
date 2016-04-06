@@ -1,8 +1,10 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NxtWallet.Model
 {
-    public class Transaction : IEquatable<Transaction>
+    [Table("Transaction")]
+    public class TransactionDto : IEquatable<TransactionDto>
     {
         public int Id { get; set; }
         public long NxtId { get; set; }
@@ -17,7 +19,7 @@ namespace NxtWallet.Model
 
         public override bool Equals(object obj)
         {
-            var transaction = obj as Transaction;
+            var transaction = obj as TransactionDto;
             return transaction != null && Equals(transaction);
         }
 
@@ -26,7 +28,7 @@ namespace NxtWallet.Model
             return NxtId.GetHashCode();
         }
 
-        public bool Equals(Transaction other)
+        public bool Equals(TransactionDto other)
         {
             return other?.NxtId == NxtId;
         }

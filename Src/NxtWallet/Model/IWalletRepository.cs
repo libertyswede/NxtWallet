@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtLib;
-using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Model
 {
@@ -16,8 +14,5 @@ namespace NxtWallet.Model
         Task LoadAsync();
         Task SaveBalanceAsync(string balance);
         Task UpdateNxtServer(string newServerAddress);
-
-        Task<IEnumerable<ContactModel>> GetAllContacts();
-        Task UpdateContact(ContactModel contactModel);
     }
 }

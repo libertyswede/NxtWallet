@@ -17,7 +17,7 @@ namespace NxtWallet
         event TransactionHandler TransactionAdded;
     }
 
-    public delegate void TransactionHandler(IBackgroundRunner sender, TransactionModel transaction);
+    public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
 
     public class BackgroundRunner : IBackgroundRunner
     {
@@ -53,13 +53,13 @@ namespace NxtWallet
             }
         }
 
-        private async Task HandleUpdatedTransactions(List<TransactionModel> updatedTransactions)
+        private async Task HandleUpdatedTransactions(List<Transaction> updatedTransactions)
         {
             await _transactionRepository.UpdateTransactionsAsync(updatedTransactions);
             updatedTransactions.ForEach(OnTransactionConfirmationUpdated);
         }
 
-        private async Task HandleNewTransactions(List<TransactionModel> newTransactions, List<TransactionModel> knownTransactions)
+        private async Task HandleNewTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions)
         {
             if (newTransactions.Any())
             {
@@ -73,8 +73,8 @@ namespace NxtWallet
             }
         }
 
-        private static List<TransactionModel> GetTransactionsWithUpdatedConfirmation(IEnumerable<TransactionModel> knownTransactions, 
-            IEnumerable<TransactionModel> nxtTransactions, IEnumerable<TransactionModel> newTransactions)
+        private static List<Transaction> GetTransactionsWithUpdatedConfirmation(IEnumerable<Transaction> knownTransactions, 
+            IEnumerable<Transaction> nxtTransactions, IEnumerable<Transaction> newTransactions)
         {
             var updatedTransactions = knownTransactions
                 .Where(t => t.IsConfirmed == false)
@@ -86,17 +86,17 @@ namespace NxtWallet
             return updatedTransactions;
         }
 
-        protected virtual void OnTransactionConfirmationUpdated(TransactionModel transaction)
+        protected virtual void OnTransactionConfirmationUpdated(Transaction transaction)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionConfirmationUpdated?.Invoke(this, transaction));
         }
 
-        protected virtual void OnTransactionBalanceUpdated(TransactionModel transaction)
+        protected virtual void OnTransactionBalanceUpdated(Transaction transaction)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionBalanceUpdated?.Invoke(this, transaction));
         }
 
-        protected virtual void OnTransactionAdded(TransactionModel transaction)
+        protected virtual void OnTransactionAdded(Transaction transaction)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionAdded?.Invoke(this, transaction));
         }

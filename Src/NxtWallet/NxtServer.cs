@@ -13,7 +13,7 @@ using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
-using Transaction = NxtWallet.Model.Transaction;
+using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
 {
@@ -24,9 +24,9 @@ namespace NxtWallet
         bool IsOnline { get; }
 
         Task<Result<string>> GetBalanceAsync();
-        Task<IEnumerable<TransactionModel>> GetTransactionsAsync(DateTime lastTimestamp);
-        Task<IEnumerable<TransactionModel>> GetTransactionsAsync();
-        Task<Result<TransactionModel>> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<IEnumerable<Transaction>> GetTransactionsAsync();
+        Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
     }
 
@@ -80,9 +80,9 @@ namespace NxtWallet
         }
 
         //TODO: Phased transactions?
-        public async Task<IEnumerable<TransactionModel>> GetTransactionsAsync(DateTime lastTimestamp)
+        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            var transactionList = new List<TransactionModel>();
+            var transactionList = new List<Transaction>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
@@ -92,8 +92,8 @@ namespace NxtWallet
                     await
                         transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
 
-                transactionList.AddRange(_mapper.Map<List<TransactionModel>>(transactionsReply.Transactions));
-                transactionList.AddRange(_mapper.Map<List<TransactionModel>>(unconfirmedReply.UnconfirmedTransactions));;
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactionsReply.Transactions));
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedReply.UnconfirmedTransactions));;
                 IsOnline = true;
             }
             catch (HttpRequestException)
@@ -107,13 +107,13 @@ namespace NxtWallet
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public Task<IEnumerable<TransactionModel>> GetTransactionsAsync()
+        public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
 
         //TODO: Use one known exception instead of Result<>
-        public async Task<Result<TransactionModel>> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public async Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             try
             {
@@ -127,9 +127,9 @@ namespace NxtWallet
 
                 IsOnline = true;
 
-                var transaction = _mapper.Map<TransactionModel>(sendMoneyReply.Transaction);
+                var transaction = _mapper.Map<Transaction>(sendMoneyReply.Transaction);
                 transaction.NxtId = broadcastReply.TransactionId;
-                return new Result<TransactionModel>(transaction);
+                return new Result<Transaction>(transaction);
             }
             catch (HttpRequestException)
             {
@@ -139,7 +139,7 @@ namespace NxtWallet
             {
                 IsOnline = false;
             }
-            return new Result<TransactionModel>();
+            return new Result<Transaction>();
         }
 
         public void UpdateNxtServer(string newServerAddress)

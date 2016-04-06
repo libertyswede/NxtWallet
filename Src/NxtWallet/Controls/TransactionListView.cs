@@ -45,7 +45,7 @@ namespace NxtWallet.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<TransactionModel>)ItemsSource;
+            var source = (ObservableCollection<Transaction>)ItemsSource;
             source.CollectionChanged += Source_CollectionChanged;
 
             foreach (var viewModelTransaction in source)
@@ -56,7 +56,7 @@ namespace NxtWallet.Controls
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<TransactionModel>)ItemsSource;
+            var source = (ObservableCollection<Transaction>)ItemsSource;
             source.CollectionChanged -= Source_CollectionChanged;
 
             foreach (var viewModelTransaction in source)
@@ -69,14 +69,14 @@ namespace NxtWallet.Controls
         {
             if (e.NewItems != null)
             {
-                foreach (var newTransaction in e.NewItems?.Cast<TransactionModel>())
+                foreach (var newTransaction in e.NewItems?.Cast<Transaction>())
                 {
                     newTransaction.PropertyChanged += TransactionOnPropertyChanged;
                 }
             }
             if (e.OldItems != null)
             {
-                foreach (var oldTransaction in e.OldItems.Cast<TransactionModel>())
+                foreach (var oldTransaction in e.OldItems.Cast<Transaction>())
                 {
                     oldTransaction.PropertyChanged -= TransactionOnPropertyChanged;
                 }
@@ -85,7 +85,7 @@ namespace NxtWallet.Controls
 
         private void TransactionOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-            if (propertyChangedEventArgs.PropertyName.Equals(nameof(TransactionModel.IsConfirmed)))
+            if (propertyChangedEventArgs.PropertyName.Equals(nameof(Transaction.IsConfirmed)))
             {
                 var listViewItem = (ListViewItem)ContainerFromItem(sender);
                 var index = IndexFromContainer(listViewItem);
@@ -113,7 +113,7 @@ namespace NxtWallet.Controls
 
         private void SetColors(ListViewItem listViewItem, int index)
         {
-            var transaction = Items[index] as TransactionModel;
+            var transaction = Items[index] as Transaction;
             SetBackgroundColor(listViewItem, index);
             SetForegroundColor(listViewItem, transaction);
         }
@@ -123,7 +123,7 @@ namespace NxtWallet.Controls
             listViewItem.Background = (index + 1) % 2 == 1 ? OddRowBackground : EvenRowBackground;
         }
 
-        private void SetForegroundColor(ListViewItem listViewItem, TransactionModel transaction)
+        private void SetForegroundColor(ListViewItem listViewItem, Transaction transaction)
         {
             if (transaction != null && transaction.IsConfirmed)
             {

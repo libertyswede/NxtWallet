@@ -1,6 +1,9 @@
-﻿namespace NxtWallet.Model
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NxtWallet.Model
 {
-    public class Contact
+    [Table("Contact")]
+    public class ContactDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

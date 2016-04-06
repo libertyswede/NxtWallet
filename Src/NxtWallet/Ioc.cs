@@ -26,12 +26,14 @@ namespace NxtWallet
                 SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
                 SimpleIoc.Default.Register<ITransactionRepository, FakeTransactionRepository>();
+                SimpleIoc.Default.Register<IContactRepository, FakeContactRepository>();
             }
             else
             {
                 SimpleIoc.Default.Register<INxtServer, NxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
                 SimpleIoc.Default.Register<ITransactionRepository, TransactionRepository>();
+                SimpleIoc.Default.Register<IContactRepository, ContactRepository>();
             }
             var repo = ServiceLocator.Current.GetInstance<IWalletRepository>();
 

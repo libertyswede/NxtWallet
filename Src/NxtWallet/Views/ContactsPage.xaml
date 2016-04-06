@@ -44,7 +44,7 @@
                       RelativePanel.AlignBottomWithPanel="True" ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single" 
                       SelectedValue="{x:Bind ViewModel.SelectedContact, Mode=TwoWay, Converter={StaticResource NoopConverter}}">
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:ContactModel">
+                    <DataTemplate x:DataType="model:Contact">
                         <StackPanel Margin="0,5">
                             <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="24" />
                             <TextBlock Text="{x:Bind NxtAddressRs, Mode=OneWay}" />

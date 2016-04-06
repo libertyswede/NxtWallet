@@ -11,9 +11,9 @@ namespace NxtWallet.ViewModel
     public class TransactionListViewModel : ViewModelBase
     {
         private readonly ITransactionRepository _transactionRepository;
-        private ObservableCollection<TransactionModel> _transactions;
+        private ObservableCollection<Transaction> _transactions;
 
-        public ObservableCollection<TransactionModel> Transactions
+        public ObservableCollection<Transaction> Transactions
         {
             get { return _transactions; }
             set { Set(ref _transactions, value); }
@@ -37,7 +37,7 @@ namespace NxtWallet.ViewModel
             };
 
             _transactionRepository = transactionRepository;
-            Transactions = new ObservableCollection<TransactionModel>();
+            Transactions = new ObservableCollection<Transaction>();
         }
 
         public void LoadTransactionsFromRepository()
@@ -46,7 +46,7 @@ namespace NxtWallet.ViewModel
             InsertTransactions(transactions);
         }
 
-        private void InsertTransactions(IEnumerable<TransactionModel> transactions)
+        private void InsertTransactions(IEnumerable<Transaction> transactions)
         {
             foreach (var transaction in transactions.Except(Transactions))
             {
@@ -54,7 +54,7 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        private void InsertTransaction(TransactionModel transaction)
+        private void InsertTransaction(Transaction transaction)
         {
             if (!Transactions.Any())
             {
@@ -74,12 +74,12 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        private TransactionModel GetPreviousTransaction(TransactionModel transaction)
+        private Transaction GetPreviousTransaction(Transaction transaction)
         {
             return Transactions.FirstOrDefault(t => t.Timestamp.CompareTo(transaction.Timestamp) < 0);
         }
 
-        private int? GetPreviousTransactionIndex(TransactionModel transaction)
+        private int? GetPreviousTransactionIndex(Transaction transaction)
         {
             var previousTransaction = GetPreviousTransaction(transaction);
             return previousTransaction == null ? null : (int?)Transactions.IndexOf(previousTransaction);

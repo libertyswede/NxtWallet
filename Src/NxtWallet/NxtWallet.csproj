@@ -116,25 +116,20 @@
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="MapperConfig.cs" />
-    <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.cs" />
-    <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.designer.cs">
-      <DependentUpon>20160327165305_Transaction_IsConfirmed.cs</DependentUpon>
+    <Compile Include="Migrations\20160406180309_Initial.cs" />
+    <Compile Include="Migrations\20160406180309_Initial.designer.cs">
+      <DependentUpon>20160406180309_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160405092302_Contacts.cs" />
-    <Compile Include="Migrations\20160405092302_Contacts.designer.cs">
-      <DependentUpon>20160405092302_Contacts.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Model\Contact.cs" />
+    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
+    <Compile Include="Model\ContactDto.cs" />
+    <Compile Include="Model\ContactRepository.cs" />
+    <Compile Include="Model\FakeContactRepository.cs" />
     <Compile Include="Model\FakeTransactionRepository.cs" />
     <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
+    <Compile Include="Model\IContactRepository.cs" />
     <Compile Include="Model\ITransactionRepository.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
-    <Compile Include="Migrations\20160321112810_Initial.cs" />
-    <Compile Include="Migrations\20160321112810_Initial.designer.cs">
-      <DependentUpon>20160321112810_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />
     <Compile Include="Model\TransactionRepository.cs" />
     <Compile Include="Model\WalletRepository.cs" />
@@ -143,13 +138,13 @@
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
-    <Compile Include="ViewModel\Model\ContactModel.cs" />
+    <Compile Include="ViewModel\Model\Contact.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
-    <Compile Include="ViewModel\Model\TransactionModel.cs" />
+    <Compile Include="ViewModel\Model\Transaction.cs" />
     <Compile Include="IDialog.cs" />
     <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
@@ -160,8 +155,8 @@
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Setting.cs" />
-    <Compile Include="Model\Transaction.cs" />
+    <Compile Include="Model\SettingDto.cs" />
+    <Compile Include="Model\TransactionDto.cs" />
     <Compile Include="Model\WalletContext.cs" />
     <Compile Include="NxtServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

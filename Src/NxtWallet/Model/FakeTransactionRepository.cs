@@ -8,11 +8,11 @@ namespace NxtWallet.Model
 {
     public class FakeTransactionRepository : ITransactionRepository
     {
-        public Task<IEnumerable<TransactionModel>> GetAllTransactionsAsync()
+        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
-            var transactions = new List<TransactionModel>
+            var transactions = new List<Transaction>
             {
-                new TransactionModel
+                new Transaction
                 {
                     NxtId = 1,
                     AccountFrom = "NXT-HMVV-XMBN-GYXK-22BKK",
@@ -23,7 +23,7 @@ namespace NxtWallet.Model
                     NqtFee = 1*100000000,
                     Timestamp = DateTime.Now.AddDays(-1)
                 },
-                new TransactionModel
+                new Transaction
                 {
                     NxtId = 2,
                     AccountFrom = "NXT-5XAB-J4KK-5JKF-EA42X",
@@ -34,7 +34,7 @@ namespace NxtWallet.Model
                     NqtFee = 1*100000000,
                     Timestamp = DateTime.Now.AddDays(-1).AddMinutes(1)
                 },
-                new TransactionModel
+                new Transaction
                 {
                     NxtId = 3,
                     AccountFrom = "NXT-HMVV-XMBN-GYXK-22BKK",
@@ -50,22 +50,22 @@ namespace NxtWallet.Model
             return Task.FromResult(transactions.AsEnumerable());
         }
 
-        public Task SaveTransactionAsync(TransactionModel transactionModel)
+        public Task SaveTransactionAsync(Transaction transaction)
         {
             return Task.CompletedTask;
         }
 
-        public Task UpdateTransactionsAsync(IEnumerable<TransactionModel> transactionModels)
+        public Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
             return Task.CompletedTask;
         }
 
-        public Task SaveTransactionsAsync(IEnumerable<TransactionModel> transactionModels)
+        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
             return Task.CompletedTask;
         }
 
-        public Task<TransactionModel> GetLatestTransactionAsync()
+        public Task<Transaction> GetLatestTransactionAsync()
         {
             return Task.FromResult(GetAllTransactionsAsync().Result.Last());
         }

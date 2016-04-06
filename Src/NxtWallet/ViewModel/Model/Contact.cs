@@ -2,7 +2,7 @@
 
 namespace NxtWallet.ViewModel.Model
 {
-    public class ContactModel : ObservableObject
+    public class Contact : ObservableObject
     {
         private string _name;
         private string _nxtAddressRs;

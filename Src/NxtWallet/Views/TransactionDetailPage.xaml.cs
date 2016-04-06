@@ -15,7 +15,7 @@ namespace NxtWallet.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ViewModel.Transaction = (TransactionModel) e.Parameter;
+            ViewModel.Transaction = (Transaction) e.Parameter;
         }
     }
 }

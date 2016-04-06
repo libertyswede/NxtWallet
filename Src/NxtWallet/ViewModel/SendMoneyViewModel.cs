@@ -66,7 +66,7 @@ namespace NxtWallet.ViewModel
             _sendMoneyDialog.Hide();
         }
 
-        private void SetBalance(TransactionModel transaction)
+        private void SetBalance(Transaction transaction)
         {
             // TODO: Could be a problem with different decimal separator signs in different regions
             var currentBalanceNxt = decimal.Parse(_walletRepository.Balance);

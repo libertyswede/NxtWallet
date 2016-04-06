@@ -5,7 +5,6 @@ using Microsoft.Data.Entity;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
-using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Model
 {
@@ -47,7 +46,7 @@ namespace NxtWallet.Model
                 var dbBalance = await context.Settings.SingleOrDefaultAsync(s => s.Key.Equals(BalanceKey));
                 if (dbBalance == null)
                 {
-                    context.Settings.Add(new Setting {Key = BalanceKey, Value = balance});
+                    context.Settings.Add(new SettingDto {Key = BalanceKey, Value = balance});
                 }
                 else
                 {
@@ -68,52 +67,23 @@ namespace NxtWallet.Model
             }
         }
 
-        public Task<IEnumerable<ContactModel>> GetAllContacts()
-        {
-            var contacts = new List<ContactModel>
-            {
-                new ContactModel {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
-                new ContactModel {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},
-                new ContactModel {Name = "EvilDave", NxtAddressRs = "NXT-BNZB-9V8M-XRPW-3S3WD"},
-                new ContactModel {Name = "coretechs", NxtAddressRs = "NXT-WY9K-ZMTT-QQTT-3NBL7"},
-                new ContactModel {Name = "Damelon", NxtAddressRs = "NXT-D6K7-MLY6-98FM-FLL5T"}
-            };
-            return Task.FromResult(contacts.AsEnumerable());
-        }
-
-        public async Task UpdateContact(ContactModel contactModel)
-        {
-            using (var context = new WalletContext())
-            {
-                var contact = new Contact
-                {
-                    Id = contactModel.Id,
-                    Name = contactModel.Name,
-                    NxtAddressRs = contactModel.NxtAddressRs
-                };
-                context.Contacts.Attach(contact);
-                context.Entry(contact).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-            }
-        }
-
-        private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateBalance(IEnumerable<SettingDto> dbSettings, WalletContext context)
         {
             Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;
             if (Balance == null)
             {
                 Balance = "0.0";
-                context.Settings.Add(new Setting {Key = BalanceKey, Value = Balance});
+                context.Settings.Add(new SettingDto {Key = BalanceKey, Value = Balance});
             }
         }
 
-        private void ReadOrGenerateBackupCompleted(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateBackupCompleted(IEnumerable<SettingDto> dbSettings, WalletContext context)
         {
             var backupCompleted = dbSettings.SingleOrDefault(s => s.Key.Equals(BackupCompletedKey))?.Value;
             if (backupCompleted == null)
             {
                 BackupCompleted = false;
-                context.Settings.Add(new Setting {Key = BackupCompletedKey, Value = BackupCompleted.ToString()});
+                context.Settings.Add(new SettingDto {Key = BackupCompletedKey, Value = BackupCompleted.ToString()});
             }
             else
             {
@@ -121,25 +91,25 @@ namespace NxtWallet.Model
             }
         }
 
-        private void ReadOrGenerateNxtServer(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateNxtServer(IEnumerable<SettingDto> dbSettings, WalletContext context)
         {
             NxtServer = dbSettings.SingleOrDefault(s => s.Key.Equals(NxtServerKey))?.Value;
             if (NxtServer == null)
             {
                 //NxtServer = Constants.DefaultNxtUrl;
                 NxtServer = Constants.TestnetNxtUrl;
-                context.Settings.Add(new Setting {Key = NxtServerKey, Value = NxtServer});
+                context.Settings.Add(new SettingDto {Key = NxtServerKey, Value = NxtServer});
             }
         }
 
-        private void ReadOrGenerateSecretPhrase(IEnumerable<Setting> dbSettings, WalletContext context)
+        private void ReadOrGenerateSecretPhrase(IEnumerable<SettingDto> dbSettings, WalletContext context)
         {
             SecretPhrase = dbSettings.SingleOrDefault(s => s.Key.Equals(SecretPhraseKey))?.Value;
             if (SecretPhrase == null)
             {
                 var generator = new LocalPasswordGenerator();
                 SecretPhrase = generator.GeneratePassword();
-                context.Settings.Add(new Setting {Key = SecretPhraseKey, Value = SecretPhrase});
+                context.Settings.Add(new SettingDto {Key = SecretPhraseKey, Value = SecretPhrase});
             }
         }
 

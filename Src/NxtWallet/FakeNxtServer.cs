@@ -6,7 +6,7 @@ using GalaSoft.MvvmLight;
 using NxtLib;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
-using Transaction = NxtWallet.Model.Transaction;
+using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
 {
@@ -25,19 +25,19 @@ namespace NxtWallet
             return Task.FromResult(new Result<string>("11.00"));
         }
 
-        public Task<IEnumerable<TransactionModel>> GetTransactionsAsync(DateTime lastTimestamp)
+        public Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            return Task.FromResult(new List<TransactionModel>().AsEnumerable());
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
         }
 
-        public Task<IEnumerable<TransactionModel>> GetTransactionsAsync()
+        public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(DateTime.UtcNow);
         }
 
-        public Task<Result<TransactionModel>> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            return Task.FromResult(new Result<TransactionModel>());
+            return Task.FromResult(new Result<Transaction>());
         }
 
         public void UpdateNxtServer(string newServerAddress)

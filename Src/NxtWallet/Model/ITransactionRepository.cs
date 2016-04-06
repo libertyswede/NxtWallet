@@ -6,10 +6,10 @@ namespace NxtWallet.Model
 {
     public interface ITransactionRepository
     {
-        Task<IEnumerable<TransactionModel>> GetAllTransactionsAsync();
-        Task SaveTransactionAsync(TransactionModel transactionModel);
-        Task UpdateTransactionsAsync(IEnumerable<TransactionModel> transactionModels);
-        Task SaveTransactionsAsync(IEnumerable<TransactionModel> transactionModels);
-        Task<TransactionModel> GetLatestTransactionAsync();
+        Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
+        Task SaveTransactionAsync(Transaction transaction);
+        Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels);
+        Task SaveTransactionsAsync(IEnumerable<Transaction> transactionModels);
+        Task<Transaction> GetLatestTransactionAsync();
     }
 }

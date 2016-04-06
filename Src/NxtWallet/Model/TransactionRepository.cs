@@ -16,7 +16,7 @@ namespace NxtWallet.Model
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TransactionModel>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
             using (var context = new WalletContext())
             {
@@ -24,27 +24,27 @@ namespace NxtWallet.Model
                     .OrderByDescending(t => t.Timestamp)
                     .ToListAsync();
 
-                return _mapper.Map<IEnumerable<TransactionModel>>(transactions);
+                return _mapper.Map<IEnumerable<Transaction>>(transactions);
             }
         }
 
-        public async Task SaveTransactionAsync(TransactionModel transactionModel)
+        public async Task SaveTransactionAsync(Transaction transaction)
         {
-            var transaction = _mapper.Map<Transaction>(transactionModel);
+            var transactionDto = _mapper.Map<TransactionDto>(transaction);
             using (var context = new WalletContext())
             {
-                var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transaction.NxtId);
+                var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transactionDto.NxtId);
                 if (existingTransaction == null)
                 {
-                    context.Transactions.Add(transaction);
+                    context.Transactions.Add(transactionDto);
                     await context.SaveChangesAsync();
                 }
             }
         }
 
-        public async Task UpdateTransactionsAsync(IEnumerable<TransactionModel> transactionModels)
+        public async Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
-            var transactions = _mapper.Map<IEnumerable<Transaction>>(transactionModels);
+            var transactions = _mapper.Map<IEnumerable<TransactionDto>>(transactionModels);
             using (var context = new WalletContext())
             {
                 foreach (var transaction in transactions)
@@ -56,20 +56,20 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task SaveTransactionsAsync(IEnumerable<TransactionModel> transactionModels)
+        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
             using (var context = new WalletContext())
             {
                 var existingTransactions = await GetAllTransactionsAsync();
                 foreach (var transaction in transactionModels.Except(existingTransactions))
                 {
-                    context.Transactions.Add(_mapper.Map<Transaction>(transaction));
+                    context.Transactions.Add(_mapper.Map<TransactionDto>(transaction));
                 }
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task<TransactionModel> GetLatestTransactionAsync()
+        public async Task<Transaction> GetLatestTransactionAsync()
         {
             using (var context = new WalletContext())
             {
@@ -77,7 +77,7 @@ namespace NxtWallet.Model
                     .OrderByDescending(t => t.Timestamp)
                     .FirstOrDefaultAsync();
 
-                return _mapper.Map<TransactionModel>(transaction);
+                return _mapper.Map<Transaction>(transaction);
             }
         }
     }
