@@ -1,4 +1,5 @@
-﻿using NxtWallet.ViewModel;
+﻿using Windows.UI.Xaml.Navigation;
+using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
 {
@@ -9,6 +10,12 @@ namespace NxtWallet.Views
         public ContactsPage()
         {
             InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            ViewModel.SelectedContact = null;
         }
     }
 }
