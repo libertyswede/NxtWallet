@@ -12,7 +12,7 @@ namespace NxtWallet.Test
         [TestInitialize]
         public void TestInitialize()
         {
-            _viewmodel = new TransactionListViewModel(new FakeWalletRepository(), new FakeBackgroundRunner());
+            _viewmodel = new TransactionListViewModel(new FakeTransactionRepository(), new FakeBackgroundRunner());
         }
 
         [TestMethod]

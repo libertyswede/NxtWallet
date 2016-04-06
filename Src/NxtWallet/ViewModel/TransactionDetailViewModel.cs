@@ -1,12 +1,13 @@
 ﻿using GalaSoft.MvvmLight;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.ViewModel
 {
     public class TransactionDetailViewModel : ViewModelBase
     {
-        private ViewModelTransaction _transaction;
+        private TransactionModel _transaction;
 
-        public ViewModelTransaction Transaction
+        public TransactionModel Transaction
         {
             get { return _transaction; }
             set { Set(ref _transaction, value); }

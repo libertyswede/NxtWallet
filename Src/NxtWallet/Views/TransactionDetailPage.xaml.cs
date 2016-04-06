@@ -1,5 +1,6 @@
 ﻿using Windows.UI.Xaml.Navigation;
 using NxtWallet.ViewModel;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Views
 {
@@ -14,7 +15,7 @@ namespace NxtWallet.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ViewModel.Transaction = (ViewModelTransaction) e.Parameter;
+            ViewModel.Transaction = (TransactionModel) e.Parameter;
         }
     }
 }

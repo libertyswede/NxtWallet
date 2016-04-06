@@ -7,6 +7,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using NxtWallet.ViewModel;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Controls
 {
@@ -44,7 +45,7 @@ namespace NxtWallet.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<ViewModelTransaction>)ItemsSource;
+            var source = (ObservableCollection<TransactionModel>)ItemsSource;
             source.CollectionChanged += Source_CollectionChanged;
 
             foreach (var viewModelTransaction in source)
@@ -55,7 +56,7 @@ namespace NxtWallet.Controls
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<ViewModelTransaction>)ItemsSource;
+            var source = (ObservableCollection<TransactionModel>)ItemsSource;
             source.CollectionChanged -= Source_CollectionChanged;
 
             foreach (var viewModelTransaction in source)
@@ -68,14 +69,14 @@ namespace NxtWallet.Controls
         {
             if (e.NewItems != null)
             {
-                foreach (var newTransaction in e.NewItems?.Cast<ViewModelTransaction>())
+                foreach (var newTransaction in e.NewItems?.Cast<TransactionModel>())
                 {
                     newTransaction.PropertyChanged += TransactionOnPropertyChanged;
                 }
             }
             if (e.OldItems != null)
             {
-                foreach (var oldTransaction in e.OldItems.Cast<ViewModelTransaction>())
+                foreach (var oldTransaction in e.OldItems.Cast<TransactionModel>())
                 {
                     oldTransaction.PropertyChanged -= TransactionOnPropertyChanged;
                 }
@@ -84,7 +85,7 @@ namespace NxtWallet.Controls
 
         private void TransactionOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-            if (propertyChangedEventArgs.PropertyName.Equals(nameof(ViewModelTransaction.IsConfirmed)))
+            if (propertyChangedEventArgs.PropertyName.Equals(nameof(TransactionModel.IsConfirmed)))
             {
                 var listViewItem = (ListViewItem)ContainerFromItem(sender);
                 var index = IndexFromContainer(listViewItem);
@@ -112,7 +113,7 @@ namespace NxtWallet.Controls
 
         private void SetColors(ListViewItem listViewItem, int index)
         {
-            var transaction = Items[index] as ViewModelTransaction;
+            var transaction = Items[index] as TransactionModel;
             SetBackgroundColor(listViewItem, index);
             SetForegroundColor(listViewItem, transaction);
         }
@@ -122,7 +123,7 @@ namespace NxtWallet.Controls
             listViewItem.Background = (index + 1) % 2 == 1 ? OddRowBackground : EvenRowBackground;
         }
 
-        private void SetForegroundColor(ListViewItem listViewItem, ViewModelTransaction transaction)
+        private void SetForegroundColor(ListViewItem listViewItem, TransactionModel transaction)
         {
             if (transaction != null && transaction.IsConfirmed)
             {

@@ -4,9 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:NxtWallet.Model"
+    xmlns:nxtWallet="using:NxtWallet"
+    xmlns:model="using:NxtWallet.ViewModel.Model"
     mc:Ignorable="d"
     DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}">
+    <Page.Resources>
+        <nxtWallet:NoopConverter x:Key="NoopConverter" />
+    </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
@@ -37,16 +41,36 @@
         <RelativePanel x:Name="RelativePanel" Margin="10">
             <TextBlock x:Name="HeaderText" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
             <ListView RelativePanel.Below="HeaderText" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" 
-                      RelativePanel.AlignBottomWithPanel="True" ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single">
+                      RelativePanel.AlignBottomWithPanel="True" ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single" 
+                      SelectedValue="{x:Bind ViewModel.SelectedContact, Mode=TwoWay, Converter={StaticResource NoopConverter}}">
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Contact">
+                    <DataTemplate x:DataType="model:ContactModel">
                         <StackPanel Margin="0,5">
-                            <TextBlock Text="{x:Bind Name}" FontSize="24" />
-                            <TextBlock Text="{x:Bind NxtAddressRs}" />
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="24" />
+                            <TextBlock Text="{x:Bind NxtAddressRs, Mode=OneWay}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
         </RelativePanel>
+        <Grid Grid.Column="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Contact Details" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="10" Text="Name:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.Name, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" Text="Nxt Address:" HorizontalAlignment="Right"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.NxtAddressRs, Mode=TwoWay}"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="Save" Height="30" Margin="10" Width="128" Command="{x:Bind ViewModel.SaveSelectedContact}"/>
+        </Grid>
     </Grid>
 </Page>

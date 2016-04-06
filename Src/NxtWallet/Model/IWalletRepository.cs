@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtLib;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Model
 {
@@ -13,14 +14,10 @@ namespace NxtWallet.Model
         bool BackupCompleted { get; }
 
         Task LoadAsync();
-        Task<IEnumerable<ITransaction>> GetAllTransactionsAsync();
-        Task SaveTransactionAsync(ITransaction transaction);
-        Task UpdateTransactionsAsync(IEnumerable<ITransaction> transactions);
-        Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions);
         Task SaveBalanceAsync(string balance);
-        Task<ITransaction> GetLatestTransactionAsync();
         Task UpdateNxtServer(string newServerAddress);
-        Task<bool> HasOutgoingTransaction();
-        Task<IEnumerable<Contact>>  GetAllContacts();
+
+        Task<IEnumerable<ContactModel>> GetAllContacts();
+        Task UpdateContact(ContactModel contactModel);
     }
 }

@@ -115,6 +115,7 @@
     <Compile Include="FakeBackgroundRunner.cs" />
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
+    <Compile Include="MapperConfig.cs" />
     <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.cs" />
     <Compile Include="Migrations\20160327165305_Transaction_IsConfirmed.designer.cs">
       <DependentUpon>20160327165305_Transaction_IsConfirmed.cs</DependentUpon>
@@ -124,8 +125,10 @@
       <DependentUpon>20160405092302_Contacts.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\Contact.cs" />
+    <Compile Include="Model\FakeTransactionRepository.cs" />
     <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
+    <Compile Include="Model\ITransactionRepository.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
     <Compile Include="Migrations\20160321112810_Initial.cs" />
     <Compile Include="Migrations\20160321112810_Initial.designer.cs">
@@ -133,17 +136,20 @@
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />
+    <Compile Include="Model\TransactionRepository.cs" />
     <Compile Include="Model\WalletRepository.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
+    <Compile Include="NoopConverter.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
+    <Compile Include="ViewModel\Model\ContactModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
-    <Compile Include="ViewModel\Model\ViewModelTransaction.cs" />
+    <Compile Include="ViewModel\Model\TransactionModel.cs" />
     <Compile Include="IDialog.cs" />
     <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>

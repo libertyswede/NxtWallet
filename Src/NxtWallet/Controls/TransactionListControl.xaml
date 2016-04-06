@@ -71,7 +71,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="model:ViewModelTransaction">
+                <DataTemplate x:DataType="model:TransactionModel">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{Binding ElementName=MessageColumn, Path=Width}" />

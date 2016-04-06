@@ -25,7 +25,8 @@ namespace NxtWallet.Model
             modelBuilder.Entity<Contact>()
                 .Property(c => c.Name)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(50)
+                .HasAnnotation("BackingField", "_name");
 
             modelBuilder.Entity<Contact>()
                 .Property(c => c.NxtAddressRs)
@@ -64,7 +65,7 @@ namespace NxtWallet.Model
                 .IsRequired();
 
             modelBuilder.Entity<Transaction>()
-                .Property(t => t.NqtFeeAmount)
+                .Property(t => t.NqtFee)
                 .IsRequired();
 
             modelBuilder.Entity<Transaction>()

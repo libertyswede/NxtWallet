@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
 using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using NxtLib;
@@ -11,6 +12,7 @@ using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
+using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.Model.Transaction;
 
 namespace NxtWallet
@@ -22,15 +24,16 @@ namespace NxtWallet
         bool IsOnline { get; }
 
         Task<Result<string>> GetBalanceAsync();
-        Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp);
-        Task<IEnumerable<ITransaction>> GetTransactionsAsync();
-        Task<Result<ITransaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<IEnumerable<TransactionModel>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<IEnumerable<TransactionModel>> GetTransactionsAsync();
+        Task<Result<TransactionModel>> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
     }
 
     public class NxtServer : ObservableObject, INxtServer
     {
         private readonly IWalletRepository _walletRepository;
+        private readonly IMapper _mapper;
         private bool _isOnline;
         private IServiceFactory _serviceFactory;
 
@@ -40,9 +43,10 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
-        public NxtServer(IWalletRepository walletRepository)
+        public NxtServer(IWalletRepository walletRepository, IMapper mapper)
         {
             _walletRepository = walletRepository;
+            _mapper = mapper;
             IsOnline = false;
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
@@ -76,9 +80,9 @@ namespace NxtWallet
         }
 
         //TODO: Phased transactions?
-        public async Task<IEnumerable<ITransaction>> GetTransactionsAsync(DateTime lastTimestamp)
+        public async Task<IEnumerable<TransactionModel>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            var transactionList = new List<Transaction>();
+            var transactionList = new List<TransactionModel>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
@@ -88,11 +92,8 @@ namespace NxtWallet
                     await
                         transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
 
-                transactionList.AddRange(
-                    transactionsReply.Transactions.Select(serverTransaction => new Transaction(serverTransaction)));
-                transactionList.AddRange(
-                    unconfirmedReply.UnconfirmedTransactions.Select(
-                        serverTransaction => new Transaction(serverTransaction)));
+                transactionList.AddRange(_mapper.Map<List<TransactionModel>>(transactionsReply.Transactions));
+                transactionList.AddRange(_mapper.Map<List<TransactionModel>>(unconfirmedReply.UnconfirmedTransactions));;
                 IsOnline = true;
             }
             catch (HttpRequestException)
@@ -106,12 +107,13 @@ namespace NxtWallet
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public Task<IEnumerable<ITransaction>> GetTransactionsAsync()
+        public Task<IEnumerable<TransactionModel>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
 
-        public async Task<Result<ITransaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
+        //TODO: Use one known exception instead of Result<>
+        public async Task<Result<TransactionModel>> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             try
             {
@@ -124,8 +126,10 @@ namespace NxtWallet
                 var broadcastReply = await transactionService.BroadcastTransaction(new TransactionParameter(signedTransaction.ToString()));
 
                 IsOnline = true;
-                var transaction = new Transaction(sendMoneyReply.Transaction, (long)broadcastReply.TransactionId);
-                return new Result<ITransaction>(transaction);
+
+                var transaction = _mapper.Map<TransactionModel>(sendMoneyReply.Transaction);
+                transaction.NxtId = broadcastReply.TransactionId;
+                return new Result<TransactionModel>(transaction);
             }
             catch (HttpRequestException)
             {
@@ -135,7 +139,7 @@ namespace NxtWallet
             {
                 IsOnline = false;
             }
-            return new Result<ITransaction>();
+            return new Result<TransactionModel>();
         }
 
         public void UpdateNxtServer(string newServerAddress)

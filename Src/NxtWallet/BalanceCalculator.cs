@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NxtWallet.Model;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet
 {
     public interface IBalanceCalculator
     {
-        IEnumerable<ITransaction> Calculate(IReadOnlyList<ITransaction> newTransactions, IReadOnlyList<ITransaction> allTransactions);
+        IEnumerable<TransactionModel> Calculate(IReadOnlyList<TransactionModel> newTransactions, IReadOnlyList<TransactionModel> allTransactions);
     }
 
     public class BalanceCalculator : IBalanceCalculator
@@ -18,7 +19,7 @@ namespace NxtWallet
             _walletRepository = walletRepository;
         }
 
-        public IEnumerable<ITransaction> Calculate(IReadOnlyList<ITransaction> newTransactions, IReadOnlyList<ITransaction> allTransactions)
+        public IEnumerable<TransactionModel> Calculate(IReadOnlyList<TransactionModel> newTransactions, IReadOnlyList<TransactionModel> allTransactions)
         {
             var firstNewTransaction = newTransactions.OrderBy(t => t.Timestamp).First();
             UpdateTransactionBalance(firstNewTransaction, allTransactions);
@@ -27,9 +28,9 @@ namespace NxtWallet
             return updatedTransactions;
         }
 
-        private IEnumerable<ITransaction> UpdateSubsequentTransactionBalances(ITransaction viewModelTransaction, IReadOnlyList<ITransaction> allTransactions)
+        private IEnumerable<TransactionModel> UpdateSubsequentTransactionBalances(TransactionModel viewModelTransaction, IReadOnlyList<TransactionModel> allTransactions)
         {
-            var updatedTransactions = new HashSet<ITransaction>();
+            var updatedTransactions = new HashSet<TransactionModel>();
 
             foreach (var subsequentTransaction in GetSubsequentTransactions(viewModelTransaction, allTransactions))
             {
@@ -40,7 +41,7 @@ namespace NxtWallet
             return updatedTransactions;
         }
 
-        private void UpdateTransactionBalance(ITransaction transaction, IEnumerable<ITransaction> allTransactions)
+        private void UpdateTransactionBalance(TransactionModel transaction, IEnumerable<TransactionModel> allTransactions)
         {
             var previousBalance = GetPreviousTransaction(transaction, allTransactions)?.NqtBalance ?? 0;
 
@@ -50,18 +51,18 @@ namespace NxtWallet
             }
             else
             {
-                transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFeeAmount);
+                transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFee);
             }
         }
 
-        private static IEnumerable<ITransaction> GetSubsequentTransactions(ITransaction transaction,
-            IEnumerable<ITransaction> allTransactions)
+        private static IEnumerable<TransactionModel> GetSubsequentTransactions(TransactionModel transaction,
+            IEnumerable<TransactionModel> allTransactions)
         {
             return allTransactions.Where(t => t.Timestamp.CompareTo(transaction.Timestamp) > 0).ToList();
         }
 
-        private static ITransaction GetPreviousTransaction(ITransaction transaction,
-            IEnumerable<ITransaction> allTransactions)
+        private static TransactionModel GetPreviousTransaction(TransactionModel transaction,
+            IEnumerable<TransactionModel> allTransactions)
         {
             return allTransactions.FirstOrDefault(t => t.Timestamp.CompareTo(transaction.Timestamp) < 0);
         }

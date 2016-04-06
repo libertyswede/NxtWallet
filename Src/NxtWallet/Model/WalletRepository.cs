@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Model
 {
@@ -40,69 +40,6 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task<IEnumerable<ITransaction>> GetAllTransactionsAsync()
-        {
-            using (var context = new WalletContext())
-            {
-                var transactions = await context.Transactions
-                    .OrderByDescending(t => t.Timestamp)
-                    .ToListAsync();
-
-                return transactions;
-            }
-        }
-
-        public async Task<ITransaction> GetLatestTransactionAsync()
-        {
-            using (var context = new WalletContext())
-            {
-                var transaction = await context.Transactions
-                    .OrderByDescending(t => t.Timestamp)
-                    .FirstOrDefaultAsync();
-
-                return transaction;
-            }
-        }
-
-        public async Task SaveTransactionAsync(ITransaction transaction)
-        {
-            using (var context = new WalletContext())
-            {
-                var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transaction.NxtId);
-                if (existingTransaction == null)
-                {
-                    context.Transactions.Add((Transaction)transaction);
-                    await context.SaveChangesAsync();
-                }
-            }
-        }
-
-        public async Task UpdateTransactionsAsync(IEnumerable<ITransaction> transactions)
-        {
-            using (var context = new WalletContext())
-            {
-                foreach (var transaction in transactions)
-                {
-                    context.Transactions.Attach((Transaction)transaction);
-                    context.Entry(transaction).State = EntityState.Modified;
-                }
-                await context.SaveChangesAsync();
-            }
-        }
-
-        public async Task SaveTransactionsAsync(IEnumerable<ITransaction> transactions)
-        {
-            using (var context = new WalletContext())
-            {
-                var existingTransactions = (await GetAllTransactionsAsync()).ToList();
-                foreach (var transaction in transactions.Except(existingTransactions))
-                {
-                    context.Transactions.Add((Transaction)transaction);
-                }
-                await context.SaveChangesAsync();
-            }
-        }
-
         public async Task SaveBalanceAsync(string balance)
         {
             using (var context = new WalletContext())
@@ -131,26 +68,33 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task<bool> HasOutgoingTransaction()
+        public Task<IEnumerable<ContactModel>> GetAllContacts()
+        {
+            var contacts = new List<ContactModel>
+            {
+                new ContactModel {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
+                new ContactModel {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},
+                new ContactModel {Name = "EvilDave", NxtAddressRs = "NXT-BNZB-9V8M-XRPW-3S3WD"},
+                new ContactModel {Name = "coretechs", NxtAddressRs = "NXT-WY9K-ZMTT-QQTT-3NBL7"},
+                new ContactModel {Name = "Damelon", NxtAddressRs = "NXT-D6K7-MLY6-98FM-FLL5T"}
+            };
+            return Task.FromResult(contacts.AsEnumerable());
+        }
+
+        public async Task UpdateContact(ContactModel contactModel)
         {
             using (var context = new WalletContext())
             {
-                var anyTransaction = await context.Transactions.AnyAsync(t => t.AccountFrom == NxtAccount.AccountRs);
-                return anyTransaction;
+                var contact = new Contact
+                {
+                    Id = contactModel.Id,
+                    Name = contactModel.Name,
+                    NxtAddressRs = contactModel.NxtAddressRs
+                };
+                context.Contacts.Attach(contact);
+                context.Entry(contact).State = EntityState.Modified;
+                await context.SaveChangesAsync();
             }
-        }
-
-        public Task<IEnumerable<Contact>> GetAllContacts()
-        {
-            var contacts = new List<Contact>
-            {
-                new Contact {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
-                new Contact {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},
-                new Contact {Name = "EvilDave", NxtAddressRs = "NXT-BNZB-9V8M-XRPW-3S3WD"},
-                new Contact {Name = "coretechs", NxtAddressRs = "NXT-WY9K-ZMTT-QQTT-3NBL7"},
-                new Contact {Name = "Damelon", NxtAddressRs = "NXT-D6K7-MLY6-98FM-FLL5T"}
-            };
-            return Task.FromResult(contacts.AsEnumerable());
         }
 
         private void ReadOrGenerateBalance(IEnumerable<Setting> dbSettings, WalletContext context)

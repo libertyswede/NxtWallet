@@ -4,48 +4,49 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtWallet.Model;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.ViewModel
 {
     public class TransactionListViewModel : ViewModelBase
     {
-        private readonly IWalletRepository _walletRepository;
-        private ObservableCollection<ViewModelTransaction> _transactions;
+        private readonly ITransactionRepository _transactionRepository;
+        private ObservableCollection<TransactionModel> _transactions;
 
-        public ObservableCollection<ViewModelTransaction> Transactions
+        public ObservableCollection<TransactionModel> Transactions
         {
             get { return _transactions; }
             set { Set(ref _transactions, value); }
         }
 
-        public TransactionListViewModel(IWalletRepository walletRepository, IBackgroundRunner backgroundRunner)
+        public TransactionListViewModel(ITransactionRepository transactionRepository, IBackgroundRunner backgroundRunner)
         {
             backgroundRunner.TransactionAdded += (sender, transaction) =>
             {
-                InsertTransaction(new ViewModelTransaction(transaction, walletRepository.NxtAccount.AccountRs));
+                InsertTransaction(transaction);
             };
             backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.GetTransactionId());
-                existingTransaction.SetBalance(transaction.NqtBalance);
+                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.NxtId);
+                existingTransaction.NqtBalance = transaction.NqtBalance;
             };
             backgroundRunner.TransactionConfirmationUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.GetTransactionId());
+                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.NxtId);
                 existingTransaction.IsConfirmed = transaction.IsConfirmed;
             };
 
-            _walletRepository = walletRepository;
-            Transactions = new ObservableCollection<ViewModelTransaction>();
+            _transactionRepository = transactionRepository;
+            Transactions = new ObservableCollection<TransactionModel>();
         }
 
         public void LoadTransactionsFromRepository()
         {
-            var transactions = Task.Run(async () => await _walletRepository.GetAllTransactionsAsync()).Result;
-            InsertTransactions(transactions.Select(t => new ViewModelTransaction(t, _walletRepository.NxtAccount.AccountRs)));
+            var transactions = Task.Run(async () => await _transactionRepository.GetAllTransactionsAsync()).Result;
+            InsertTransactions(transactions);
         }
 
-        private void InsertTransactions(IEnumerable<ViewModelTransaction> transactions)
+        private void InsertTransactions(IEnumerable<TransactionModel> transactions)
         {
             foreach (var transaction in transactions.Except(Transactions))
             {
@@ -53,7 +54,7 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        private void InsertTransaction(ViewModelTransaction transaction)
+        private void InsertTransaction(TransactionModel transaction)
         {
             if (!Transactions.Any())
             {
@@ -73,12 +74,12 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        private ViewModelTransaction GetPreviousTransaction(ViewModelTransaction transaction)
+        private TransactionModel GetPreviousTransaction(TransactionModel transaction)
         {
             return Transactions.FirstOrDefault(t => t.Timestamp.CompareTo(transaction.Timestamp) < 0);
         }
 
-        private int? GetPreviousTransactionIndex(ViewModelTransaction transaction)
+        private int? GetPreviousTransactionIndex(TransactionModel transaction)
         {
             var previousTransaction = GetPreviousTransaction(transaction);
             return previousTransaction == null ? null : (int?)Transactions.IndexOf(previousTransaction);

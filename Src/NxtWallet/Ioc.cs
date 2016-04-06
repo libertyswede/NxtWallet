@@ -25,16 +25,20 @@ namespace NxtWallet
             {
                 SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
+                SimpleIoc.Default.Register<ITransactionRepository, FakeTransactionRepository>();
             }
             else
             {
                 SimpleIoc.Default.Register<INxtServer, NxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
+                SimpleIoc.Default.Register<ITransactionRepository, TransactionRepository>();
             }
+            var repo = ServiceLocator.Current.GetInstance<IWalletRepository>();
 
             SimpleIoc.Default.Register<IBackgroundRunner, BackgroundRunner>();
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
+            SimpleIoc.Default.Register(() => MapperConfig.Setup(repo).CreateMapper());
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();
