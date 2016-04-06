@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight;
 using NxtWallet.Model;
 
-namespace NxtWallet.ViewModel
+namespace NxtWallet.ViewModel.Model
 {
     public class ViewModelTransaction : ObservableObject, IEquatable<ViewModelTransaction>
     {

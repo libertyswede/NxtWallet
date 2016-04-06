@@ -5,8 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:NxtWallet.Controls"
-    xmlns:viewModel="using:NxtWallet.ViewModel"
     xmlns:nxtWallet="using:NxtWallet"
+    xmlns:model="using:NxtWallet.ViewModel.Model"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="700"
@@ -71,7 +71,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="viewModel:ViewModelTransaction">
+                <DataTemplate x:DataType="model:ViewModelTransaction">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{Binding ElementName=MessageColumn, Path=Width}" />

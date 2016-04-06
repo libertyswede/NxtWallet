@@ -143,7 +143,7 @@
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
-    <Compile Include="ViewModel\ViewModelTransaction.cs" />
+    <Compile Include="ViewModel\Model\ViewModelTransaction.cs" />
     <Compile Include="IDialog.cs" />
     <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
