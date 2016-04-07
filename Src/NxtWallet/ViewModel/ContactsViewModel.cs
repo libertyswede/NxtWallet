@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using NxtWallet.Model;
@@ -23,19 +22,27 @@ namespace NxtWallet.ViewModel
         public Contact SelectedContact
         {
             get { return _selectedContact; }
-            set { Set(ref _selectedContact, value); }
+            set
+            {
+                if (_selectedContact == value)
+                    return;
+
+                Set(ref _selectedContact, value);
+                DeleteCommand.RaiseCanExecuteChanged();
+                SaveSelectedContact.RaiseCanExecuteChanged();
+            }
         }
 
-        public ICommand AddCommand { get; }
-        public ICommand DeleteCommand { get; }
-        public ICommand SaveSelectedContact { get; }
+        public RelayCommand AddCommand { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand SaveSelectedContact { get; }
 
         public ContactsViewModel(IContactRepository contactRepository)
         {
             _contactRepository = contactRepository;
-            SaveSelectedContact = new RelayCommand(SaveContact);
+            SaveSelectedContact = new RelayCommand(SaveContact, () => SelectedContact != null);
             AddCommand = new RelayCommand(AddContact);
-            DeleteCommand = new RelayCommand(DeleteContact);
+            DeleteCommand = new RelayCommand(DeleteContact, () => SelectedContact != null);
         }
 
         public async void LoadFromRepository()
@@ -46,7 +53,7 @@ namespace NxtWallet.ViewModel
 
         private async void SaveContact()
         {
-            //await _walletRepository.UpdateContact(SelectedContact);
+            await _contactRepository.UpdateContact(SelectedContact);
         }
 
         private async void AddContact()
@@ -65,6 +72,7 @@ namespace NxtWallet.ViewModel
         {
             if (SelectedContact == null)
                 return;
+
             Contacts.Remove(SelectedContact);
             await _contactRepository.DeleteContact(SelectedContact);
             SelectedContact = null;
