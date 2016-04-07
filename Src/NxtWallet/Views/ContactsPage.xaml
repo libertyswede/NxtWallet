@@ -7,7 +7,8 @@
     xmlns:nxtWallet="using:NxtWallet"
     xmlns:model="using:NxtWallet.ViewModel.Model"
     mc:Ignorable="d"
-    DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}">
+    DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}"
+    Loaded="ContactsPage_OnLoaded">
     <Page.Resources>
         <nxtWallet:NoopConverter x:Key="NoopConverter" />
     </Page.Resources>
@@ -38,10 +39,14 @@
             <ColumnDefinition Width="*" x:Name="MasterColumn"/>
             <ColumnDefinition Width="*" x:Name="DetailsColumn"/>
         </Grid.ColumnDefinitions>
-        <RelativePanel x:Name="RelativePanel" Margin="10">
-            <TextBlock x:Name="HeaderText" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
-            <ListView RelativePanel.Below="HeaderText" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" 
-                      RelativePanel.AlignBottomWithPanel="True" ItemsSource="{x:Bind ViewModel.Contacts}" SelectionMode="Single" 
+        <Grid x:Name="RelativePanel" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
+            <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.Contacts, Mode=OneWay}" SelectionMode="Single" 
                       SelectedValue="{x:Bind ViewModel.SelectedContact, Mode=TwoWay, Converter={StaticResource NoopConverter}}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="model:Contact">
@@ -52,7 +57,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </RelativePanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button Content="Add" Command="{x:Bind ViewModel.AddCommand}" />
+                <Button Content="Delete" Command="{x:Bind ViewModel.DeleteCommand}" />
+            </StackPanel>
+        </Grid>
         <Grid Grid.Column="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

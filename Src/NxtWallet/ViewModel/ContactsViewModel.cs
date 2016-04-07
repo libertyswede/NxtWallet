@@ -26,24 +26,48 @@ namespace NxtWallet.ViewModel
             set { Set(ref _selectedContact, value); }
         }
 
+        public ICommand AddCommand { get; }
+        public ICommand DeleteCommand { get; }
         public ICommand SaveSelectedContact { get; }
 
         public ContactsViewModel(IContactRepository contactRepository)
         {
             _contactRepository = contactRepository;
             SaveSelectedContact = new RelayCommand(SaveContact);
-            LoadContacts();
+            AddCommand = new RelayCommand(AddContact);
+            DeleteCommand = new RelayCommand(DeleteContact);
         }
 
-        private async void LoadContacts()
+        public async void LoadFromRepository()
         {
-            var contacts = await _contactRepository.GetAllContacts();
-            Contacts = new ObservableCollection<Contact>(contacts.OrderBy(c => c.Name));
+            var contacts = (await _contactRepository.GetAllContacts()).OrderBy(c => c.Name).ToList();
+            Contacts = new ObservableCollection<Contact>(contacts);
         }
 
         private async void SaveContact()
         {
             //await _walletRepository.UpdateContact(SelectedContact);
+        }
+
+        private async void AddContact()
+        {
+            var newContact = new Contact
+            {
+                Name = "name",
+                NxtAddressRs = "NXT-"
+            };
+            newContact = await _contactRepository.AddContact(newContact);
+            Contacts.Add(newContact);
+            SelectedContact = newContact;
+        }
+
+        private async void DeleteContact()
+        {
+            if (SelectedContact == null)
+                return;
+            Contacts.Remove(SelectedContact);
+            await _contactRepository.DeleteContact(SelectedContact);
+            SelectedContact = null;
         }
     }
 }

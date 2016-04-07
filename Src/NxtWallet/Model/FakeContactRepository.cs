@@ -24,5 +24,15 @@ namespace NxtWallet.Model
         {
             return Task.CompletedTask;
         }
+
+        public Task<Contact> AddContact(Contact contact)
+        {
+            return Task.FromResult(contact);
+        }
+
+        public Task DeleteContact(Contact contact)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

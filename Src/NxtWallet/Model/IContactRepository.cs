@@ -8,5 +8,7 @@ namespace NxtWallet.Model
     {
         Task<IEnumerable<Contact>> GetAllContacts();
         Task UpdateContact(Contact contact);
+        Task<Contact> AddContact(Contact contact);
+        Task DeleteContact(Contact contact);
     }
 }
