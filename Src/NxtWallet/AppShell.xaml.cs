@@ -84,6 +84,15 @@ namespace NxtWallet
             NavMenuList.ItemsSource = _navlist;
         }
 
+        public void Navigate(NavigationPage navigationPage, object parameter)
+        {
+            if (navigationPage == NavigationPage.SendMoneyPage)
+            {
+                NavMenuList.SetSelectedItem((ListViewItem)NavMenuList.ContainerFromIndex(1));
+                MainFrame.Navigate(typeof(SendMoneyPage), parameter);
+            }
+        }
+
         public Frame AppFrame => MainFrame;
 
         /// <summary>

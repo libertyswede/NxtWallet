@@ -58,8 +58,9 @@
                 </ListView.ItemTemplate>
             </ListView>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                <Button Content="Add" Command="{x:Bind ViewModel.AddCommand}" />
-                <Button Content="Delete" Command="{x:Bind ViewModel.DeleteCommand}" />
+                <Button Content="Add" Command="{x:Bind ViewModel.AddCommand}" Margin="10" />
+                <Button Content="Delete" Command="{x:Bind ViewModel.DeleteCommand}" Margin="10" />
+                <Button Content="Send NXT" Command="{x:Bind ViewModel.SendMoneyCommand}" Margin="10" />
             </StackPanel>
         </Grid>
         <Grid Grid.Column="1" Margin="10">

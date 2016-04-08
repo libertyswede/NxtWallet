@@ -3,7 +3,6 @@ using Microsoft.Practices.ServiceLocation;
 using NxtWallet.Controls;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
-using SendMoneyDialog = NxtWallet.Controls.SendMoneyDialog;
 
 namespace NxtWallet
 {
@@ -37,10 +36,11 @@ namespace NxtWallet
             }
             var repo = ServiceLocator.Current.GetInstance<IWalletRepository>();
 
+            SimpleIoc.Default.Register(() => MapperConfig.Setup(repo).CreateMapper());
             SimpleIoc.Default.Register<IBackgroundRunner, BackgroundRunner>();
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
-            SimpleIoc.Default.Register(() => MapperConfig.Setup(repo).CreateMapper());
+            SimpleIoc.Default.Register<INavigationService, NavigationService>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();

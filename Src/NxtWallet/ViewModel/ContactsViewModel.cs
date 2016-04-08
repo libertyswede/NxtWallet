@@ -10,6 +10,7 @@ namespace NxtWallet.ViewModel
     public class ContactsViewModel : ViewModelBase
     {
         private readonly IContactRepository _contactRepository;
+        private readonly INavigationService _navigationService;
         private ObservableCollection<Contact> _contacts;
         private Contact _selectedContact;
 
@@ -30,19 +31,28 @@ namespace NxtWallet.ViewModel
                 Set(ref _selectedContact, value);
                 DeleteCommand.RaiseCanExecuteChanged();
                 SaveSelectedContact.RaiseCanExecuteChanged();
+                SendMoneyCommand.RaiseCanExecuteChanged();
             }
         }
 
         public RelayCommand AddCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand SaveSelectedContact { get; }
+        public RelayCommand SendMoneyCommand { get; }
 
-        public ContactsViewModel(IContactRepository contactRepository)
+        public ContactsViewModel(IContactRepository contactRepository, INavigationService navigationService)
         {
             _contactRepository = contactRepository;
+            _navigationService = navigationService;
             SaveSelectedContact = new RelayCommand(SaveContact, () => SelectedContact != null);
             AddCommand = new RelayCommand(AddContact);
             DeleteCommand = new RelayCommand(DeleteContact, () => SelectedContact != null);
+            SendMoneyCommand = new RelayCommand(SendMoney, () => SelectedContact != null);
+        }
+
+        private void SendMoney()
+        {
+            _navigationService.NavigateTo(NavigationPage.SendMoneyPage, SelectedContact);
         }
 
         public async void LoadFromRepository()

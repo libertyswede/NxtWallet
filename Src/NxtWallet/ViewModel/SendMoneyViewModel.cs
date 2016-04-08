@@ -49,6 +49,11 @@ namespace NxtWallet.ViewModel
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.CanExecute(_nxtServer.IsOnline);
         }
 
+        public void OnNavigatedTo(Contact contact)
+        {
+            Recipient = contact?.NxtAddressRs;
+        }
+
         private async void SendMoney()
         {
             // ReSharper disable once UnusedVariable

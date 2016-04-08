@@ -1,4 +1,6 @@
-﻿using NxtWallet.ViewModel;
+﻿using Windows.UI.Xaml.Navigation;
+using NxtWallet.ViewModel;
+using NxtWallet.ViewModel.Model;
 
 namespace NxtWallet.Views
 {
@@ -9,6 +11,12 @@ namespace NxtWallet.Views
         public SendMoneyPage()
         {
             InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            ViewModel.OnNavigatedTo(e.Parameter as Contact);
         }
     }
 }
