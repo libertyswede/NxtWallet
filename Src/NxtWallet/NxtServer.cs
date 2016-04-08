@@ -12,7 +12,6 @@ using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
