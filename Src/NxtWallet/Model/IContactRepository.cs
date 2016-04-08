@@ -6,10 +6,10 @@ namespace NxtWallet.Model
 {
     public interface IContactRepository
     {
-        Task<IList<Contact>> GetAllContacts();
-        Task UpdateContact(Contact contact);
-        Task<Contact> AddContact(Contact contact);
-        Task DeleteContact(Contact contact);
-        Task<IList<Contact>> GetContacts(IEnumerable<string> nxtRsAddresses);
+        Task<IList<Contact>> GetAllContactsAsync();
+        Task UpdateContactAsync(Contact contact);
+        Task<Contact> AddContactAsync(Contact contact);
+        Task DeleteContactAsync(Contact contact);
+        Task<IList<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
     }
 }

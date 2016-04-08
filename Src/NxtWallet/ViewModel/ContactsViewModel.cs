@@ -47,13 +47,13 @@ namespace NxtWallet.ViewModel
 
         public async void LoadFromRepository()
         {
-            var contacts = (await _contactRepository.GetAllContacts()).OrderBy(c => c.Name).ToList();
+            var contacts = (await _contactRepository.GetAllContactsAsync()).OrderBy(c => c.Name).ToList();
             Contacts = new ObservableCollection<Contact>(contacts);
         }
 
         private async void SaveContact()
         {
-            await _contactRepository.UpdateContact(SelectedContact);
+            await _contactRepository.UpdateContactAsync(SelectedContact);
         }
 
         private async void AddContact()
@@ -63,7 +63,7 @@ namespace NxtWallet.ViewModel
                 Name = "name",
                 NxtAddressRs = "NXT-"
             };
-            newContact = await _contactRepository.AddContact(newContact);
+            newContact = await _contactRepository.AddContactAsync(newContact);
             Contacts.Add(newContact);
             SelectedContact = newContact;
         }
@@ -74,7 +74,7 @@ namespace NxtWallet.ViewModel
                 return;
 
             Contacts.Remove(SelectedContact);
-            await _contactRepository.DeleteContact(SelectedContact);
+            await _contactRepository.DeleteContactAsync(SelectedContact);
             SelectedContact = null;
         }
     }

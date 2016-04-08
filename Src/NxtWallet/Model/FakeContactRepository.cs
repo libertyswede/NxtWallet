@@ -6,7 +6,7 @@ namespace NxtWallet.Model
 {
     public class FakeContactRepository : IContactRepository
     {
-        public Task<IList<Contact>> GetAllContacts()
+        public Task<IList<Contact>> GetAllContactsAsync()
         {
             IList<Contact> contacts = new List<Contact>
             {
@@ -19,22 +19,22 @@ namespace NxtWallet.Model
             return Task.FromResult(contacts);
         }
 
-        public Task UpdateContact(Contact contact)
+        public Task UpdateContactAsync(Contact contact)
         {
             return Task.CompletedTask;
         }
 
-        public Task<Contact> AddContact(Contact contact)
+        public Task<Contact> AddContactAsync(Contact contact)
         {
             return Task.FromResult(contact);
         }
 
-        public Task DeleteContact(Contact contact)
+        public Task DeleteContactAsync(Contact contact)
         {
             return Task.CompletedTask;
         }
 
-        public Task<IList<Contact>> GetContacts(IEnumerable<string> nxtRsAddresses)
+        public Task<IList<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses)
         {
             IList<Contact> contacts = new List<Contact>();
             return Task.FromResult(contacts);

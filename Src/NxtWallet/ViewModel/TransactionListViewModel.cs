@@ -47,7 +47,7 @@ namespace NxtWallet.ViewModel
         public void LoadTransactionsFromRepository()
         {
             var transactions = Task.Run(async () => await _transactionRepository.GetAllTransactionsAsync()).Result.ToList();
-            var contacts = Task.Run(async () => await _contactRepository.GetAllContacts())
+            var contacts = Task.Run(async () => await _contactRepository.GetAllContactsAsync())
                 .Result
                 .ToDictionary(contact => contact.NxtAddressRs);
             transactions.ForEach(t => t.UpdateWithContactInfo(contacts));
@@ -56,7 +56,7 @@ namespace NxtWallet.ViewModel
 
         private async void UpdateTransactionWithContactInfo(Transaction transaction)
         {
-            var contacts = await _contactRepository.GetContacts(new[] { transaction.AccountFrom, transaction.AccountTo });
+            var contacts = await _contactRepository.GetContactsAsync(new[] { transaction.AccountFrom, transaction.AccountTo });
             transaction.UpdateWithContactInfo(contacts);
         }
 
