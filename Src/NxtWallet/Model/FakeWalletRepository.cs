@@ -10,6 +10,7 @@ namespace NxtWallet.Model
         public string SecretPhrase { get; set; }
         public string Balance { get; set; } = "1100000000";
         public bool BackupCompleted { get; } = false;
+        public int SleepTime { get; } = 10000;
 
         public Task LoadAsync()
         {

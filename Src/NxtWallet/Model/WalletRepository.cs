@@ -13,12 +13,14 @@ namespace NxtWallet.Model
         private const string SecretPhraseKey = "secretPhrase";
         private const string BackupCompletedKey = "backupCompleted";
         private const string NxtServerKey = "nxtServer";
+        private const string SleepTimeKey = "sleepTime";
         private const string BalanceKey = "balance";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
         public string SecretPhrase { get; private set; }
         public bool BackupCompleted { get; private set; }
+        public int SleepTime { get; private set; }
         public string Balance { get; private set; }
 
         public async Task LoadAsync()
@@ -31,6 +33,7 @@ namespace NxtWallet.Model
 
                 ReadOrGenerateSecretPhrase(dbSettings, context);
                 ReadOrGenerateNxtServer(dbSettings, context);
+                ReadOrGenerateSleepTime(dbSettings, context);
                 ReadOrGenerateBalance(dbSettings, context);
                 ReadOrGenerateBackupCompleted(dbSettings, context);
 
@@ -100,6 +103,17 @@ namespace NxtWallet.Model
                 NxtServer = Constants.TestnetNxtUrl;
                 context.Settings.Add(new SettingDto {Key = NxtServerKey, Value = NxtServer});
             }
+        }
+
+        private void ReadOrGenerateSleepTime(IEnumerable<SettingDto> dbSettings, WalletContext context)
+        {
+            var sleepTime = dbSettings.SingleOrDefault(s => s.Key.Equals(SleepTimeKey))?.Value;
+            if (sleepTime == null)
+            {
+                sleepTime = 30000.ToString();
+                context.Settings.Add(new SettingDto {Key = SleepTimeKey, Value = sleepTime});
+            }
+            SleepTime = int.Parse(sleepTime);
         }
 
         private void ReadOrGenerateSecretPhrase(IEnumerable<SettingDto> dbSettings, WalletContext context)

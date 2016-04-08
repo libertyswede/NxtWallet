@@ -10,6 +10,7 @@ namespace NxtWallet.Model
         string SecretPhrase { get; }
         string Balance { get; }
         bool BackupCompleted { get; }
+        int SleepTime { get; }
 
         Task LoadAsync();
         Task SaveBalanceAsync(string balance);

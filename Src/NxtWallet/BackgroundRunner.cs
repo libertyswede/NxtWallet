@@ -24,16 +24,19 @@ namespace NxtWallet
         private readonly INxtServer _nxtServer;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IBalanceCalculator _balanceCalculator;
+        private readonly IWalletRepository _walletRepository;
 
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
         public event TransactionHandler TransactionAdded;
 
-        public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository, IBalanceCalculator balanceCalculator)
+        public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
+            IBalanceCalculator balanceCalculator, IWalletRepository walletRepository)
         {
             _nxtServer = nxtServer;
             _transactionRepository = transactionRepository;
             _balanceCalculator = balanceCalculator;
+            _walletRepository = walletRepository;
         }
 
         public async Task Run(CancellationToken token)
@@ -49,7 +52,7 @@ namespace NxtWallet
                 await HandleUpdatedTransactions(updatedTransactions);
                 await HandleNewTransactions(newTransactions, knownTransactions);
 
-                await Task.Delay(10000, token);
+                await Task.Delay(_walletRepository.SleepTime, token);
             }
         }
 
