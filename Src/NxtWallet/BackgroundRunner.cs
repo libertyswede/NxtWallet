@@ -49,7 +49,7 @@ namespace NxtWallet
                 await HandleUpdatedTransactions(updatedTransactions);
                 await HandleNewTransactions(newTransactions, knownTransactions);
 
-                await Task.Delay(30000, token);
+                await Task.Delay(10000, token);
             }
         }
 
