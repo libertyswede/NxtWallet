@@ -31,7 +31,7 @@ namespace NxtWallet
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Fee.Nqt))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.SenderRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
-                    .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations.HasValue && src.Confirmations.Value > 0))
+                    .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null))
                     .AfterMap((src, dest) => dest.UserIsRecipient = repo.NxtAccount.AccountRs.Equals(dest.AccountTo));
             });
 
