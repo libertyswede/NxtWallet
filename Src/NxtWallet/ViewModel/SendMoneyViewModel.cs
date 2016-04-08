@@ -52,6 +52,8 @@ namespace NxtWallet.ViewModel
         public void OnNavigatedTo(Contact contact)
         {
             Recipient = contact?.NxtAddressRs;
+            Amount = "";
+            Message = "";
         }
 
         private async void SendMoney()
