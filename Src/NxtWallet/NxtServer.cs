@@ -85,14 +85,15 @@ namespace NxtWallet
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionsReply = await transactionService.GetBlockchainTransactions(
+                var transactionsTask = transactionService.GetBlockchainTransactions(
                     _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
-                var unconfirmedReply =
-                    await
-                        transactionService.GetUnconfirmedTransactions(new List<Account> {_walletRepository.NxtAccount});
+                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(
+                    new List<Account> {_walletRepository.NxtAccount});
 
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactionsReply.Transactions));
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedReply.UnconfirmedTransactions));;
+                await Task.WhenAll(transactionsTask, unconfirmedTask);
+
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactionsTask.Result.Transactions));
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedTask.Result.UnconfirmedTransactions));;
                 IsOnline = true;
             }
             catch (HttpRequestException)
