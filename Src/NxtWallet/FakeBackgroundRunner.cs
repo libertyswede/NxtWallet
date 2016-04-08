@@ -13,5 +13,6 @@ namespace NxtWallet
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
         public event TransactionHandler TransactionAdded;
+        public event BalanceHandler BalanceUpdated;
     }
 }
