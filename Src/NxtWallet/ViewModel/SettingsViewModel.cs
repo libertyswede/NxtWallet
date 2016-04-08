@@ -29,7 +29,7 @@ namespace NxtWallet.ViewModel
         private async void Save()
         {
             _nxtServer.UpdateNxtServer(_serverAddress);
-            await Task.Run(async () => await _walletRepository.UpdateNxtServer(_serverAddress));
+            await Task.Run(async () => await _walletRepository.UpdateNxtServerAsync(_serverAddress));
         }
     }
 }

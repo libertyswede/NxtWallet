@@ -21,7 +21,7 @@ namespace NxtWallet.Model
             return Task.CompletedTask;
         }
 
-        public Task UpdateNxtServer(string newServerAddress)
+        public Task UpdateNxtServerAsync(string newServerAddress)
         {
             return Task.CompletedTask;
         }

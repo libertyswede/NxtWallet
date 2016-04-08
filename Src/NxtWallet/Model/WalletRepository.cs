@@ -57,7 +57,7 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task UpdateNxtServer(string newServerAddress)
+        public async Task UpdateNxtServerAsync(string newServerAddress)
         {
             using (var context = new WalletContext())
             {
