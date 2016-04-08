@@ -83,7 +83,7 @@ namespace NxtWallet
 
         private async Task HandleBalance(Result<string> balanceResult)
         {
-            if (balanceResult.Success)
+            if (balanceResult.Success && balanceResult.Value != _walletRepository.Balance)
             {
                 await _walletRepository.SaveBalanceAsync(balanceResult.Value);
                 OnBalanceUpdated(balanceResult.Value);
