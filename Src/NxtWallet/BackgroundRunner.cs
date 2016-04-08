@@ -15,9 +15,11 @@ namespace NxtWallet
         event TransactionHandler TransactionConfirmationUpdated;
         event TransactionHandler TransactionBalanceUpdated;
         event TransactionHandler TransactionAdded;
+        event BalanceHandler BalanceUpdated;
     }
 
     public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
+    public delegate void BalanceHandler(IBackgroundRunner sender, string balance);
 
     public class BackgroundRunner : IBackgroundRunner
     {
@@ -29,6 +31,7 @@ namespace NxtWallet
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
         public event TransactionHandler TransactionAdded;
+        public event BalanceHandler BalanceUpdated;
 
         public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
             IBalanceCalculator balanceCalculator, IWalletRepository walletRepository)
@@ -45,12 +48,14 @@ namespace NxtWallet
             {
                 var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
                 var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
+                var balanceResult = await _nxtServer.GetBalanceAsync();
 
                 var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
                 var updatedTransactions = GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions);
                 
                 await HandleUpdatedTransactions(updatedTransactions);
                 await HandleNewTransactions(newTransactions, knownTransactions);
+                await HandleBalance(balanceResult);
 
                 await Task.Delay(_walletRepository.SleepTime, token);
             }
@@ -73,6 +78,15 @@ namespace NxtWallet
 
                 updated.ForEach(OnTransactionBalanceUpdated);
                 newTransactions.ForEach(OnTransactionAdded);
+            }
+        }
+
+        private async Task HandleBalance(Result<string> balanceResult)
+        {
+            if (balanceResult.Success)
+            {
+                await _walletRepository.SaveBalanceAsync(balanceResult.Value);
+                OnBalanceUpdated(balanceResult.Value);
             }
         }
 
@@ -102,6 +116,11 @@ namespace NxtWallet
         protected virtual void OnTransactionAdded(Transaction transaction)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionAdded?.Invoke(this, transaction));
+        }
+
+        protected virtual void OnBalanceUpdated(string balance)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() => BalanceUpdated?.Invoke(this, balance));
         }
     }
 }

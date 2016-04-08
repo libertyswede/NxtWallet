@@ -31,7 +31,8 @@ namespace NxtWallet.ViewModel
             set { Set(ref _showAddress, value); }
         }
 
-        public OverviewViewModel(IWalletRepository walletRepository, INxtServer nxtServer)
+        public OverviewViewModel(IWalletRepository walletRepository, INxtServer nxtServer,
+            IBackgroundRunner backgroundRunner)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
@@ -39,6 +40,8 @@ namespace NxtWallet.ViewModel
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
             ShowAddress = walletRepository.BackupCompleted;
+
+            backgroundRunner.BalanceUpdated += (sender, balance) => Balance = balance;
         }
 
         public void LoadFromRepository()
