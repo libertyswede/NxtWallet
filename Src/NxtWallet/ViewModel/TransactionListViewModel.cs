@@ -11,6 +11,7 @@ namespace NxtWallet.ViewModel
     public class TransactionListViewModel : ViewModelBase
     {
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IContactRepository _contactRepository;
         private ObservableCollection<Transaction> _transactions;
 
         public ObservableCollection<Transaction> Transactions
@@ -19,10 +20,12 @@ namespace NxtWallet.ViewModel
             set { Set(ref _transactions, value); }
         }
 
-        public TransactionListViewModel(ITransactionRepository transactionRepository, IBackgroundRunner backgroundRunner)
+        public TransactionListViewModel(ITransactionRepository transactionRepository, IBackgroundRunner backgroundRunner,
+            IContactRepository contactRepository)
         {
             backgroundRunner.TransactionAdded += (sender, transaction) =>
             {
+                UpdateTransactionWithContactInfo(transaction);
                 InsertTransaction(transaction);
             };
             backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
@@ -37,13 +40,24 @@ namespace NxtWallet.ViewModel
             };
 
             _transactionRepository = transactionRepository;
+            _contactRepository = contactRepository;
             Transactions = new ObservableCollection<Transaction>();
         }
 
         public void LoadTransactionsFromRepository()
         {
-            var transactions = Task.Run(async () => await _transactionRepository.GetAllTransactionsAsync()).Result;
+            var transactions = Task.Run(async () => await _transactionRepository.GetAllTransactionsAsync()).Result.ToList();
+            var contacts = Task.Run(async () => await _contactRepository.GetAllContacts())
+                .Result
+                .ToDictionary(contact => contact.NxtAddressRs);
+            transactions.ForEach(t => t.UpdateWithContactInfo(contacts));
             InsertTransactions(transactions);
+        }
+
+        private async void UpdateTransactionWithContactInfo(Transaction transaction)
+        {
+            var contacts = await _contactRepository.GetContacts(new[] { transaction.AccountFrom, transaction.AccountTo });
+            transaction.UpdateWithContactInfo(contacts);
         }
 
         private void InsertTransactions(IEnumerable<Transaction> transactions)

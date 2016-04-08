@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using NxtWallet.ViewModel.Model;
 
@@ -7,9 +6,9 @@ namespace NxtWallet.Model
 {
     public class FakeContactRepository : IContactRepository
     {
-        public Task<IEnumerable<Contact>> GetAllContacts()
+        public Task<IList<Contact>> GetAllContacts()
         {
-            var contacts = new List<Contact>
+            IList<Contact> contacts = new List<Contact>
             {
                 new Contact {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
                 new Contact {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},
@@ -17,7 +16,7 @@ namespace NxtWallet.Model
                 new Contact {Name = "coretechs", NxtAddressRs = "NXT-WY9K-ZMTT-QQTT-3NBL7"},
                 new Contact {Name = "Damelon", NxtAddressRs = "NXT-D6K7-MLY6-98FM-FLL5T"}
             };
-            return Task.FromResult(contacts.AsEnumerable());
+            return Task.FromResult(contacts);
         }
 
         public Task UpdateContact(Contact contact)
@@ -33,6 +32,12 @@ namespace NxtWallet.Model
         public Task DeleteContact(Contact contact)
         {
             return Task.CompletedTask;
+        }
+
+        public Task<IList<Contact>> GetContacts(IEnumerable<string> nxtRsAddresses)
+        {
+            IList<Contact> contacts = new List<Contact>();
+            return Task.FromResult(contacts);
         }
     }
 }

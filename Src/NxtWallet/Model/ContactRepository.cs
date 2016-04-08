@@ -16,12 +16,12 @@ namespace NxtWallet.Model
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Contact>> GetAllContacts()
+        public async Task<IList<Contact>> GetAllContacts()
         {
             using (var context = new WalletContext())
             {
                 var contactsDto = await context.Contacts.ToListAsync();
-                return _mapper.Map<IEnumerable<Contact>>(contactsDto);
+                return _mapper.Map<IList<Contact>>(contactsDto);
             }
         }
 
@@ -44,6 +44,15 @@ namespace NxtWallet.Model
         public async Task DeleteContact(Contact contact)
         {
             await UpdateEntityState(contact, EntityState.Deleted);
+        }
+
+        public async Task<IList<Contact>> GetContacts(IEnumerable<string> nxtRsAddresses)
+        {
+            using (var context = new WalletContext())
+            {
+                var list = await context.Contacts.Where(c => nxtRsAddresses.Contains(c.NxtAddressRs)).ToListAsync();
+                return _mapper.Map<IList<Contact>>(list);
+            }
         }
 
         private async Task UpdateEntityState(Contact contact, EntityState entityState)

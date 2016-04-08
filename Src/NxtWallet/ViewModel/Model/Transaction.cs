@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using GalaSoft.MvvmLight;
 
 namespace NxtWallet.ViewModel.Model
@@ -6,6 +8,7 @@ namespace NxtWallet.ViewModel.Model
     public class Transaction : ObservableObject, IEquatable<Transaction>
     {
         private bool _isConfirmed;
+        private bool _userIsRecipient;
 
         public int Id { get; set; }
         public ulong NxtId { get; set; }
@@ -19,12 +22,26 @@ namespace NxtWallet.ViewModel.Model
         public long NqtBalance { get; set; }
         public string FormattedBalance => (NqtBalance / (decimal)100000000).ToFormattedString();
         public string AccountFrom { get; set; }
-        public string ContactListAccountFrom => UserIsRecipient ? AccountFrom : "you";
+        public string ContactListAccountFrom { get; private set; }
         public string AccountTo { get; set; }
-        public string ContactListAccountTo => UserIsRecipient ? "you" : AccountTo;
+        public string ContactListAccountTo { get; private set; }
         public string Message { get; set; }
-        public bool UserIsRecipient { get; set; }
-
+        public bool UserIsRecipient
+        {
+            get { return _userIsRecipient; }
+            set
+            {
+                _userIsRecipient = value;
+                if (_userIsRecipient)
+                {
+                    ContactListAccountTo = "you";
+                }
+                else
+                {
+                    ContactListAccountFrom = "you";
+                }
+            }
+        }
         public bool IsConfirmed
         {
             get { return _isConfirmed; }
@@ -50,6 +67,34 @@ namespace NxtWallet.ViewModel.Model
         public bool IsReceived(string yourAccountRs)
         {
             return AccountTo == yourAccountRs;
+        }
+
+        public void UpdateWithContactInfo(IList<Contact> contacts)
+        {
+            if (UserIsRecipient)
+            {
+                var contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom));
+                ContactListAccountFrom = contact?.NxtAddressRs ?? ContactListAccountFrom;
+            }
+            else
+            {
+                var contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo));
+                ContactListAccountTo = contact?.NxtAddressRs ?? ContactListAccountTo;
+            }
+        }
+
+        public void UpdateWithContactInfo(IDictionary<string, Contact> contacts)
+        {
+            Contact contact;
+            
+            if (UserIsRecipient && contacts.TryGetValue(AccountFrom, out contact))
+            {
+                ContactListAccountFrom = contact.Name;
+            }
+            else if (!UserIsRecipient && contacts.TryGetValue(AccountTo, out contact))
+            {
+                ContactListAccountTo = contact.Name;
+            }
         }
     }
 }
