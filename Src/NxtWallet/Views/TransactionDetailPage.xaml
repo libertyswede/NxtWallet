@@ -54,7 +54,7 @@
         </Grid.ColumnDefinitions>
         <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,40,0,20" FontSize="21.333" >
             <Run Text="Transaction:" />
-            <Run Text="{x:Bind ViewModel.Transaction.NxtId}" />
+            <Hyperlink NavigateUri="{x:Bind ViewModel.TransactionLink}" ><Run Text="{x:Bind ViewModel.Transaction.NxtId}" /></Hyperlink>
         </TextBlock>
         <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
             <Grid >
