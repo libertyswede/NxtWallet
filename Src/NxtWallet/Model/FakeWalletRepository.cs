@@ -26,5 +26,10 @@ namespace NxtWallet.Model
         {
             return Task.CompletedTask;
         }
+
+        public Task UpdateBackupCompleted(bool completed)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

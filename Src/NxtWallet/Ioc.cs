@@ -3,6 +3,7 @@ using Microsoft.Practices.ServiceLocation;
 using NxtWallet.Controls;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
+using NxtWallet.Views;
 
 namespace NxtWallet
 {
@@ -15,6 +16,8 @@ namespace NxtWallet
         public SettingsViewModel SettingsViewModel => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public ReceiveMoneyViewModel ReceiveMoneyViewModel => ServiceLocator.Current.GetInstance<ReceiveMoneyViewModel>();
         public ContactsViewModel ContactsViewModel => ServiceLocator.Current.GetInstance<ContactsViewModel>();
+        public BackupSecretPhraseViewModel BackupSecretPhraseViewModel => ServiceLocator.Current.GetInstance<BackupSecretPhraseViewModel>();
+        public BackupConfirmViewModel BackupConfirmViewModel => ServiceLocator.Current.GetInstance<BackupConfirmViewModel>();
 
         static Ioc()
         {
@@ -38,9 +41,11 @@ namespace NxtWallet
 
             SimpleIoc.Default.Register(() => MapperConfig.Setup(repo).CreateMapper());
             SimpleIoc.Default.Register<IBackgroundRunner, BackgroundRunner>();
-            SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
             SimpleIoc.Default.Register<INavigationService, NavigationService>();
+            SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
+            SimpleIoc.Default.Register<IBackupInfoDialog, BackupInfoDialog>();
+            SimpleIoc.Default.Register<IBackupDoneDialog, BackupDoneDialog>();
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();
@@ -48,6 +53,8 @@ namespace NxtWallet
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<ReceiveMoneyViewModel>();
             SimpleIoc.Default.Register<ContactsViewModel>();
+            SimpleIoc.Default.Register<BackupSecretPhraseViewModel>();
+            SimpleIoc.Default.Register<BackupConfirmViewModel>();
         }
 
         public static void Register()

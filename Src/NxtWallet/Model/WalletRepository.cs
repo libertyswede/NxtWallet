@@ -67,6 +67,18 @@ namespace NxtWallet.Model
                 var setting = context.Settings.Single(s => s.Key == NxtServerKey);
                 setting.Value = newServerAddress;
                 await context.SaveChangesAsync();
+                NxtServer = newServerAddress;
+            }
+        }
+
+        public async Task UpdateBackupCompleted(bool completed)
+        {
+            using (var context = new WalletContext())
+            {
+                var setting = context.Settings.Single(s => s.Key == BackupCompletedKey);
+                setting.Value = completed.ToString();
+                await context.SaveChangesAsync();
+                BackupCompleted = completed;
             }
         }
 

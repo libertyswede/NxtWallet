@@ -138,6 +138,8 @@
     <Compile Include="NoopConverter.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
+    <Compile Include="ViewModel\BackupConfirmViewModel.cs" />
+    <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
     <Compile Include="ViewModel\Model\Contact.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
@@ -149,6 +151,18 @@
     <Compile Include="IDialog.cs" />
     <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
       <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BackupConfirmPage.xaml.cs">
+      <DependentUpon>BackupConfirmPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BackupDoneDialog.xaml.cs">
+      <DependentUpon>BackupDoneDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BackupInfoDialog.xaml.cs">
+      <DependentUpon>BackupInfoDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BackupSecretPhrasePage.xaml.cs">
+      <DependentUpon>BackupSecretPhrasePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ContactsPage.xaml.cs">
       <DependentUpon>ContactsPage.xaml</DependentUpon>
@@ -210,6 +224,7 @@
     <Content Include="Assets\StoreLogo.scale-150.png" />
     <Content Include="Assets\StoreLogo.scale-200.png" />
     <Content Include="Assets\StoreLogo.scale-400.png" />
+    <Content Include="Assets\warning.png" />
     <Content Include="Assets\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
@@ -225,6 +240,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\NetworkIndicatorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BackupConfirmPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BackupDoneDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BackupInfoDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BackupSecretPhrasePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

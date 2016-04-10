@@ -86,10 +86,22 @@ namespace NxtWallet
 
         public void Navigate(NavigationPage navigationPage, object parameter)
         {
-            if (navigationPage == NavigationPage.SendMoneyPage)
+            switch (navigationPage)
             {
-                NavMenuList.SetSelectedItem((ListViewItem)NavMenuList.ContainerFromIndex(1));
-                MainFrame.Navigate(typeof(SendMoneyPage), parameter);
+                case NavigationPage.BackupConfirmPage:
+                    MainFrame.Navigate(typeof (BackupConfirmPage), parameter);
+                    break;
+                case NavigationPage.BackupSecretPhrasePage:
+                    MainFrame.Navigate(typeof(BackupSecretPhrasePage), parameter);
+                    break;
+                case NavigationPage.ReceiveMoneyPage:
+                    NavMenuList.SetSelectedItem((ListViewItem)NavMenuList.ContainerFromIndex(2));
+                    MainFrame.Navigate(typeof (ReceiveMoneyPage), parameter);
+                    break;
+                case NavigationPage.SendMoneyPage:
+                    NavMenuList.SetSelectedItem((ListViewItem)NavMenuList.ContainerFromIndex(1));
+                    MainFrame.Navigate(typeof (SendMoneyPage), parameter);
+                    break;
             }
         }
 

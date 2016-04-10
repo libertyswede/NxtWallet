@@ -4,6 +4,9 @@ namespace NxtWallet
 {
     public enum NavigationPage
     {
+        BackupConfirmPage,
+        BackupSecretPhrasePage,
+        ReceiveMoneyPage,
         SendMoneyPage
     }
 
