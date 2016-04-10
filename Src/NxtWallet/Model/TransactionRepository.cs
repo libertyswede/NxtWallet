@@ -68,17 +68,5 @@ namespace NxtWallet.Model
                 await context.SaveChangesAsync();
             }
         }
-
-        public async Task<Transaction> GetLatestTransactionAsync()
-        {
-            using (var context = new WalletContext())
-            {
-                var transaction = await context.Transactions
-                    .OrderByDescending(t => t.Timestamp)
-                    .FirstOrDefaultAsync();
-
-                return _mapper.Map<Transaction>(transaction);
-            }
-        }
     }
 }

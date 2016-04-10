@@ -39,7 +39,6 @@ namespace NxtWallet.ViewModel
 
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
-            ShowAddress = walletRepository.BackupCompleted;
 
             backgroundRunner.BalanceUpdated += (sender, balance) => Balance = balance;
         }
@@ -47,6 +46,7 @@ namespace NxtWallet.ViewModel
         public void LoadFromRepository()
         {
             Balance = _walletRepository.Balance;
+            ShowAddress = _walletRepository.BackupCompleted;
         }
 
         public async Task LoadFromNxtServerAsync()

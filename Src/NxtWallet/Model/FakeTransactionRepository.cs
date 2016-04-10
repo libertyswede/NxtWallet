@@ -64,10 +64,5 @@ namespace NxtWallet.Model
         {
             return Task.CompletedTask;
         }
-
-        public Task<Transaction> GetLatestTransactionAsync()
-        {
-            return Task.FromResult(GetAllTransactionsAsync().Result.Last());
-        }
     }
 }
