@@ -108,6 +108,7 @@
     </Compile>
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BoolToVisiblityConverter.cs" />
+    <Compile Include="Controls\SelectableTextBlock.cs" />
     <Compile Include="Controls\TransactionListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />

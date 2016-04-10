@@ -5,16 +5,66 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:nxtWallet="using:NxtWallet"
+    xmlns:controls="using:NxtWallet.Controls"
     mc:Ignorable="d"
     DataContext="{Binding ReceiveMoneyViewModel, Source={StaticResource Ioc}}">
     <Page.Resources>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisiblityConverter" />
     </Page.Resources>
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Text="{x:Bind ViewModel.NxtAddress}" Margin="10,10,-10,-10" Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisiblityConverter}}"/>
-        <TextBlock Text="{x:Bind ViewModel.PublicKey}" Margin="10,38,-10,-38" Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisiblityConverter}}"/>
-        <Image Source="{x:Bind ViewModel.NxtAddressQr}" Margin="10,80,0,0" Width="200" Height="200"
-               Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisiblityConverter}}"/>
+    <Grid x:Name="Grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.Setters>
+                        <Setter Target="AddressLabel.(TextBlock.FontSize)" Value="14.667"/>
+                        <Setter Target="Address.(Control.FontSize)" Value="14.667"/>
+                        <Setter Target="PublicKeyLabel.(TextBlock.FontSize)" Value="14.667"/>
+                        <Setter Target="PublicKey.(TextBlock.FontSize)" Value="14.667"/>
+                        <Setter Target="QrCodeLabel.(TextBlock.FontSize)" Value="14.667"/>
+                        <Setter Target="Grid.(Grid.BorderThickness)">
+                            <Setter.Value>
+                                <Thickness>0,50,0,0</Thickness>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin0}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin540">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin540}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Receive Money" Margin="10,5,10,20" FontSize="26.667" FontWeight="Bold" />
 
+        <TextBlock x:Name="AddressLabel" Grid.Row="1" Grid.Column="0" Text="Nxt Address:" HorizontalAlignment="Right" Margin="10,5" FontSize="18.667" />
+        <controls:SelectableTextBlock x:Name="Address" Grid.Row="1" Grid.Column="1" Margin="0" FontSize="18.667" 
+                 Text="{x:Bind ViewModel.NxtAddress}"
+                 Visibility="{x:Bind ViewModel.ShowNxtAddress, Converter={StaticResource BoolToVisiblityConverter}}" />
+
+        <TextBlock x:Name="PublicKeyLabel" Grid.Row="2" Grid.Column="0" Text="Public Key:" Margin="10,5" HorizontalAlignment="Right" FontSize="18.667" 
+                   Visibility="{x:Bind ViewModel.ShowPublicKey, Converter={StaticResource BoolToVisiblityConverter}}" />
+        <controls:SelectableTextBlock x:Name="PublicKey" Grid.Row="2" Grid.Column="1" Margin="0" FontSize="18.667"
+                   Text="{x:Bind ViewModel.PublicKey}" 
+                   Visibility="{x:Bind ViewModel.ShowPublicKey, Converter={StaticResource BoolToVisiblityConverter}}" />
+
+        <TextBlock x:Name="QrCodeLabel" Grid.Row="3" Grid.Column="0" Text="QR Code:" Margin="10,5" HorizontalAlignment="Right" FontSize="18.667" />
+        <Image Grid.Row="3" Grid.Column="1" Width="200" Height="200" Margin="10,5" HorizontalAlignment="Left" VerticalAlignment="Top"
+               Source="{x:Bind ViewModel.NxtAddressQr}" 
+               Visibility="{x:Bind ViewModel.ShowNxtAddress, Converter={StaticResource BoolToVisiblityConverter}}" />
     </Grid>
 </Page>

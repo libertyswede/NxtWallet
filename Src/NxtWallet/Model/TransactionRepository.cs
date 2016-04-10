@@ -10,10 +10,12 @@ namespace NxtWallet.Model
     public class TransactionRepository : ITransactionRepository
     {
         private readonly IMapper _mapper;
+        private readonly IWalletRepository _walletRepository;
 
-        public TransactionRepository(IMapper mapper)
+        public TransactionRepository(IMapper mapper, IWalletRepository walletRepository)
         {
             _mapper = mapper;
+            _walletRepository = walletRepository;
         }
 
         public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
@@ -66,6 +68,16 @@ namespace NxtWallet.Model
                     context.Transactions.Add(_mapper.Map<TransactionDto>(transaction));
                 }
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> HasOutgoingTransactionAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                var outgouingTransaction = await context.Transactions
+                    .AnyAsync(t => t.AccountFrom == _walletRepository.NxtAccount.AccountRs);
+                return outgouingTransaction;
             }
         }
     }
