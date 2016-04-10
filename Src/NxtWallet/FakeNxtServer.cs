@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
-using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
@@ -20,9 +18,9 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
-        public Task<Result<string>> GetBalanceAsync()
+        public Task<long> GetBalanceAsync()
         {
-            return Task.FromResult(new Result<string>("11.00"));
+            return Task.FromResult(11 * 100000000L);
         }
 
         public Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)

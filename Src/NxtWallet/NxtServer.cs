@@ -22,7 +22,7 @@ namespace NxtWallet
 
         bool IsOnline { get; }
 
-        Task<Result<string>> GetBalanceAsync();
+        Task<long> GetBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
@@ -50,32 +50,35 @@ namespace NxtWallet
             _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
         }
 
-        //TODO: Scrap Result class and instead cast one Exception type, wrapping the caught exception
-        public async Task<Result<string>> GetBalanceAsync()
+        public async Task<long> GetBalanceAsync()
         {
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
                 var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
                 IsOnline = true;
-                return new Result<string>(balanceResult.UnconfirmedBalance.Nxt.ToFormattedString());
+                return balanceResult.UnconfirmedBalance.Nqt;
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
             }
-            catch (JsonReaderException)
+            catch (JsonReaderException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when parsing response", e);
             }
             catch (NxtException e)
             {
                 if (!e.Message.Equals("Unknown account"))
                 {
-                    throw;
+                    IsOnline = false;
+                    throw new Exception("", e);
                 }
             }
-            return new Result<string>(string.Empty, false);
+            IsOnline = true;
+            return 0;
         }
 
         //TODO: Phased transactions?

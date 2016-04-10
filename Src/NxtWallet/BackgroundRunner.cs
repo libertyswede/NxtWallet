@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,18 +47,25 @@ namespace NxtWallet
         {
             while (!token.IsCancellationRequested)
             {
-                var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
-                var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
-                var balanceResult = await _nxtServer.GetBalanceAsync();
+                try
+                {
+                    var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
+                    var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
+                    var balanceResult = await _nxtServer.GetBalanceAsync();
 
-                var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
-                var updatedTransactions = GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions);
+                    var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
+                    var updatedTransactions = GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions);
                 
-                await HandleUpdatedTransactions(updatedTransactions);
-                await HandleNewTransactions(newTransactions, knownTransactions);
-                await HandleBalance(balanceResult);
+                    await HandleUpdatedTransactions(updatedTransactions);
+                    await HandleNewTransactions(newTransactions, knownTransactions);
+                    await HandleBalance(balanceResult, newTransactions);
 
-                await Task.Delay(_walletRepository.SleepTime, token);
+                    await Task.Delay(_walletRepository.SleepTime, token);
+                }
+                catch (Exception)
+                {
+                    // ignore
+                }
             }
         }
 
@@ -67,7 +75,7 @@ namespace NxtWallet
             updatedTransactions.ForEach(OnTransactionConfirmationUpdated);
         }
 
-        private async Task HandleNewTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions)
+        private async Task HandleNewTransactions(List<Transaction> newTransactions, IEnumerable<Transaction> knownTransactions)
         {
             if (newTransactions.Any())
             {
@@ -81,12 +89,15 @@ namespace NxtWallet
             }
         }
 
-        private async Task HandleBalance(Result<string> balanceResult)
+        private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions)
         {
-            if (balanceResult.Success && balanceResult.Value != _walletRepository.Balance)
+            var unconfirmedBalanceNqt = newTransactions.Where(t => t.UserIsRecipient && !t.IsConfirmed).Sum(t => t.NqtAmount);
+            var balanceNqt = unconfirmedBalanceNqt + confirmedBalanceNqt;
+            var balance = balanceNqt.NqtToNxt().ToFormattedString();
+            if (balance != _walletRepository.Balance)
             {
-                await _walletRepository.SaveBalanceAsync(balanceResult.Value);
-                OnBalanceUpdated(balanceResult.Value);
+                await _walletRepository.SaveBalanceAsync(balance);
+                OnBalanceUpdated(balance);
             }
         }
 

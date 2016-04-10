@@ -7,7 +7,6 @@
     xmlns:controls="using:NxtWallet.Controls"
     xmlns:nxtWallet="using:NxtWallet"
     mc:Ignorable="d"
-    Loading="OverviewPage_OnLoading"
     DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
     <Page.Resources>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisibilityConverter" />
