@@ -60,7 +60,7 @@ namespace NxtWallet
                 
                     await HandleUpdatedTransactions(updatedTransactions);
                     await HandleNewTransactions(newTransactions, knownTransactions);
-                    await HandleBalance(balanceResult, newTransactions);
+                    await HandleBalance(balanceResult, newTransactions, knownTransactions);
 
                     await Task.Delay(_walletRepository.SleepTime, token);
                 }
@@ -100,9 +100,12 @@ namespace NxtWallet
             newTransactions.ForEach(t => t.UpdateWithContactInfo(contacts));
         }
 
-        private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions)
+        private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions, List<Transaction> knownTransactions)
         {
-            var unconfirmedBalanceNqt = newTransactions.Where(t => t.UserIsRecipient && !t.IsConfirmed).Sum(t => t.NqtAmount);
+            var unconfirmedBalanceNqt = newTransactions.Union(knownTransactions)
+                .Where(t => t.UserIsRecipient && !t.IsConfirmed)
+                .Sum(t => t.NqtAmount);
+
             var balanceNqt = unconfirmedBalanceNqt + confirmedBalanceNqt;
             var balance = balanceNqt.NqtToNxt().ToFormattedString();
             if (balance != _walletRepository.Balance)
