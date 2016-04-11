@@ -67,7 +67,7 @@ namespace NxtWallet.ViewModel
                 var transaction = transactionResult.Value;
                 SetBalance(transaction);
                 await _transactionRepository.SaveTransactionAsync(transaction);
-                await _walletRepository.SaveBalanceAsync((transaction.NqtBalance/100000000M).ToFormattedString());
+                await _walletRepository.UpdateBalanceAsync((transaction.NqtBalance/100000000M).ToFormattedString());
                 //await Task.Delay(5000); // For testing purposes
             });
             _sendMoneyDialog.Hide();

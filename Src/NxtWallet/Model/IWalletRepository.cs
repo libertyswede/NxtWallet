@@ -11,9 +11,10 @@ namespace NxtWallet.Model
         string Balance { get; }
         bool BackupCompleted { get; }
         int SleepTime { get; }
+        bool NotificationsEnabled { get; }
 
         Task LoadAsync();
-        Task SaveBalanceAsync(string balance);
+        Task UpdateBalanceAsync(string balance);
         Task UpdateNxtServerAsync(string newServerAddress);
         Task UpdateBackupCompleted(bool completed);
     }

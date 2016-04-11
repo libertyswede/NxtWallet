@@ -116,6 +116,7 @@
     <Compile Include="FakeBackgroundRunner.cs" />
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
+    <Compile Include="FakeToastManager.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="MapperConfig.cs" />
     <Compile Include="Migrations\20160406180309_Initial.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="NoopConverter.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
+    <Compile Include="ToastManager.cs" />
     <Compile Include="ViewModel\BackupConfirmViewModel.cs" />
     <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
@@ -220,6 +222,9 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-256_altform-unplated.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-48_altform-unplated.png" />
+    <Content Include="Assets\Square71x71Logo.scale-100.png" />
+    <Content Include="Assets\Square71x71Logo.scale-200.png" />
+    <Content Include="Assets\Square71x71Logo.scale-400.png" />
     <Content Include="Assets\StoreLogo.scale.png" />
     <Content Include="Assets\StoreLogo.scale-125.png" />
     <Content Include="Assets\StoreLogo.scale-150.png" />

@@ -67,6 +67,10 @@ namespace NxtWallet
             // Ensure the current window is active
             Window.Current.Activate();
             DispatcherHelper.Initialize();
+
+            var toastManager = ServiceLocator.Current.GetInstance<IToastManager>();
+            toastManager.Register();
+
             _cancellationTokenSource = new CancellationTokenSource();
             var token = _cancellationTokenSource.Token;
             var runner = ServiceLocator.Current.GetInstance<IBackgroundRunner>();

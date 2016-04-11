@@ -11,13 +11,14 @@ namespace NxtWallet.Model
         public string Balance { get; set; } = "1100000000";
         public bool BackupCompleted { get; } = false;
         public int SleepTime { get; } = 10000;
+        public bool NotificationsEnabled { get; } = true;
 
         public Task LoadAsync()
         {
             return Task.CompletedTask;
         }
 
-        public Task SaveBalanceAsync(string balance)
+        public Task UpdateBalanceAsync(string balance)
         {
             return Task.CompletedTask;
         }

@@ -48,38 +48,17 @@ namespace NxtWallet.ViewModel.Model
             set { Set(ref _isConfirmed, value); }
         }
 
-        public override bool Equals(object obj)
-        {
-            var transaction = obj as Transaction;
-            return transaction != null && Equals(transaction);
-        }
-
-        public override int GetHashCode()
-        {
-            return NxtId.GetHashCode();
-        }
-
-        public bool Equals(Transaction other)
-        {
-            return other?.NxtId == NxtId;
-        }
-
-        public bool IsReceived(string yourAccountRs)
-        {
-            return AccountTo == yourAccountRs;
-        }
-
         public void UpdateWithContactInfo(IList<Contact> contacts)
         {
-            if (UserIsRecipient)
+            Contact contact;
+
+            if (UserIsRecipient && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom))) != null)
             {
-                var contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom));
-                ContactListAccountFrom = contact?.NxtAddressRs ?? ContactListAccountFrom;
+                ContactListAccountFrom = contact.Name;
             }
-            else
+            else if (!UserIsRecipient && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))) != null)
             {
-                var contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo));
-                ContactListAccountTo = contact?.NxtAddressRs ?? ContactListAccountTo;
+                ContactListAccountTo = contact.Name;
             }
         }
 
@@ -95,6 +74,22 @@ namespace NxtWallet.ViewModel.Model
             {
                 ContactListAccountTo = contact.Name;
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            var transaction = obj as Transaction;
+            return transaction != null && Equals(transaction);
+        }
+
+        public override int GetHashCode()
+        {
+            return NxtId.GetHashCode();
+        }
+
+        public bool Equals(Transaction other)
+        {
+            return other?.NxtId == NxtId;
         }
     }
 }

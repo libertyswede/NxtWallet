@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Entity;
@@ -15,12 +17,14 @@ namespace NxtWallet.Model
         private const string NxtServerKey = "nxtServer";
         private const string SleepTimeKey = "sleepTime";
         private const string BalanceKey = "balance";
+        private const string NotificationsEnabledKey = "notificationsEnabled";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
         public string SecretPhrase { get; private set; }
         public bool BackupCompleted { get; private set; }
         public int SleepTime { get; private set; }
+        public bool NotificationsEnabled { get; private set; }
         public string Balance { get; private set; }
 
         public async Task LoadAsync()
@@ -31,115 +35,59 @@ namespace NxtWallet.Model
 
                 var dbSettings = await context.Settings.ToListAsync();
 
-                ReadOrGenerateSecretPhrase(dbSettings, context);
-                ReadOrGenerateNxtServer(dbSettings, context);
-                ReadOrGenerateSleepTime(dbSettings, context);
-                ReadOrGenerateBalance(dbSettings, context);
-                ReadOrGenerateBackupCompleted(dbSettings, context);
+                Balance = ReadOrGenerate(dbSettings, context, BalanceKey, () => "0.0");
+                SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
+                NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
+                SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
+                BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
+                NotificationsEnabled = ReadOrGenerate(dbSettings, context, NotificationsEnabledKey, () => true);
 
                 NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task SaveBalanceAsync(string balance)
+        public async Task UpdateBalanceAsync(string balance)
         {
-            using (var context = new WalletContext())
-            {
-                var dbBalance = await context.Settings.SingleOrDefaultAsync(s => s.Key.Equals(BalanceKey));
-                if (dbBalance == null)
-                {
-                    context.Settings.Add(new SettingDto {Key = BalanceKey, Value = balance});
-                }
-                else
-                {
-                    dbBalance.Value = balance;
-                }
-                await context.SaveChangesAsync();
-                Balance = balance;
-            }
+            await Update(BalanceKey, balance);
+            Balance = balance;
         }
 
         public async Task UpdateNxtServerAsync(string newServerAddress)
         {
-            using (var context = new WalletContext())
-            {
-                var setting = context.Settings.Single(s => s.Key == NxtServerKey);
-                setting.Value = newServerAddress;
-                await context.SaveChangesAsync();
-                NxtServer = newServerAddress;
-            }
+            await Update(NxtServerKey, newServerAddress);
+            NxtServer = newServerAddress;
         }
 
         public async Task UpdateBackupCompleted(bool completed)
         {
+            await Update(BackupCompletedKey, completed);
+            BackupCompleted = completed;
+        }
+
+        private static async Task Update<T>(string key, T value)
+        {
             using (var context = new WalletContext())
             {
-                var setting = context.Settings.Single(s => s.Key == BackupCompletedKey);
-                setting.Value = completed.ToString();
+                var setting = context.Settings.Single(s => s.Key == key);
+                setting.Value = value.ToString();
                 await context.SaveChangesAsync();
-                BackupCompleted = completed;
             }
         }
 
-        private void ReadOrGenerateBalance(IEnumerable<SettingDto> dbSettings, WalletContext context)
+        private static T ReadOrGenerate<T>(IEnumerable<SettingDto> dbSettings, WalletContext context, string key,
+            Func<T> defaultValueAction) where T : IConvertible
         {
-            Balance = dbSettings.SingleOrDefault(s => s.Key.Equals(BalanceKey))?.Value;
-            if (Balance == null)
-            {
-                Balance = "0.0";
-                context.Settings.Add(new SettingDto {Key = BalanceKey, Value = Balance});
-            }
+            var nullableValue = dbSettings.SingleOrDefault(s => s.Key.Equals(key))?.Value;
+            if (nullableValue != null)
+                return (T) Convert.ChangeType(nullableValue, typeof (T));
+
+            var defaultValue = defaultValueAction.Invoke();
+            context.Settings.Add(new SettingDto {Key = key, Value = defaultValue.ToString(CultureInfo.InvariantCulture)});
+            return defaultValue;
         }
 
-        private void ReadOrGenerateBackupCompleted(IEnumerable<SettingDto> dbSettings, WalletContext context)
-        {
-            var backupCompleted = dbSettings.SingleOrDefault(s => s.Key.Equals(BackupCompletedKey))?.Value;
-            if (backupCompleted == null)
-            {
-                BackupCompleted = false;
-                context.Settings.Add(new SettingDto {Key = BackupCompletedKey, Value = BackupCompleted.ToString()});
-            }
-            else
-            {
-                BackupCompleted = bool.Parse(backupCompleted);
-            }
-        }
-
-        private void ReadOrGenerateNxtServer(IEnumerable<SettingDto> dbSettings, WalletContext context)
-        {
-            NxtServer = dbSettings.SingleOrDefault(s => s.Key.Equals(NxtServerKey))?.Value;
-            if (NxtServer == null)
-            {
-                //NxtServer = Constants.DefaultNxtUrl;
-                NxtServer = Constants.TestnetNxtUrl;
-                context.Settings.Add(new SettingDto {Key = NxtServerKey, Value = NxtServer});
-            }
-        }
-
-        private void ReadOrGenerateSleepTime(IEnumerable<SettingDto> dbSettings, WalletContext context)
-        {
-            var sleepTime = dbSettings.SingleOrDefault(s => s.Key.Equals(SleepTimeKey))?.Value;
-            if (sleepTime == null)
-            {
-                sleepTime = 30000.ToString();
-                context.Settings.Add(new SettingDto {Key = SleepTimeKey, Value = sleepTime});
-            }
-            SleepTime = int.Parse(sleepTime);
-        }
-
-        private void ReadOrGenerateSecretPhrase(IEnumerable<SettingDto> dbSettings, WalletContext context)
-        {
-            SecretPhrase = dbSettings.SingleOrDefault(s => s.Key.Equals(SecretPhraseKey))?.Value;
-            if (SecretPhrase == null)
-            {
-                var generator = new LocalPasswordGenerator();
-                SecretPhrase = generator.GeneratePassword();
-                context.Settings.Add(new SettingDto {Key = SecretPhraseKey, Value = SecretPhrase});
-            }
-        }
-
-        private static void CreateAndMigrateDb(WalletContext context)
+        private static void CreateAndMigrateDb(DbContext context)
         {
             context.Database.Migrate();
         }

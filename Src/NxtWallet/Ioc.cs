@@ -29,6 +29,7 @@ namespace NxtWallet
                 SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
                 SimpleIoc.Default.Register<ITransactionRepository, FakeTransactionRepository>();
                 SimpleIoc.Default.Register<IContactRepository, FakeContactRepository>();
+                SimpleIoc.Default.Register<IToastManager, FakeToastManager>();
             }
             else
             {
@@ -36,6 +37,7 @@ namespace NxtWallet
                 SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
                 SimpleIoc.Default.Register<ITransactionRepository, TransactionRepository>();
                 SimpleIoc.Default.Register<IContactRepository, ContactRepository>();
+                SimpleIoc.Default.Register<IToastManager, ToastManager>();
             }
             var repo = ServiceLocator.Current.GetInstance<IWalletRepository>();
 

@@ -28,6 +28,7 @@ namespace NxtWallet
         private readonly ITransactionRepository _transactionRepository;
         private readonly IBalanceCalculator _balanceCalculator;
         private readonly IWalletRepository _walletRepository;
+        private readonly IContactRepository _contactRepository;
 
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
@@ -35,12 +36,13 @@ namespace NxtWallet
         public event BalanceHandler BalanceUpdated;
 
         public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
-            IBalanceCalculator balanceCalculator, IWalletRepository walletRepository)
+            IBalanceCalculator balanceCalculator, IWalletRepository walletRepository, IContactRepository contactRepository)
         {
             _nxtServer = nxtServer;
             _transactionRepository = transactionRepository;
             _balanceCalculator = balanceCalculator;
             _walletRepository = walletRepository;
+            _contactRepository = contactRepository;
         }
 
         public async Task Run(CancellationToken token)
@@ -79,6 +81,7 @@ namespace NxtWallet
         {
             if (newTransactions.Any())
             {
+                await UpdateTransactionContacts(newTransactions);
                 var allTransactions = knownTransactions.Union(newTransactions).OrderBy(t => t.Timestamp).ToList();
                 var updated = _balanceCalculator.Calculate(newTransactions, allTransactions).ToList();
                 await _transactionRepository.SaveTransactionsAsync(newTransactions);
@@ -89,6 +92,14 @@ namespace NxtWallet
             }
         }
 
+        private async Task UpdateTransactionContacts(List<Transaction> newTransactions)
+        {
+            var accountsRs =
+                newTransactions.Select(t => t.AccountFrom).Union(newTransactions.Select(t => t.AccountTo)).Distinct();
+            var contacts = (await _contactRepository.GetContactsAsync(accountsRs)).ToDictionary(contact => contact.NxtAddressRs);
+            newTransactions.ForEach(t => t.UpdateWithContactInfo(contacts));
+        }
+
         private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions)
         {
             var unconfirmedBalanceNqt = newTransactions.Where(t => t.UserIsRecipient && !t.IsConfirmed).Sum(t => t.NqtAmount);
@@ -96,7 +107,7 @@ namespace NxtWallet
             var balance = balanceNqt.NqtToNxt().ToFormattedString();
             if (balance != _walletRepository.Balance)
             {
-                await _walletRepository.SaveBalanceAsync(balance);
+                await _walletRepository.UpdateBalanceAsync(balance);
                 OnBalanceUpdated(balance);
             }
         }

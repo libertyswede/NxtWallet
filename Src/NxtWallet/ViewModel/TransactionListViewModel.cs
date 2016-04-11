@@ -25,7 +25,6 @@ namespace NxtWallet.ViewModel
         {
             backgroundRunner.TransactionAdded += (sender, transaction) =>
             {
-                UpdateTransactionWithContactInfo(transaction);
                 InsertTransaction(transaction);
             };
             backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
@@ -52,12 +51,6 @@ namespace NxtWallet.ViewModel
                 .ToDictionary(contact => contact.NxtAddressRs);
             transactions.ForEach(t => t.UpdateWithContactInfo(contacts));
             InsertTransactions(transactions);
-        }
-
-        private async void UpdateTransactionWithContactInfo(Transaction transaction)
-        {
-            var contacts = await _contactRepository.GetContactsAsync(new[] { transaction.AccountFrom, transaction.AccountTo });
-            transaction.UpdateWithContactInfo(contacts);
         }
 
         private void InsertTransactions(IEnumerable<Transaction> transactions)
