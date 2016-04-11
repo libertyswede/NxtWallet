@@ -17,5 +17,6 @@ namespace NxtWallet.Model
         Task UpdateBalanceAsync(string balance);
         Task UpdateNxtServerAsync(string newServerAddress);
         Task UpdateBackupCompleted(bool completed);
+        Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
     }
 }

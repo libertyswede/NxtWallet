@@ -19,15 +19,22 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Server address:" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.ServerAddress, Mode=TwoWay}" />
-        <!--<TextBlock Grid.Row="1" Grid.Column="0" Text="Setting2" />
-        <TextBox Grid.Row="1" Grid.Column="1" />
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Setting3" />
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Server address:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.ServerAddress, Mode=TwoWay}" Margin="0,5,0,0" />
+        <CheckBox Grid.Row="1" Grid.Column="0" Content="Notifications:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" 
+                  FlowDirection="RightToLeft" IsChecked="{x:Bind ViewModel.IsNotificationsEnabled, Mode=TwoWay}" FontFamily="Tw Cen MT" >
+            <CheckBox.Template>
+                <ControlTemplate TargetType="CheckBox">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </CheckBox.Template>
+        </CheckBox>
+        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{x:Bind ViewModel.IsNotificationsEnabled, Mode=TwoWay}" />
+        <!--<TextBlock Grid.Row="2" Grid.Column="0" Text="Setting3" />
         <TextBox Grid.Row="2" Grid.Column="1" />
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Setting4" />
         <TextBox Grid.Row="3" Grid.Column="1" />-->
-        <Button Grid.Row="4" Grid.Column="1" Content="Save" Command="{x:Bind ViewModel.SaveCommand}" />
+        <Button Grid.Row="4" Grid.Column="1" Content="Save" Command="{x:Bind ViewModel.SaveCommand}" Margin="0,10,0,0" />
     </Grid>
 </Page>

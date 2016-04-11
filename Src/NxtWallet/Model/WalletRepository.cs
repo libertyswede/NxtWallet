@@ -59,6 +59,12 @@ namespace NxtWallet.Model
             NxtServer = newServerAddress;
         }
 
+        public async Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled)
+        {
+            await Update(NotificationsEnabledKey, newNotificationsEnabled);
+            NotificationsEnabled = newNotificationsEnabled;
+        }
+
         public async Task UpdateBackupCompleted(bool completed)
         {
             await Update(BackupCompletedKey, completed);

@@ -32,5 +32,10 @@ namespace NxtWallet.Model
         {
             return Task.CompletedTask;
         }
+
+        public Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
