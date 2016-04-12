@@ -119,9 +119,9 @@
     <Compile Include="FakeToastManager.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="MapperConfig.cs" />
-    <Compile Include="Migrations\20160406180309_Initial.cs" />
-    <Compile Include="Migrations\20160406180309_Initial.designer.cs">
-      <DependentUpon>20160406180309_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160412184348_Initial.cs" />
+    <Compile Include="Migrations\20160412184348_Initial.designer.cs">
+      <DependentUpon>20160412184348_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Model\ContactDto.cs" />

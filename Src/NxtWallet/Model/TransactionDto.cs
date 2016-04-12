@@ -16,6 +16,7 @@ namespace NxtWallet.Model
         public string AccountTo { get; set; }
         public string Message { get; set; }
         public bool IsConfirmed { get; set; }
+        public int TransactionType { get; set; }
 
         public override bool Equals(object obj)
         {

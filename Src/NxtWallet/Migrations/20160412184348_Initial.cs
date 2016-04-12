@@ -48,7 +48,8 @@ namespace NxtWallet.Migrations
                     NqtBalance = table.Column<long>(nullable: false),
                     NqtFee = table.Column<long>(nullable: false),
                     NxtId = table.Column<long>(nullable: false),
-                    Timestamp = table.Column<DateTime>(nullable: false)
+                    Timestamp = table.Column<DateTime>(nullable: false),
+                    TransactionType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

@@ -79,6 +79,8 @@ namespace NxtWallet.Migrations
 
                     b.Property<DateTime>("Timestamp");
 
+                    b.Property<int>("TransactionType");
+
                     b.HasKey("Id");
 
                     b.HasAnnotation("Relational:TableName", "Transaction");

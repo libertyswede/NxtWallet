@@ -83,6 +83,10 @@ namespace NxtWallet.Model
             modelBuilder.Entity<TransactionDto>()
                 .Property(t => t.IsConfirmed)
                 .HasDefaultValue(true);
+
+            modelBuilder.Entity<TransactionDto>()
+                .Property(t => t.TransactionType)
+                .IsRequired();
         }
     }
 }
