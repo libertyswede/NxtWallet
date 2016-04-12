@@ -14,7 +14,7 @@ namespace NxtWallet.ViewModel.Model
         public ulong NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
-        public string FormattedAmount => (UserIsRecipient ? "" : "-") + FormattedAmountAbsolute;
+        public string FormattedAmount => (UserIsRecipient || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
         public string FormattedAmountAbsolute => (NqtAmount / (decimal)100000000).ToFormattedString();
         public long NqtFee { get; set; }
         public string FormattedFee => UserIsRecipient ? string.Empty : "-" + FormattedFeeAbsolute;
@@ -56,7 +56,7 @@ namespace NxtWallet.ViewModel.Model
             {
                 ContactListAccountFrom = contact.Name;
             }
-            else if (!UserIsRecipient && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))) != null)
+            else if (!UserIsRecipient && AccountTo != null && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))) != null)
             {
                 ContactListAccountTo = contact.Name;
             }
@@ -70,7 +70,7 @@ namespace NxtWallet.ViewModel.Model
             {
                 ContactListAccountFrom = contact.Name;
             }
-            else if (!UserIsRecipient && contacts.TryGetValue(AccountTo, out contact))
+            else if (!UserIsRecipient && AccountTo != null && contacts.TryGetValue(AccountTo, out contact))
             {
                 ContactListAccountTo = contact.Name;
             }

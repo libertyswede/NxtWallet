@@ -81,22 +81,19 @@ namespace NxtWallet
             return 0;
         }
 
-        //TODO: Phased transactions?
         public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
         {
             var transactionList = new List<Transaction>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionsTask = transactionService.GetBlockchainTransactions(
-                    _walletRepository.NxtAccount, lastTimestamp, TransactionSubType.PaymentOrdinaryPayment);
-                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(
-                    new List<Account> {_walletRepository.NxtAccount});
+                var transactionsTask = transactionService.GetBlockchainTransactions(_walletRepository.NxtAccount, lastTimestamp);
+                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount});
 
                 await Task.WhenAll(transactionsTask, unconfirmedTask);
 
                 transactionList.AddRange(_mapper.Map<List<Transaction>>(transactionsTask.Result.Transactions));
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedTask.Result.UnconfirmedTransactions));;
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedTask.Result.UnconfirmedTransactions));
                 IsOnline = true;
             }
             catch (HttpRequestException)

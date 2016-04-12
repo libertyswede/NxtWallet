@@ -74,7 +74,6 @@ namespace NxtWallet.Model
 
             modelBuilder.Entity<TransactionDto>()
                 .Property(t => t.AccountTo)
-                .IsRequired()
                 .HasMaxLength(25);
 
             modelBuilder.Entity<TransactionDto>()

@@ -60,7 +60,6 @@ namespace NxtWallet.Migrations
                         .HasAnnotation("MaxLength", 25);
 
                     b.Property<string>("AccountTo")
-                        .IsRequired()
                         .HasAnnotation("MaxLength", 25);
 
                     b.Property<bool>("IsConfirmed")

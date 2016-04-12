@@ -41,7 +41,7 @@ namespace NxtWallet.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     AccountFrom = table.Column<string>(nullable: false),
-                    AccountTo = table.Column<string>(nullable: false),
+                    AccountTo = table.Column<string>(nullable: true),
                     IsConfirmed = table.Column<bool>(nullable: false, defaultValue: true),
                     Message = table.Column<string>(nullable: true),
                     NqtAmount = table.Column<long>(nullable: false),
