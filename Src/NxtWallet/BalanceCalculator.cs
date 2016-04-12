@@ -38,13 +38,13 @@ namespace NxtWallet
         {
             var previousBalance = GetPreviousTransaction(transaction, allTransactions)?.NqtBalance ?? 0;
 
-            if (transaction.UserIsRecipient)
+            if (transaction.UserIsSender)
             {
-                transaction.NqtBalance = previousBalance + transaction.NqtAmount;
+                transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFee);
             }
             else
             {
-                transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFee);
+                transaction.NqtBalance = previousBalance + transaction.NqtAmount;
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
+using NxtLib;
 
 namespace NxtWallet.ViewModel.Model
 {
@@ -9,6 +10,7 @@ namespace NxtWallet.ViewModel.Model
     {
         private bool _isConfirmed;
         private bool _userIsRecipient;
+        private bool _userIsSender;
 
         public int Id { get; set; }
         public ulong NxtId { get; set; }
@@ -17,7 +19,7 @@ namespace NxtWallet.ViewModel.Model
         public string FormattedAmount => (UserIsRecipient || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
         public string FormattedAmountAbsolute => (NqtAmount / (decimal)100000000).ToFormattedString();
         public long NqtFee { get; set; }
-        public string FormattedFee => UserIsRecipient ? string.Empty : "-" + FormattedFeeAbsolute;
+        public string FormattedFee => UserIsSender ? "-" + FormattedFeeAbsolute : string.Empty;
         public string FormattedFeeAbsolute => (NqtFee / (decimal)100000000).ToFormattedString();
         public long NqtBalance { get; set; }
         public string FormattedBalance => (NqtBalance / (decimal)100000000).ToFormattedString();
@@ -26,20 +28,23 @@ namespace NxtWallet.ViewModel.Model
         public string AccountTo { get; set; }
         public string ContactListAccountTo { get; private set; }
         public string Message { get; set; }
+        public TransactionSubType TransactionType { get; set; }
         public bool UserIsRecipient
         {
             get { return _userIsRecipient; }
             set
             {
                 _userIsRecipient = value;
-                if (_userIsRecipient)
-                {
-                    ContactListAccountTo = "you";
-                }
-                else
-                {
-                    ContactListAccountFrom = "you";
-                }
+                ContactListAccountTo = _userIsRecipient ? "you" : AccountTo;
+            }
+        }
+        public bool UserIsSender
+        {
+            get { return _userIsSender; }
+            set
+            {
+                _userIsSender = value;
+                ContactListAccountFrom = _userIsSender ? "you" : AccountFrom;
             }
         }
         public bool IsConfirmed
@@ -50,15 +55,13 @@ namespace NxtWallet.ViewModel.Model
 
         public void UpdateWithContactInfo(IList<Contact> contacts)
         {
-            Contact contact;
-
-            if (UserIsRecipient && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom))) != null)
+            if (!UserIsSender)
             {
-                ContactListAccountFrom = contact.Name;
+                ContactListAccountFrom = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom))?.Name ?? AccountFrom;
             }
-            else if (!UserIsRecipient && AccountTo != null && (contact = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))) != null)
+            if (!UserIsRecipient && AccountTo != null)
             {
-                ContactListAccountTo = contact.Name;
+                ContactListAccountTo = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))?.Name ?? AccountTo;
             }
         }
 
@@ -66,13 +69,13 @@ namespace NxtWallet.ViewModel.Model
         {
             Contact contact;
             
-            if (UserIsRecipient && contacts.TryGetValue(AccountFrom, out contact))
+            if (!UserIsSender)
             {
-                ContactListAccountFrom = contact.Name;
+                ContactListAccountFrom = contacts.TryGetValue(AccountFrom, out contact) ? contact.Name : AccountFrom;
             }
-            else if (!UserIsRecipient && AccountTo != null && contacts.TryGetValue(AccountTo, out contact))
+            if (!UserIsRecipient && AccountTo != null)
             {
-                ContactListAccountTo = contact.Name;
+                ContactListAccountTo = contacts.TryGetValue(AccountTo, out contact) ? contact.Name : AccountTo;
             }
         }
 
