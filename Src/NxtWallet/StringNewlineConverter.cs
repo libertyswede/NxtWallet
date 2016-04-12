@@ -7,6 +7,9 @@ namespace NxtWallet
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            if (value == null)
+                return string.Empty;
+
             var theString = value.ToString();
             var newLineIndex = theString.IndexOfAny(new[] {'\n', '\r'});
             if (newLineIndex != -1)
