@@ -51,13 +51,12 @@ namespace NxtWallet
             {
                 try
                 {
+                    var updatedTransactions = new List<Transaction>();
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
-                    // TODO: Calculate transactions
-                    // TODO: If balanceResult + unconfirmed tx.sum(amount) != transactions.Last().Balance
-                    if (true)
+                    if (!BalanceEqualsLastTransactionBalance(nxtTransactions, knownTransactions, updatedTransactions, balanceResult))
                     {
                         var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
                         nxtTransactions = nxtTransactions.Union(tradesResult).ToList();
@@ -69,10 +68,9 @@ namespace NxtWallet
                     }
 
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
-                    var updatedTransactions = GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions);
-                    
+                    updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
+                    updatedTransactions.AddRange(await HandleNewTransactions(newTransactions, knownTransactions));
                     await HandleUpdatedTransactions(updatedTransactions);
-                    await HandleNewTransactions(newTransactions, knownTransactions);
                     await HandleBalance(balanceResult, newTransactions, knownTransactions);
 
                     await Task.Delay(_walletRepository.SleepTime, token);
@@ -84,25 +82,42 @@ namespace NxtWallet
             }
         }
 
+        private bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions,
+            IReadOnlyCollection<Transaction> knownTransactions, List<Transaction> updated, long balanceResult)
+        {
+            var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
+            var allTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
+
+            if (newTransactions.Any())
+            {
+                updated.AddRange(_balanceCalculator.Calculate(newTransactions, allTransactions));
+            }
+            var lastTxBalance = allTransactions.LastOrDefault()?.NqtBalance ?? 0;
+            var unconfirmedSum =
+                allTransactions.Where(t => !t.IsConfirmed).Sum(t => t.UserIsRecipient ? t.NqtAmount : -t.NqtAmount);
+            var equals = balanceResult + unconfirmedSum == lastTxBalance;
+            return @equals;
+        }
+
         private async Task HandleUpdatedTransactions(List<Transaction> updatedTransactions)
         {
-            await _transactionRepository.UpdateTransactionsAsync(updatedTransactions);
+            await _transactionRepository.UpdateTransactionsAsync(updatedTransactions.Distinct());
             updatedTransactions.ForEach(OnTransactionConfirmationUpdated);
         }
 
-        private async Task HandleNewTransactions(List<Transaction> newTransactions, IEnumerable<Transaction> knownTransactions)
+        private async Task<IEnumerable<Transaction>> HandleNewTransactions(List<Transaction> newTransactions, IEnumerable<Transaction> knownTransactions)
         {
+            var updated = new List<Transaction>();
             if (newTransactions.Any())
             {
                 await UpdateTransactionContacts(newTransactions);
                 var allTransactions = knownTransactions.Union(newTransactions).OrderBy(t => t.Timestamp).ToList();
-                var updated = _balanceCalculator.Calculate(newTransactions, allTransactions).ToList();
+                updated = _balanceCalculator.Calculate(newTransactions, allTransactions).ToList();
                 await _transactionRepository.SaveTransactionsAsync(newTransactions);
-                await _transactionRepository.UpdateTransactionsAsync(updated);
 
-                updated.ForEach(OnTransactionBalanceUpdated);
                 newTransactions.ForEach(OnTransactionAdded);
             }
+            return updated;
         }
 
         private async Task UpdateTransactionContacts(List<Transaction> newTransactions)
