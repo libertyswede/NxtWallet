@@ -38,6 +38,11 @@ namespace NxtWallet
             return Task.FromResult(new Result<Transaction>());
         }
 
+        public Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
+        {
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
+        }
+
         public void UpdateNxtServer(string newServerAddress)
         {
         }

@@ -55,9 +55,22 @@ namespace NxtWallet
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
+                    // TODO: Calculate transactions
+                    // TODO: If balanceResult + unconfirmed tx.sum(amount) != transactions.Last().Balance
+                    if (true)
+                    {
+                        var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
+                        nxtTransactions = nxtTransactions.Union(tradesResult).ToList();
+
+                        if (tradesResult.Any())
+                        {
+                            await _walletRepository.UpdateLastAssetTrade(tradesResult.Max(t => t.Timestamp).AddSeconds(1));
+                        }
+                    }
+
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
                     var updatedTransactions = GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions);
-                
+                    
                     await HandleUpdatedTransactions(updatedTransactions);
                     await HandleNewTransactions(newTransactions, knownTransactions);
                     await HandleBalance(balanceResult, newTransactions, knownTransactions);

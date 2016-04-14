@@ -9,6 +9,7 @@ using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using NxtLib;
 using NxtLib.Accounts;
+using NxtLib.AssetExchange;
 using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
@@ -26,6 +27,7 @@ namespace NxtWallet
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
         void UpdateNxtServer(string newServerAddress);
     }
 
@@ -96,13 +98,15 @@ namespace NxtWallet
                 transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedTask.Result.UnconfirmedTransactions));
                 IsOnline = true;
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
             }
-            catch (JsonReaderException)
+            catch (JsonReaderException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when parsing response", e);
             }
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
@@ -131,15 +135,38 @@ namespace NxtWallet
                 transaction.NxtId = broadcastReply.TransactionId;
                 return new Result<Transaction>(transaction);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
             }
-            catch (JsonReaderException)
+            catch (JsonReaderException e)
             {
                 IsOnline = false;
+                throw new Exception("Error when parsing response", e);
             }
-            return new Result<Transaction>();
+        }
+
+        public async Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
+        {
+            try
+            {
+                var assetService = _serviceFactory.CreateAssetExchangeService();
+                var trades = await assetService.GetTrades(
+                    AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp);
+
+                return _mapper.Map<IEnumerable<Transaction>>(trades.Trades);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         public void UpdateNxtServer(string newServerAddress)

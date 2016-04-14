@@ -18,6 +18,7 @@ namespace NxtWallet.Model
         private const string SleepTimeKey = "sleepTime";
         private const string BalanceKey = "balance";
         private const string NotificationsEnabledKey = "notificationsEnabled";
+        private const string LastAssetTradeKey = "lastAssetTrade";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
@@ -26,6 +27,7 @@ namespace NxtWallet.Model
         public int SleepTime { get; private set; }
         public bool NotificationsEnabled { get; private set; }
         public string Balance { get; private set; }
+        public DateTime LastAssetTrade { get; private set; }
 
         public async Task LoadAsync()
         {
@@ -41,10 +43,17 @@ namespace NxtWallet.Model
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
                 BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
                 NotificationsEnabled = ReadOrGenerate(dbSettings, context, NotificationsEnabledKey, () => true);
+                LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
 
                 NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
                 await context.SaveChangesAsync();
             }
+        }
+
+        public async Task UpdateLastAssetTrade(DateTime newTimestamp)
+        {
+            await Update(LastAssetTradeKey, newTimestamp.ToString("O"));
+            LastAssetTrade = newTimestamp;
         }
 
         public async Task UpdateBalanceAsync(string balance)
@@ -91,6 +100,13 @@ namespace NxtWallet.Model
             var defaultValue = defaultValueAction.Invoke();
             context.Settings.Add(new SettingDto {Key = key, Value = defaultValue.ToString(CultureInfo.InvariantCulture)});
             return defaultValue;
+        }
+
+        private static DateTime ReadOrGenerateDateTime(IEnumerable<SettingDto> dbSettings, WalletContext context,
+            string key, Func<DateTime> defaultValueAction)
+        {
+            var value = ReadOrGenerate(dbSettings, context, key, () => defaultValueAction.Invoke().ToString("O"));
+            return DateTime.ParseExact(value, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         private static void CreateAndMigrateDb(DbContext context)

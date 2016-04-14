@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using NxtLib;
 
@@ -12,11 +13,13 @@ namespace NxtWallet.Model
         bool BackupCompleted { get; }
         int SleepTime { get; }
         bool NotificationsEnabled { get; }
+        DateTime LastAssetTrade { get; }
 
         Task LoadAsync();
         Task UpdateBalanceAsync(string balance);
         Task UpdateNxtServerAsync(string newServerAddress);
         Task UpdateBackupCompleted(bool completed);
         Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
+        Task UpdateLastAssetTrade(DateTime newTimestamp);
     }
 }

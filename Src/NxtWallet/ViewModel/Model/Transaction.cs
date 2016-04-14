@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
-using NxtLib;
 
 namespace NxtWallet.ViewModel.Model
 {
@@ -28,7 +27,7 @@ namespace NxtWallet.ViewModel.Model
         public string AccountTo { get; set; }
         public string ContactListAccountTo { get; private set; }
         public string Message { get; set; }
-        public TransactionSubType TransactionType { get; set; }
+        public TransactionType TransactionType { get; set; }
         public bool UserIsRecipient
         {
             get { return _userIsRecipient; }
@@ -94,5 +93,76 @@ namespace NxtWallet.ViewModel.Model
         {
             return other?.NxtId == NxtId;
         }
+    }
+
+    public enum TransactionType
+    {
+        // Payment
+        OrdinaryPayment,
+
+        // Messaging
+        ArbitraryMessage,
+        AliasAssignment,
+        PollCreation,
+        VoteCasting,
+        HubTerminalAnnouncement,
+        AccountInfo,
+        AliasSell,
+        AliasBuy,
+        AliasDelete,
+        PhasingVoteCasting,
+        AccountProperty,
+        AccountPropertyDelete,
+
+        // ColoredCoins
+        AssetIssuance,
+        AssetTransfer,
+        AskOrderPlacement,
+        BidOrderPlacement,
+        AskOrderCancellation,
+        BidOrderCancellation,
+        DividendPayment,
+        AssetDelete,
+
+        // DigitalGoods
+        DigitalGoodsListing,
+        DigitalGoodsDelisting,
+        DigitalGoodsPriceChange,
+        DigitalGoodsQuantityChange,
+        DigitalGoodsPurchase,
+        DigitalGoodsDelivery,
+        DigitalGoodsFeedback,
+        DigitalGoodsRefund,
+
+        // AccountControl
+        EffectiveBalanceLeasing,
+        SetPhasingOnly,
+
+        // MonetarySystem
+        CurrencyIssuance,
+        ReserveIncrease,
+        ReserveClaim,
+        CurrencyTransfer,
+        PublishExchangeOffer,
+        ExchangeBuy,
+        ExchangeSell,
+        CurrencyMinting,
+        CurrencyDeletion,
+
+        // TaggedData
+        TaggedDataUpload,
+        TaggedDataExtend,
+
+        // Shuffling
+        ShufflingCreation,
+        ShufflingRegistration,
+        ShufflingProcessing,
+        ShufflingRecipients,
+        ShufflingVerification,
+        ShufflingCancellation,
+
+        // Technically not transactions
+        AssetTrade = 1001,
+        ForgeIncome = 1002
     }
 }
