@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
+using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
@@ -41,6 +42,11 @@ namespace NxtWallet
         public Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
         {
             return Task.FromResult(new List<Transaction>().AsEnumerable());
+        }
+
+        public Task<Asset> GetAssetAsync(ulong assetId)
+        {
+            return Task.FromResult(new Asset());
         }
 
         public void UpdateNxtServer(string newServerAddress)

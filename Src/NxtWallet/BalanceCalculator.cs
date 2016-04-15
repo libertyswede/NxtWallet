@@ -7,6 +7,7 @@ namespace NxtWallet
     public interface IBalanceCalculator
     {
         IEnumerable<Transaction> Calculate(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> allTransactions);
+        bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions, IReadOnlyList<Transaction> knownTransactions, List<Transaction> updatedTransactions, long balanceResult);
     }
 
     public class BalanceCalculator : IBalanceCalculator
@@ -19,6 +20,23 @@ namespace NxtWallet
             var updatedTransactions = UpdateSubsequentTransactionBalances(firstNewTransaction, allOrderedTransactions);
             updatedTransactions = updatedTransactions.Except(newTransactions);
             return updatedTransactions;
+        }
+
+        public bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions, IReadOnlyList<Transaction> knownTransactions,
+            List<Transaction> updatedTransactions, long balanceResult)
+        {
+            var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
+            var allOrderedTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
+
+            if (newTransactions.Any())
+            {
+                updatedTransactions.AddRange(Calculate(newTransactions, allOrderedTransactions));
+            }
+            var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;
+            var unconfirmedSum = allOrderedTransactions.Where(t => !t.IsConfirmed)
+                .Sum(t => t.UserIsRecipient ? t.NqtAmount : -t.NqtAmount);
+            var equals = balanceResult + unconfirmedSum == lastTxBalance;
+            return equals;
         }
 
         private IEnumerable<Transaction> UpdateSubsequentTransactionBalances(Transaction viewTransaction, IList<Transaction> allTransactions)

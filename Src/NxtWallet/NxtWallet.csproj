@@ -106,6 +106,7 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AssetTracker.cs" />
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BoolToVisiblityConverter.cs" />
     <Compile Include="Controls\SelectableTextBlock.cs" />
@@ -121,7 +122,14 @@
     <Compile Include="Migrations\20160412184348_Initial.designer.cs">
       <DependentUpon>20160412184348_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20160415183737_Assets.cs" />
+    <Compile Include="Migrations\20160415183737_Assets.designer.cs">
+      <DependentUpon>20160415183737_Assets.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
+    <Compile Include="Model\AssetDto.cs" />
+    <Compile Include="Model\AssetOwnershipDto.cs" />
+    <Compile Include="Model\AssetRepository.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="MapperConfig.cs" />
     <Compile Include="Model\ContactDto.cs" />
@@ -144,6 +152,9 @@
     <Compile Include="ViewModel\BackupConfirmViewModel.cs" />
     <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
+    <Compile Include="ViewModel\Model\Asset.cs" />
+    <Compile Include="ViewModel\Model\AssetOwnership.cs" />
+    <Compile Include="ViewModel\Model\AssetTradeTransaction.cs" />
     <Compile Include="ViewModel\Model\Contact.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />

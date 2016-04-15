@@ -4,6 +4,8 @@ namespace NxtWallet.Model
 {
     public class WalletContext : DbContext
     {
+        public DbSet<AssetDto> Assets { get; set; }
+        public DbSet<AssetOwnershipDto> AssetOwnerships { get; set; }
         public DbSet<ContactDto> Contacts { get; set; }
         public DbSet<SettingDto> Settings { get; set; }
         public DbSet<TransactionDto> Transactions { get; set; }
@@ -15,9 +17,42 @@ namespace NxtWallet.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            OnAssetCreating(modelBuilder);
+            OnAssetOwnershipCreating(modelBuilder);
             OnContactCreating(modelBuilder);
             OnSettingCreating(modelBuilder);
             OnTransactionCreating(modelBuilder);
+        }
+
+        private static void OnAssetCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AssetDto>()
+                .Property(a => a.NxtId)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetDto>()
+                .Property(a => a.Decimals)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetDto>()
+                .Property(a => a.Name)
+                .HasMaxLength(10)
+                .IsRequired();
+        }
+
+        private static void OnAssetOwnershipCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AssetOwnershipDto>()
+                .Property(o => o.QuantityQnt)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetOwnershipDto>()
+                .Property(o => o.Height)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetOwnershipDto>()
+                .HasOne(o => o.Transaction)
+                .WithOne();
         }
 
         private static void OnContactCreating(ModelBuilder modelBuilder)

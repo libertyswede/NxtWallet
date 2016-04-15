@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using NxtLib;
 using NxtWallet.Controls;
 using NxtWallet.Model;
 using NxtWallet.ViewModel;
@@ -48,6 +49,9 @@ namespace NxtWallet
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<IBackupInfoDialog, BackupInfoDialog>();
             SimpleIoc.Default.Register<IBackupDoneDialog, BackupDoneDialog>();
+            SimpleIoc.Default.Register<IAssetRepository, AssetRepository>();
+            SimpleIoc.Default.Register<IAssetTracker, AssetTracker>();
+            SimpleIoc.Default.Register<IServiceFactory>(() => new ServiceFactory(repo.NxtServer));
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
             SimpleIoc.Default.Register<TransactionListViewModel>();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
+using NxtLib;
 
 namespace NxtWallet.ViewModel.Model
 {
@@ -28,6 +29,8 @@ namespace NxtWallet.ViewModel.Model
         public string ContactListAccountTo { get; private set; }
         public string Message { get; set; }
         public TransactionType TransactionType { get; set; }
+        public int Height { get; set; }
+        public Attachment Attachment { get; set; }
         public bool UserIsRecipient
         {
             get { return _userIsRecipient; }

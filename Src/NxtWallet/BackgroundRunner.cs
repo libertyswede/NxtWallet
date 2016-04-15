@@ -29,6 +29,7 @@ namespace NxtWallet
         private readonly IBalanceCalculator _balanceCalculator;
         private readonly IWalletRepository _walletRepository;
         private readonly IContactRepository _contactRepository;
+        private readonly IAssetTracker _assetTracker;
 
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
@@ -36,30 +37,35 @@ namespace NxtWallet
         public event BalanceHandler BalanceUpdated;
 
         public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
-            IBalanceCalculator balanceCalculator, IWalletRepository walletRepository, IContactRepository contactRepository)
+            IBalanceCalculator balanceCalculator, IWalletRepository walletRepository,
+            IContactRepository contactRepository, IAssetTracker assetTracker)
         {
             _nxtServer = nxtServer;
             _transactionRepository = transactionRepository;
             _balanceCalculator = balanceCalculator;
             _walletRepository = walletRepository;
             _contactRepository = contactRepository;
+            _assetTracker = assetTracker;
         }
 
         public async Task Run(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
+                var updatedTransactions = new List<Transaction>();
                 try
                 {
-                    var updatedTransactions = new List<Transaction>();
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
-                    if (!BalanceEqualsLastTransactionBalance(nxtTransactions, knownTransactions, updatedTransactions, balanceResult))
+                    var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
+                    
+                    if (!_balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions, knownTransactions, updatedTransactions, balanceResult))
                     {
                         var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
-                        nxtTransactions = nxtTransactions.Union(tradesResult).ToList();
+                        var newTrades = tradesResult.Except(knownTransactions).ToList();
+                        newTransactions.AddRange(newTrades);
 
                         if (tradesResult.Any())
                         {
@@ -67,7 +73,8 @@ namespace NxtWallet
                         }
                     }
 
-                    var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
+                    var newAssetOwnerships = await _assetTracker.UpdateAssetOwnership(newTransactions);
+
                     updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
                     updatedTransactions.AddRange(await HandleNewTransactions(newTransactions, knownTransactions));
                     await HandleUpdatedTransactions(updatedTransactions);
@@ -80,23 +87,6 @@ namespace NxtWallet
                     // ignore
                 }
             }
-        }
-
-        private bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions,
-            IReadOnlyCollection<Transaction> knownTransactions, List<Transaction> updated, long balanceResult)
-        {
-            var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
-            var allTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
-
-            if (newTransactions.Any())
-            {
-                updated.AddRange(_balanceCalculator.Calculate(newTransactions, allTransactions));
-            }
-            var lastTxBalance = allTransactions.LastOrDefault()?.NqtBalance ?? 0;
-            var unconfirmedSum =
-                allTransactions.Where(t => !t.IsConfirmed).Sum(t => t.UserIsRecipient ? t.NqtAmount : -t.NqtAmount);
-            var equals = balanceResult + unconfirmedSum == lastTxBalance;
-            return @equals;
         }
 
         private async Task HandleUpdatedTransactions(List<Transaction> updatedTransactions)

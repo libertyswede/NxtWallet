@@ -13,6 +13,8 @@ using NxtLib.AssetExchange;
 using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
+using NxtWallet.ViewModel.Model;
+using Asset = NxtWallet.ViewModel.Model.Asset;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
@@ -28,6 +30,7 @@ namespace NxtWallet
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
+        Task<Asset> GetAssetAsync(ulong assetId);
         void UpdateNxtServer(string newServerAddress);
     }
 
@@ -44,12 +47,12 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
-        public NxtServer(IWalletRepository walletRepository, IMapper mapper)
+        public NxtServer(IWalletRepository walletRepository, IMapper mapper, IServiceFactory serviceFactory)
         {
             _walletRepository = walletRepository;
             _mapper = mapper;
             IsOnline = false;
-            _serviceFactory = new ServiceFactory(_walletRepository.NxtServer);
+            _serviceFactory = serviceFactory;
         }
 
         public async Task<long> GetBalanceAsync()
@@ -147,6 +150,27 @@ namespace NxtWallet
             }
         }
 
+        public async Task<Asset> GetAssetAsync(ulong assetId)
+        {
+            try
+            {
+                var assetService = _serviceFactory.CreateAssetExchangeService();
+                var asset = await assetService.GetAsset(assetId);
+                IsOnline = true;
+                return _mapper.Map<Asset>(asset);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
         public async Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
         {
             try
@@ -155,7 +179,7 @@ namespace NxtWallet
                 var trades = await assetService.GetTrades(
                     AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp);
 
-                return _mapper.Map<IEnumerable<Transaction>>(trades.Trades);
+                return _mapper.Map<IEnumerable<AssetTradeTransaction>>(trades.Trades);
             }
             catch (HttpRequestException e)
             {
