@@ -36,7 +36,11 @@ namespace NxtWallet.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("AssetDecimals");
+
                     b.Property<int>("AssetId");
+
+                    b.Property<long>("BalanceQnt");
 
                     b.Property<int>("Height");
 

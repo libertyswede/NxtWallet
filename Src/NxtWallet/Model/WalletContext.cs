@@ -47,6 +47,14 @@ namespace NxtWallet.Model
                 .IsRequired();
 
             modelBuilder.Entity<AssetOwnershipDto>()
+                .Property(o => o.AssetDecimals)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetOwnershipDto>()
+                .Property(o => o.BalanceQnt)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetOwnershipDto>()
                 .Property(o => o.Height)
                 .IsRequired();
 

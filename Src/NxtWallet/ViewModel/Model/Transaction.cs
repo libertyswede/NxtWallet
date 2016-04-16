@@ -6,7 +6,7 @@ using NxtLib;
 
 namespace NxtWallet.ViewModel.Model
 {
-    public class Transaction : ObservableObject, IEquatable<Transaction>
+    public class Transaction : ObservableObject, IEquatable<Transaction>, ILedgerEntry
     {
         private bool _isConfirmed;
         private bool _userIsRecipient;
@@ -95,6 +95,36 @@ namespace NxtWallet.ViewModel.Model
         public bool Equals(Transaction other)
         {
             return other?.NxtId == NxtId;
+        }
+
+        public long GetAmount()
+        {
+            return NqtAmount;
+        }
+
+        public long GetBalance()
+        {
+            return NqtBalance;
+        }
+
+        public long GetFee()
+        {
+            return NqtFee;
+        }
+
+        public long GetOrder()
+        {
+            return Timestamp.Ticks;
+        }
+
+        public void SetBalance(long balance)
+        {
+            NqtBalance = balance;
+        }
+
+        bool ILedgerEntry.UserIsSender()
+        {
+            return UserIsSender;
         }
     }
 

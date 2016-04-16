@@ -6,20 +6,21 @@ namespace NxtWallet
 {
     public interface IBalanceCalculator
     {
-        IEnumerable<Transaction> Calculate(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> allTransactions);
-        bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions, IReadOnlyList<Transaction> knownTransactions, List<Transaction> updatedTransactions, long balanceResult);
+        IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> allEntries) where T : ILedgerEntry;
+        bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions, IReadOnlyList<Transaction> knownTransactions, 
+            List<Transaction> updatedTransactions, long balanceResult);
     }
 
     public class BalanceCalculator : IBalanceCalculator
     {
-        public IEnumerable<Transaction> Calculate(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> allTransactions)
+        public IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> allEntries) where T : ILedgerEntry
         {
-            var allOrderedTransactions = allTransactions.OrderBy(t => t.Timestamp).ToList();
-            var firstNewTransaction = newTransactions.OrderBy(t => t.Timestamp).First();
-            UpdateTransactionBalance(firstNewTransaction, allTransactions);
-            var updatedTransactions = UpdateSubsequentTransactionBalances(firstNewTransaction, allOrderedTransactions);
-            updatedTransactions = updatedTransactions.Except(newTransactions);
-            return updatedTransactions;
+            var allOrderedEntries = allEntries.OrderBy(t => t.GetOrder()).ToList();
+            var firstNewEntry = newEntries.OrderBy(t => t.GetOrder()).First();
+            UpdateEntryBalance(firstNewEntry, allEntries);
+            var updatedEntries = UpdateSubsequentEntryBalances(firstNewEntry, allOrderedEntries);
+            updatedEntries = updatedEntries.Except(newEntries);
+            return updatedEntries;
         }
 
         public bool BalanceEqualsLastTransactionBalance(IEnumerable<Transaction> nxtTransactions, IReadOnlyList<Transaction> knownTransactions,
@@ -30,7 +31,8 @@ namespace NxtWallet
 
             if (newTransactions.Any())
             {
-                updatedTransactions.AddRange(Calculate(newTransactions, allOrderedTransactions));
+                var updated = Calculate(newTransactions, allOrderedTransactions);
+                updatedTransactions.AddRange(updated);
             }
             var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;
             var unconfirmedSum = allOrderedTransactions.Where(t => !t.IsConfirmed)
@@ -39,44 +41,44 @@ namespace NxtWallet
             return equals;
         }
 
-        private IEnumerable<Transaction> UpdateSubsequentTransactionBalances(Transaction viewTransaction, IList<Transaction> allTransactions)
+        private IEnumerable<T> UpdateSubsequentEntryBalances<T>(T entry, IList<T> allEntries) where T : ILedgerEntry
         {
-            var updatedTransactions = new HashSet<Transaction>();
+            var updatedEntries = new HashSet<T>();
 
-            foreach (var subsequentTransaction in GetSubsequentTransactions(viewTransaction, allTransactions))
+            foreach (var subsequentEntry in GetSubsequentEntries(entry, allEntries))
             {
-                UpdateTransactionBalance(subsequentTransaction, allTransactions);
-                updatedTransactions.Add(subsequentTransaction);
+                UpdateEntryBalance(subsequentEntry, allEntries);
+                updatedEntries.Add(subsequentEntry);
             }
 
-            return updatedTransactions;
+            return updatedEntries;
         }
 
-        private void UpdateTransactionBalance(Transaction transaction, IEnumerable<Transaction> allTransactions)
+        private void UpdateEntryBalance<T>(T entry, IEnumerable<T> allEntries) where T : ILedgerEntry
         {
-            var previousBalance = GetPreviousTransaction(transaction, allTransactions)?.NqtBalance ?? 0;
+            var previousBalance = GetPreviousEntry(entry, allEntries)?.GetBalance() ?? 0;
 
-            if (transaction.UserIsSender)
+            if (entry.UserIsSender())
             {
-                transaction.NqtBalance = previousBalance - (transaction.NqtAmount + transaction.NqtFee);
+                entry.SetBalance(previousBalance - (entry.GetAmount() + entry.GetFee()));
             }
             else
             {
-                transaction.NqtBalance = previousBalance + transaction.NqtAmount;
+                entry.SetBalance(previousBalance + entry.GetAmount());
             }
         }
 
-        private static IEnumerable<Transaction> GetSubsequentTransactions(Transaction transaction,
-            IEnumerable<Transaction> allTransactions)
+        private static IEnumerable<T> GetSubsequentEntries<T>(T entry,
+            IEnumerable<T> allEntries) where T : ILedgerEntry
         {
-            return allTransactions.Where(t => t.Timestamp.CompareTo(transaction.Timestamp) > 0).ToList();
+            return allEntries.Where(t => t.GetOrder() > entry.GetOrder()).ToList();
         }
 
-        private static Transaction GetPreviousTransaction(Transaction transaction,
-            IEnumerable<Transaction> allTransactions)
+        private static T GetPreviousEntry<T>(T entry,
+            IEnumerable<T> allEntries) where T : ILedgerEntry
         {
-            return allTransactions
-                .LastOrDefault(t => t.Timestamp.CompareTo(transaction.Timestamp) < 0);
+            return allEntries
+                .LastOrDefault(t => t.GetOrder() < entry.GetOrder());
         }
     }
 }

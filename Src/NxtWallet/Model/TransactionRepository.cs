@@ -58,16 +58,18 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactionModels)
+        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
+            var transactionList = transactions.ToList();
             using (var context = new WalletContext())
             {
-                var existingTransactions = await GetAllTransactionsAsync();
-                foreach (var transaction in transactionModels.Except(existingTransactions))
+                var transactionDtos = transactionList.Select(t => _mapper.Map<TransactionDto>(t)).ToList();
+                foreach (var transaction in transactionDtos)
                 {
-                    context.Transactions.Add(_mapper.Map<TransactionDto>(transaction));
+                    context.Transactions.Add(transaction);
                 }
                 await context.SaveChangesAsync();
+                transactionDtos.ForEach(dto => transactionList.Single(t => t.NxtId == (ulong)dto.NxtId).Id = dto.Id);
             }
         }
 

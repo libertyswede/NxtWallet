@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Threading;
+using NxtLib;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
+using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
 namespace NxtWallet
 {
@@ -73,12 +75,29 @@ namespace NxtWallet
                         }
                     }
 
-                    var newAssetOwnerships = await _assetTracker.UpdateAssetOwnership(newTransactions);
+                    await _assetTracker.UpdateAssetOwnership(newTransactions);
 
+                    if (newTransactions.Any(t => t.TransactionType == TransactionType.DividendPayment))
+                    {
+                        var dividendTransactions = newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment).ToList();
+                        foreach (var dividendTransaction in dividendTransactions)
+                        {
+                            var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
+                            var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
+                            var quantityQnt = await _assetTracker.GetAssetQuantity(attachment.AssetId, attachment.Height);
+
+                            var recipientQnt = quantityQnt - myOwnership.BalanceQnt;
+                            var expenseNqt = attachment.AmountPerQnt.Nqt*recipientQnt;
+                            dividendTransaction.NqtAmount = expenseNqt;
+                        }
+                    }
+                    
                     updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
                     updatedTransactions.AddRange(await HandleNewTransactions(newTransactions, knownTransactions));
                     await HandleUpdatedTransactions(updatedTransactions);
                     await HandleBalance(balanceResult, newTransactions, knownTransactions);
+
+                    await _assetTracker.SaveOwnerships();
 
                     await Task.Delay(_walletRepository.SleepTime, token);
                 }

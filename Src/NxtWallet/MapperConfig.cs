@@ -48,7 +48,7 @@ namespace NxtWallet
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.BuyerRs.Equals(accountRs) ? src.AskOrder : src.BidOrder)) // buyer makes the bidorder
                     .ForMember(dest => dest.Message, opt => opt.UseValue("[Asset Trade]"))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => (src.BuyerRs.Equals(accountRs) ? -1 : 1) * src.Price.Nqt * src.QuantityQnt))
-                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt))
+                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt)) // TODO: Assumption
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs.Equals(accountRs) ? src.SellerRs : src.BuyerRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs.Equals(accountRs) ? src.SellerRs : src.BuyerRs))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
@@ -64,6 +64,10 @@ namespace NxtWallet
 
                 cfg.CreateMap<NxtLib.AssetExchange.Asset, Asset>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long)src.AssetId));
+
+                cfg.CreateMap<AssetOwnership, AssetOwnershipDto>();
+                cfg.CreateMap<AssetOwnershipDto, AssetOwnership>();
+
             });
 
             return _configuration;

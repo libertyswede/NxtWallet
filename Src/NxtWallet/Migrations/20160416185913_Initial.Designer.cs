@@ -8,8 +8,8 @@ using NxtWallet.Model;
 namespace NxtWallet.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20160415183737_Assets")]
-    partial class Assets
+    [Migration("20160416185913_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,7 +37,11 @@ namespace NxtWallet.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("AssetDecimals");
+
                     b.Property<int>("AssetId");
+
+                    b.Property<long>("BalanceQnt");
 
                     b.Property<int>("Height");
 

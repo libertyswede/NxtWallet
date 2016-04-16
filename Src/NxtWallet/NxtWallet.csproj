@@ -118,15 +118,12 @@
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="FakeToastManager.cs" />
-    <Compile Include="Migrations\20160412184348_Initial.cs" />
-    <Compile Include="Migrations\20160412184348_Initial.designer.cs">
-      <DependentUpon>20160412184348_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20160415183737_Assets.cs" />
-    <Compile Include="Migrations\20160415183737_Assets.designer.cs">
-      <DependentUpon>20160415183737_Assets.cs</DependentUpon>
+    <Compile Include="Migrations\20160416185913_Initial.cs" />
+    <Compile Include="Migrations\20160416185913_Initial.designer.cs">
+      <DependentUpon>20160416185913_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
+    <Compile Include="ViewModel\Model\ILedgerEntry.cs" />
     <Compile Include="Model\AssetDto.cs" />
     <Compile Include="Model\AssetOwnershipDto.cs" />
     <Compile Include="Model\AssetRepository.cs" />
