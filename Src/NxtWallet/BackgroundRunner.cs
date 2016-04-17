@@ -57,14 +57,19 @@ namespace NxtWallet
                 var updatedTransactions = new List<Transaction>();
                 try
                 {
+                    var currentBlockId = await _nxtServer.GetCurrentBlockId();
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
                     
-                    if (!_balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions, knownTransactions, updatedTransactions, balanceResult))
+                    // a. If hashes dont match
+                    var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions,
+                        knownTransactions, updatedTransactions, balanceResult);
+                    if (!balancesMatch)
                     {
+                        // b. Fetch asset trades
                         var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
                         var newTrades = tradesResult.Except(knownTransactions).ToList();
                         newTransactions.AddRange(newTrades);
@@ -73,23 +78,24 @@ namespace NxtWallet
                         {
                             await _walletRepository.UpdateLastAssetTrade(tradesResult.Max(t => t.Timestamp).AddSeconds(1));
                         }
+
+                        // c. Fetch MS currency trades
                     }
 
+                    // d. includes transfer, trades, divs and asset deletes
                     await _assetTracker.UpdateAssetOwnership(newTransactions);
+                    await CheckSentDividendTransactions(newTransactions);
 
-                    if (newTransactions.Any(t => t.TransactionType == TransactionType.DividendPayment))
+                    if (!balancesMatch && !_balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions, 
+                        knownTransactions, updatedTransactions, balanceResult))
                     {
-                        var dividendTransactions = newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment).ToList();
-                        foreach (var dividendTransaction in dividendTransactions)
-                        {
-                            var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
-                            var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
-                            var quantityQnt = await _assetTracker.GetAssetQuantity(attachment.AssetId, attachment.Height);
-
-                            var recipientQnt = quantityQnt - myOwnership.BalanceQnt;
-                            var expenseNqt = attachment.AmountPerQnt.Nqt*recipientQnt;
-                            dividendTransaction.NqtAmount = expenseNqt;
-                        }
+                        // e. Still no match, check for received dividens and forge income
+                        var blockHeight = await _nxtServer.GetBlockHeightAsync(_walletRepository.LastBalanceMatchBlockId);
+                        var assets = await _assetTracker.GetOwnedAssetsSince(blockHeight);
+                    }
+                    else
+                    {
+                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(currentBlockId);
                     }
                     
                     updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
@@ -104,6 +110,25 @@ namespace NxtWallet
                 catch (Exception)
                 {
                     // ignore
+                }
+            }
+        }
+
+        private async Task CheckSentDividendTransactions(List<Transaction> newTransactions)
+        {
+            if (newTransactions.Any(t => t.TransactionType == TransactionType.DividendPayment))
+            {
+                var dividendTransactions =
+                    newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment).ToList();
+                foreach (var dividendTransaction in dividendTransactions)
+                {
+                    var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
+                    var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
+                    var quantityQnt = await _assetTracker.GetAssetQuantity(attachment.AssetId, attachment.Height);
+
+                    var recipientQnt = quantityQnt - myOwnership.BalanceQnt;
+                    var expenseNqt = attachment.AmountPerQnt.Nqt*recipientQnt;
+                    dividendTransaction.NqtAmount = expenseNqt;
                 }
             }
         }

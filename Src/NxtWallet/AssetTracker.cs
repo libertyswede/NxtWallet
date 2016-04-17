@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -18,6 +19,7 @@ namespace NxtWallet
         Task<AssetOwnership> GetOwnership(ulong nxtAssetId, int height);
         Task<long> GetAssetQuantity(ulong nxtAssetId, int height);
         Task SaveOwnerships();
+        Task<IEnumerable<Asset>> GetOwnedAssetsSince(int blockHeight);
     }
 
     public class AssetTracker : IAssetTracker
@@ -27,16 +29,13 @@ namespace NxtWallet
         private readonly IMapper _mapper;
         private readonly IBalanceCalculator _balanceCalculator;
         private readonly List<AssetOwnership> _newOwnerships = new List<AssetOwnership>();
-        private readonly List<AssetOwnership> _updatedOwnerships = new List<AssetOwnership>();
 
         public IReadOnlyCollection<AssetOwnership> NewOwnerships { get; }
-        public IReadOnlyCollection<AssetOwnership> UpdatedOwnerships { get; }
 
         public AssetTracker(IAssetRepository assetRepository, IServiceFactory serviceFactory, IMapper mapper,
             IBalanceCalculator balanceCalculator)
         {
             NewOwnerships = new ReadOnlyCollection<AssetOwnership>(_newOwnerships);
-            UpdatedOwnerships = new ReadOnlyCollection<AssetOwnership>(_updatedOwnerships);
 
             _assetRepository = assetRepository;
             _assetService = serviceFactory.CreateAssetExchangeService();
@@ -47,7 +46,6 @@ namespace NxtWallet
         public async Task UpdateAssetOwnership(List<Transaction> newTransactions)
         {
             _newOwnerships.Clear();
-            _updatedOwnerships.Clear();
 
             foreach (var newTransaction in newTransactions)
             {
@@ -90,17 +88,14 @@ namespace NxtWallet
 
             if (_newOwnerships.Any())
             {
-                _updatedOwnerships.AddRange(await CalculateOwnership(_newOwnerships));
+                var updatedOwnerships = await CalculateOwnership(_newOwnerships);
+                await _assetRepository.UpdatesAssetOwnershipBalancesAsync(updatedOwnerships);
             }
         }
 
         public async Task<AssetOwnership> GetOwnership(ulong nxtAssetId, int height)
         {
-            var dbOwnership = await _assetRepository.GetAssetOwnershipsAtHeightAsync((long) nxtAssetId, height);
-            if (_updatedOwnerships.Contains(dbOwnership))
-            {
-                return _updatedOwnerships.Single(o => o.Equals(dbOwnership));
-            }
+            var dbOwnership = await _assetRepository.GetAssetOwnershipAtHeightAsync((long) nxtAssetId, height);
             if (_newOwnerships.Any())
             {
                 var asset = await _assetRepository.GetAssetAsync(nxtAssetId);
@@ -129,9 +124,59 @@ namespace NxtWallet
         public async Task SaveOwnerships()
         {
             _newOwnerships.ForEach(o => o.TransactionId = o.Transaction.Id);
-            _updatedOwnerships.ForEach(o => o.TransactionId = o.Transaction.Id);
             await _assetRepository.SaveAssetOwnershipsAsync(_newOwnerships);
-            await _assetRepository.UpdatesAssetOwnershipsAsync(_updatedOwnerships);
+        }
+
+        public async Task<IEnumerable<Asset>> GetOwnedAssetsSince(int height)
+        {
+            var dbOwnershipsOwnedAtHeight = (await _assetRepository.GetOwnershipsOwnedAtHeight(height)).ToList();
+            var dbOwnershipsSinceHeight = (await _assetRepository.GetOwnershipsOwnedSinceHeightAsync(height)).ToList();
+
+            var newOwnershipsOwnedAtHeight = GetNewownershipsOwnedAtHeight(height);
+            var newOwhershipsSinceHeight = GetOwnershipsOwnedSinceHeight(height);
+
+            // Not 100% accurate, we might get more than we asked for
+            var assetIds = dbOwnershipsOwnedAtHeight.Select(o => o.AssetId)
+                .Union(dbOwnershipsSinceHeight.Select(o => o.AssetId))
+                .Union(newOwnershipsOwnedAtHeight.Select(o => o.AssetId))
+                .Union(newOwhershipsSinceHeight.Select(o => o.AssetId))
+                .Distinct();
+
+            var assets = await _assetRepository.GetAssetsAsync(assetIds);
+            return assets;
+        }
+
+        private List<AssetOwnership> GetOwnershipsOwnedSinceHeight(int height)
+        {
+            var grouped = (from o in NewOwnerships
+                where o.Height >= height
+                group o by o.AssetId
+                into grouping
+                select new
+                {
+                    AssetId = grouping.Key,
+                    Ownership = grouping.FirstOrDefault(g => g.BalanceQnt > 0)
+                }).ToList();
+
+            return grouped.Select(g => _mapper.Map<AssetOwnership>(g.Ownership)).ToList();
+        }
+
+        private List<AssetOwnership> GetNewownershipsOwnedAtHeight(int height)
+        {
+            var grouped = (from o in NewOwnerships
+                where o.Height < height
+                group o by o.AssetId
+                into grouping
+                select new
+                {
+                    AssetId = grouping.Key,
+                    Ownership = grouping.OrderByDescending(g => g.Height).FirstOrDefault()
+                }).ToList();
+
+            return grouped
+                .Where(g => g.Ownership.BalanceQnt > 0)
+                .Select(g => _mapper.Map<AssetOwnership>(g.Ownership))
+                .ToList();
         }
 
         private async Task<IEnumerable<AssetOwnership>> CalculateOwnership(IEnumerable<AssetOwnership> assetOwnerships)

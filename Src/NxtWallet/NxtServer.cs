@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.AssetExchange;
+using NxtLib.Blocks;
 using NxtLib.Local;
 using NxtLib.Transactions;
 using NxtWallet.Model;
@@ -25,6 +26,8 @@ namespace NxtWallet
 
         bool IsOnline { get; }
 
+        Task<ulong> GetCurrentBlockId();
+        Task<int> GetBlockHeightAsync(ulong blockId);
         Task<long> GetBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
@@ -53,6 +56,48 @@ namespace NxtWallet
             _mapper = mapper;
             IsOnline = false;
             _serviceFactory = serviceFactory;
+        }
+
+        public async Task<ulong> GetCurrentBlockId()
+        {
+            try
+            {
+                var serverInfoService = _serviceFactory.CreateServerInfoService();
+                var blockchainStatus = await serverInfoService.GetBlockchainStatus();
+                IsOnline = true;
+                return blockchainStatus.LastBlockId;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<int> GetBlockHeightAsync(ulong blockId)
+        {
+            try
+            {
+                var blockService = _serviceFactory.CreateBlockService();
+                var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId));
+                IsOnline = true;
+                return blockReply.Height;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         public async Task<long> GetBalanceAsync()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,15 @@ namespace NxtWallet.Model
     public interface IAssetRepository
     {
         Task<Asset> GetAssetAsync(ulong nxtId);
+        Task<IEnumerable<Asset>> GetAssetsAsync(IEnumerable<int> assetIds);
         Task<Asset> SaveAssetAsync(Asset asset);
         Task<IEnumerable<AssetOwnership>> GetAssetOwnershipsAsync(int assetId, int minHeight);
-        Task<AssetOwnership> GetAssetOwnershipsAtHeightAsync(long nxtAssetId, int height);
+        Task<AssetOwnership> GetAssetOwnershipAtHeightAsync(long nxtAssetId, int height);
         Task SaveAssetOwnershipAsync(AssetOwnership assetOwnership);
         Task SaveAssetOwnershipsAsync(List<AssetOwnership> newOwnerships);
-        Task UpdatesAssetOwnershipsAsync(List<AssetOwnership> updatedOwnerships);
+        Task UpdatesAssetOwnershipBalancesAsync(IEnumerable<AssetOwnership> updatedOwnerships);
+        Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeight(int height);
+        Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedSinceHeightAsync(int height);
     }
 
     public class AssetRepository : IAssetRepository
@@ -33,6 +37,15 @@ namespace NxtWallet.Model
             {
                 var assetDto = await context.Assets.SingleOrDefaultAsync(a => a.NxtId == (long)nxtId);
                 return _mapper.Map<Asset>(assetDto);
+            }
+        }
+
+        public async Task<IEnumerable<Asset>> GetAssetsAsync(IEnumerable<int> assetIds)
+        {
+            using (var context = new WalletContext())
+            {
+                var assetDtos = await context.Assets.Where(a => assetIds.Contains(a.Id)).ToListAsync();
+                return _mapper.Map<IEnumerable<Asset>>(assetDtos);
             }
         }
 
@@ -62,7 +75,45 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task<AssetOwnership> GetAssetOwnershipsAtHeightAsync(long nxtAssetId, int height)
+        public async Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeight(int height)
+        {
+            using (var context = new WalletContext())
+            {
+                var grouped = await (from o in context.AssetOwnerships
+                    where o.Height < height
+                    group o by o.AssetId
+                    into grouping
+                    select new
+                    {
+                        AssetId = grouping.Key,
+                        Ownership = grouping.OrderByDescending(g => g.Height).FirstOrDefault()
+                    }).ToListAsync();
+
+                return grouped
+                    .Where(g => g.Ownership.BalanceQnt > 0)
+                    .Select(g => _mapper.Map<AssetOwnership>(g.Ownership));
+            }
+        }
+
+        public async Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedSinceHeightAsync(int height)
+        {
+            using (var context = new WalletContext())
+            {
+                var grouped = await (from o in context.AssetOwnerships
+                    where o.Height >= height
+                    group o by o.AssetId
+                    into grouping
+                    select new
+                    {
+                        AssetId = grouping.Key,
+                        Ownership = grouping.FirstOrDefault(g => g.BalanceQnt > 0)
+                    }).ToListAsync();
+
+                return grouped.Select(g => _mapper.Map<AssetOwnership>(g.Ownership));
+            }
+        }
+
+        public async Task<AssetOwnership> GetAssetOwnershipAtHeightAsync(long nxtAssetId, int height)
         {
             using (var context = new WalletContext())
             {
@@ -96,15 +147,19 @@ namespace NxtWallet.Model
             }
         }
 
-        public async Task UpdatesAssetOwnershipsAsync(List<AssetOwnership> updatedOwnerships)
+        public async Task UpdatesAssetOwnershipBalancesAsync(IEnumerable<AssetOwnership> updatedOwnerships)
         {
             using (var context = new WalletContext())
             {
-                foreach (var dto in updatedOwnerships.Select(ownership => _mapper.Map<AssetOwnershipDto>(ownership)))
+                var existing = (await context.AssetOwnerships
+                    .Where(o => updatedOwnerships.Select(ownership => ownership.Id).Contains(o.Id))
+                    .ToListAsync()).ToDictionary(o => o.Id);
+
+                foreach (var updatedOwnership in updatedOwnerships)
                 {
-                    context.AssetOwnerships.Attach(dto);
-                    context.Entry(dto).State = EntityState.Modified;
+                    existing[updatedOwnership.Id].BalanceQnt = updatedOwnership.BalanceQnt;
                 }
+
                 await context.SaveChangesAsync();
             }
         }

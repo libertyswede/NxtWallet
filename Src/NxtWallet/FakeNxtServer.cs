@@ -19,6 +19,16 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
+        public Task<ulong> GetCurrentBlockId()
+        {
+            return Task.FromResult(1UL);
+        }
+
+        public Task<int> GetBlockHeightAsync(ulong blockId)
+        {
+            return Task.FromResult(123);
+        }
+
         public Task<long> GetBalanceAsync()
         {
             return Task.FromResult(11 * 100000000L);
