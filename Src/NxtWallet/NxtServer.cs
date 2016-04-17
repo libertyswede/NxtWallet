@@ -27,10 +27,11 @@ namespace NxtWallet
         bool IsOnline { get; }
 
         Task<ulong> GetCurrentBlockId();
-        Task<int> GetBlockHeightAsync(ulong blockId);
+        Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId);
         Task<long> GetBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
+        Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
         Task<Asset> GetAssetAsync(ulong assetId);
@@ -79,14 +80,14 @@ namespace NxtWallet
             }
         }
 
-        public async Task<int> GetBlockHeightAsync(ulong blockId)
+        public async Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId)
         {
             try
             {
                 var blockService = _serviceFactory.CreateBlockService();
                 var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId));
                 IsOnline = true;
-                return blockReply.Height;
+                return blockReply;
             }
             catch (HttpRequestException e)
             {
@@ -162,6 +163,28 @@ namespace NxtWallet
         public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
+        }
+
+        public async Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)
+        {
+            try
+            {
+                var transactionService = _serviceFactory.CreateTransactionService();
+                var transactions = await transactionService.GetBlockchainTransactions(
+                    account, timestamp, TransactionSubType.ColoredCoinsDividendPayment);
+                IsOnline = true;
+                return _mapper.Map<IEnumerable<Transaction>>(transactions.Transactions);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         //TODO: Use one known exception instead of Result<>

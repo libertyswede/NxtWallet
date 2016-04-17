@@ -16,7 +16,7 @@ namespace NxtWallet.ViewModel.Model
         public ulong NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
-        public string FormattedAmount => (UserIsRecipient || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
+        public string FormattedAmount => (!UserIsSender || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
         public string FormattedAmountAbsolute => (NqtAmount / (decimal)100000000).ToFormattedString();
         public long NqtFee { get; set; }
         public string FormattedFee => UserIsSender ? "-" + FormattedFeeAbsolute : string.Empty;

@@ -90,8 +90,24 @@ namespace NxtWallet
                         knownTransactions, updatedTransactions, balanceResult))
                     {
                         // e. Still no match, check for received dividens and forge income
-                        var blockHeight = await _nxtServer.GetBlockHeightAsync(_walletRepository.LastBalanceMatchBlockId);
-                        var assets = await _assetTracker.GetOwnedAssetsSince(blockHeight);
+                        var blockReply = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
+                        var assets = (await _assetTracker.GetOwnedAssetsSince(blockReply.Height))
+                            .Where(a => a.Account != _walletRepository.NxtAccount.AccountRs);
+
+                        foreach (var asset in assets)
+                        {
+                            var dividendTransactions = await _nxtServer.GetDividendTransactionsAsync(asset.Account, blockReply.Timestamp);
+                            foreach (var dividendTransaction in dividendTransactions)
+                            {
+                                var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
+                                var ownership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
+                                if (ownership?.BalanceQnt > 0)
+                                {
+                                    dividendTransaction.NqtAmount = attachment.AmountPerQnt.Nqt * ownership.BalanceQnt;
+                                    newTransactions.Add(dividendTransaction);
+                                }
+                            }
+                        }
                     }
                     else
                     {

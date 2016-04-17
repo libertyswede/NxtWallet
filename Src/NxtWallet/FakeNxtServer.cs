@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
+using NxtLib.Blocks;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
@@ -24,9 +25,9 @@ namespace NxtWallet
             return Task.FromResult(1UL);
         }
 
-        public Task<int> GetBlockHeightAsync(ulong blockId)
+        public Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId)
         {
-            return Task.FromResult(123);
+            return Task.FromResult(new GetBlockReply<ulong>());
         }
 
         public Task<long> GetBalanceAsync()
@@ -42,6 +43,11 @@ namespace NxtWallet
         public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(DateTime.UtcNow);
+        }
+
+        public Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)
+        {
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
         }
 
         public Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
