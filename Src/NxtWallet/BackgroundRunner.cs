@@ -108,6 +108,9 @@ namespace NxtWallet
                                 }
                             }
                         }
+
+                        var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(blockReply.Timestamp);
+                        newTransactions.AddRange(forgeTransactions);
                     }
                     else
                     {

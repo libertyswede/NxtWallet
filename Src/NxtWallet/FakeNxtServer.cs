@@ -68,5 +68,10 @@ namespace NxtWallet
         public void UpdateNxtServer(string newServerAddress)
         {
         }
+
+        public Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp)
+        {
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
+        }
     }
 }

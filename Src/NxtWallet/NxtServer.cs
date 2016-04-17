@@ -36,6 +36,7 @@ namespace NxtWallet
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
         Task<Asset> GetAssetAsync(ulong assetId);
         void UpdateNxtServer(string newServerAddress);
+        Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -264,6 +265,45 @@ namespace NxtWallet
         public void UpdateNxtServer(string newServerAddress)
         {
             _serviceFactory = new ServiceFactory(newServerAddress);
+        }
+
+        public async Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp)
+        {
+            try
+            {
+                var assetService = _serviceFactory.CreateAccountService();
+                var accountBlocks = await assetService.GetAccountBlocks(_walletRepository.NxtAccount.AccountRs, timestamp);
+
+                var transactions = accountBlocks.Blocks
+                    .Where(b => b.TotalFee.Nqt > 0)
+                    .Select(block => new Transaction
+                {
+                    AccountFrom = _walletRepository.NxtAccount.AccountRs,
+                    AccountTo = _walletRepository.NxtAccount.AccountRs,
+                    Height = block.Height,
+                    IsConfirmed = true,
+                    NqtAmount = block.TotalFee.Nqt,
+                    NqtFee = 0,
+                    NxtId = block.BlockId,
+                    Timestamp = block.Timestamp,
+                    TransactionType = TransactionType.ForgeIncome,
+                    Message = "[Forge Income]",
+                    UserIsRecipient = true
+                });
+
+                IsOnline = true;
+                return transactions;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string message,
