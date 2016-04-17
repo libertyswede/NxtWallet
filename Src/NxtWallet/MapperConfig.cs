@@ -63,7 +63,8 @@ namespace NxtWallet
                 cfg.CreateMap<AssetDto, Asset>();
 
                 cfg.CreateMap<NxtLib.AssetExchange.Asset, Asset>()
-                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long)src.AssetId));
+                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long)src.AssetId))
+                    .ForMember(dest => dest.Account, opt => opt.MapFrom(src => src.AccountRs));
 
                 cfg.CreateMap<AssetOwnership, AssetOwnershipDto>();
                 cfg.CreateMap<AssetOwnershipDto, AssetOwnership>();

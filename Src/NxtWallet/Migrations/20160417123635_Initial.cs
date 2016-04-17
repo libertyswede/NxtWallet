@@ -14,6 +14,7 @@ namespace NxtWallet.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Account = table.Column<string>(nullable: false),
                     Decimals = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     NxtId = table.Column<long>(nullable: false)

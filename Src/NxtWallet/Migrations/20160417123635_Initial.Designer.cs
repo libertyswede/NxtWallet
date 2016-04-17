@@ -8,7 +8,7 @@ using NxtWallet.Model;
 namespace NxtWallet.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20160416185913_Initial")]
+    [Migration("20160417123635_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,6 +20,10 @@ namespace NxtWallet.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 25);
 
                     b.Property<int>("Decimals");
 

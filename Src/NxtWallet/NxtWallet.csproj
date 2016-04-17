@@ -118,9 +118,9 @@
     <Compile Include="FakeNxtServer.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="FakeToastManager.cs" />
-    <Compile Include="Migrations\20160416185913_Initial.cs" />
-    <Compile Include="Migrations\20160416185913_Initial.designer.cs">
-      <DependentUpon>20160416185913_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160417123635_Initial.cs" />
+    <Compile Include="Migrations\20160417123635_Initial.designer.cs">
+      <DependentUpon>20160417123635_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="ViewModel\Model\ILedgerEntry.cs" />

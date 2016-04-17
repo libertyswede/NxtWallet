@@ -8,6 +8,7 @@ namespace NxtWallet.Model
         public long NxtId { get; set; }
         public int Decimals { get; set; }
         public string Name { get; set; }
+        public string Account { get; set; }
 
         public IList<AssetOwnershipDto> Ownerships { get; set; }
     }

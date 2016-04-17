@@ -6,5 +6,6 @@
         public long NxtId { get; set; }
         public int Decimals { get; set; }
         public string Name { get; set; }
+        public string Account { get; set; }
     }
 }

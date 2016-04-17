@@ -35,6 +35,11 @@ namespace NxtWallet.Model
                 .IsRequired();
 
             modelBuilder.Entity<AssetDto>()
+                .Property(a => a.Account)
+                .HasMaxLength(25)
+                .IsRequired();
+
+            modelBuilder.Entity<AssetDto>()
                 .Property(a => a.Name)
                 .HasMaxLength(10)
                 .IsRequired();

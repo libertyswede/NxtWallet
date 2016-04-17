@@ -20,6 +20,10 @@ namespace NxtWallet.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 25);
+
                     b.Property<int>("Decimals");
 
                     b.Property<string>("Name")
