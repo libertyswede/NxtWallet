@@ -16,7 +16,7 @@ namespace NxtWallet
         {
             var allOrderedEntries = allEntries.OrderBy(t => t.GetOrder()).ToList();
             var firstNewEntry = newEntries.OrderBy(t => t.GetOrder()).First();
-            UpdateEntryBalance(firstNewEntry, allEntries);
+            UpdateEntryBalance(firstNewEntry, allOrderedEntries);
             var updatedEntries = UpdateSubsequentEntryBalances(firstNewEntry, allOrderedEntries);
             updatedEntries = updatedEntries.Except(newEntries);
             return updatedEntries;
@@ -40,22 +40,22 @@ namespace NxtWallet
             return equals;
         }
 
-        private IEnumerable<T> UpdateSubsequentEntryBalances<T>(T entry, IList<T> allEntries) where T : ILedgerEntry
+        private IEnumerable<T> UpdateSubsequentEntryBalances<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
         {
             var updatedEntries = new HashSet<T>();
 
-            foreach (var subsequentEntry in GetSubsequentEntries(entry, allEntries))
+            foreach (var subsequentEntry in GetSubsequentEntries(entry, allOrderedEntries))
             {
-                UpdateEntryBalance(subsequentEntry, allEntries);
+                UpdateEntryBalance(subsequentEntry, allOrderedEntries);
                 updatedEntries.Add(subsequentEntry);
             }
 
             return updatedEntries;
         }
 
-        private void UpdateEntryBalance<T>(T entry, IEnumerable<T> allEntries) where T : ILedgerEntry
+        private void UpdateEntryBalance<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
         {
-            var previousBalance = GetPreviousEntry(entry, allEntries)?.GetBalance() ?? 0;
+            var previousBalance = GetPreviousEntry(entry, allOrderedEntries)?.GetBalance() ?? 0;
 
             if (entry.UserIsSender())
             {
@@ -68,16 +68,16 @@ namespace NxtWallet
         }
 
         private static IEnumerable<T> GetSubsequentEntries<T>(T entry,
-            IEnumerable<T> allEntries) where T : ILedgerEntry
+            IList<T> allOrderedEntries) where T : ILedgerEntry
         {
-            return allEntries.Where(t => t.GetOrder() > entry.GetOrder()).ToList();
+            return allOrderedEntries.Skip(allOrderedEntries.IndexOf(entry) + 1).ToList();
         }
 
         private static T GetPreviousEntry<T>(T entry,
-            IEnumerable<T> allEntries) where T : ILedgerEntry
+            IList<T> allOrderedEntries) where T : ILedgerEntry
         {
-            return allEntries
-                .LastOrDefault(t => t.GetOrder() < entry.GetOrder());
+            var index = allOrderedEntries.IndexOf(entry);
+            return index > 0 ? allOrderedEntries[index - 1] : default(T);
         }
     }
 }
