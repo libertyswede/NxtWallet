@@ -19,7 +19,7 @@ namespace NxtWallet.Model
         private const string BalanceKey = "balance";
         private const string NotificationsEnabledKey = "notificationsEnabled";
         private const string LastAssetTradeKey = "lastAssetTrade";
-        private const string LastBalanceMatchHeightKey = "lastBalanceMatchHeight";
+        private const string LastBalanceMatchBlockIdKey = "lastBalanceMatchBlockId";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
@@ -43,7 +43,7 @@ namespace NxtWallet.Model
                 SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
                 NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
-                LastBalanceMatchBlockId = ReadOrGenerate(dbSettings, context, LastBalanceMatchHeightKey, () => Constants.GenesisBlockId);
+                LastBalanceMatchBlockId = ReadOrGenerate(dbSettings, context, LastBalanceMatchBlockIdKey, () => Constants.GenesisBlockId);
                 BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
                 NotificationsEnabled = ReadOrGenerate(dbSettings, context, NotificationsEnabledKey, () => true);
                 LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
@@ -85,7 +85,7 @@ namespace NxtWallet.Model
 
         public async Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId)
         {
-            await Update(LastBalanceMatchHeightKey, blockId.ToString());
+            await Update(LastBalanceMatchBlockIdKey, blockId.ToString());
             LastBalanceMatchBlockId = blockId;
         }
 
