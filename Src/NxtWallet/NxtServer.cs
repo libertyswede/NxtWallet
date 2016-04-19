@@ -12,11 +12,14 @@ using NxtLib.Accounts;
 using NxtLib.AssetExchange;
 using NxtLib.Blocks;
 using NxtLib.Local;
+using NxtLib.MonetarySystem;
+using NxtLib.ServerInfo;
 using NxtLib.Transactions;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
 using Asset = NxtWallet.ViewModel.Model.Asset;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
+using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
 
 namespace NxtWallet
 {
@@ -26,8 +29,9 @@ namespace NxtWallet
 
         bool IsOnline { get; }
 
-        Task<ulong> GetCurrentBlockId();
+        Task<BlockchainStatus> GetCurrentBlockId();
         Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId);
+        Task<GetBlockReply<ulong>> GetBlockAsync(int height);
         Task<long> GetBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
@@ -39,6 +43,7 @@ namespace NxtWallet
         Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp);
         Task<Transaction> GetTransactionAsync(ulong transactionId);
         Task<bool> GetIsPurchaseExpired(ulong purchaseId);
+        Task<Currency> GetCurrencyAsync(ulong currencyId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -62,14 +67,14 @@ namespace NxtWallet
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<ulong> GetCurrentBlockId()
+        public async Task<BlockchainStatus> GetCurrentBlockId()
         {
             try
             {
                 var serverInfoService = _serviceFactory.CreateServerInfoService();
                 var blockchainStatus = await serverInfoService.GetBlockchainStatus();
                 IsOnline = true;
-                return blockchainStatus.LastBlockId;
+                return blockchainStatus;
             }
             catch (HttpRequestException e)
             {
@@ -89,6 +94,27 @@ namespace NxtWallet
             {
                 var blockService = _serviceFactory.CreateBlockService();
                 var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId));
+                IsOnline = true;
+                return blockReply;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<GetBlockReply<ulong>> GetBlockAsync(int height)
+        {
+            try
+            {
+                var blockService = _serviceFactory.CreateBlockService();
+                var blockReply = await blockService.GetBlock(BlockLocator.ByHeight(height));
                 IsOnline = true;
                 return blockReply;
             }
@@ -164,6 +190,27 @@ namespace NxtWallet
                 var purchaseReply = await dgsService.GetPurchase(purchaseId);
                 IsOnline = true;
                 return purchaseReply.Pending == false && purchaseReply.GoodsData == null;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<Currency> GetCurrencyAsync(ulong currencyId)
+        {
+            try
+            {
+                var msService = _serviceFactory.CreateMonetarySystemService();
+                var currency = await msService.GetCurrency(CurrencyLocator.ByCurrencyId(currencyId));
+                IsOnline = true;
+                return currency;
             }
             catch (HttpRequestException e)
             {

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
 using NxtLib.Blocks;
+using NxtLib.MonetarySystem;
+using NxtLib.ServerInfo;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
@@ -20,12 +22,17 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
-        public Task<ulong> GetCurrentBlockId()
+        public Task<BlockchainStatus> GetCurrentBlockId()
         {
-            return Task.FromResult(1UL);
+            return Task.FromResult(new BlockchainStatus());
         }
 
         public Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId)
+        {
+            return Task.FromResult(new GetBlockReply<ulong>());
+        }
+
+        public Task<GetBlockReply<ulong>> GetBlockAsync(int height)
         {
             return Task.FromResult(new GetBlockReply<ulong>());
         }
@@ -82,6 +89,11 @@ namespace NxtWallet
         public Task<bool> GetIsPurchaseExpired(ulong purchaseId)
         {
             return Task.FromResult(false);
+        }
+
+        public Task<Currency> GetCurrencyAsync(ulong currencyId)
+        {
+            return Task.FromResult(new Currency());
         }
     }
 }

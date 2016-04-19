@@ -155,6 +155,8 @@
     <Compile Include="ViewModel\Model\AssetOwnership.cs" />
     <Compile Include="ViewModel\Model\AssetTradeTransaction.cs" />
     <Compile Include="ViewModel\Model\Contact.cs" />
+    <Compile Include="ViewModel\Model\MsReserveIncreaseTransaction.cs" />
+    <Compile Include="ViewModel\Model\MsUndoCrowdfundingTransaction.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />

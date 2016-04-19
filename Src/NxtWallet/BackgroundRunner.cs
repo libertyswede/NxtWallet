@@ -5,9 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Threading;
 using NxtLib;
+using NxtLib.ServerInfo;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
+using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
 
 namespace NxtWallet
 {
@@ -58,7 +60,7 @@ namespace NxtWallet
                 try
                 {
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
-                    var currentBlockId = await _nxtServer.GetCurrentBlockId();
+                    var blockchainStatus = await _nxtServer.GetCurrentBlockId();
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
@@ -68,6 +70,7 @@ namespace NxtWallet
                     CheckDgsRefundTransactions(newTransactions);
                     CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
                     CheckSentDgsPurchaseTransactions(newTransactions);
+                    await CheckMsReserveIncreaseTransactions(newTransactions);
 
                     var balancesMatch = BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult);
                     if (!balancesMatch)
@@ -86,10 +89,11 @@ namespace NxtWallet
                         var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(blockReply.Timestamp);
                         newTransactions.AddRange(forgeTransactions);
                         await CheckExpiredDgsPurchases(allTransactions, newTransactions);
+                        await CheckMsUndoCrowdfundingTransaction(knownTransactions, blockchainStatus, newTransactions);
 
                         if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                         {
-                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(currentBlockId);
+                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
                         }
                         else
                         {
@@ -99,7 +103,7 @@ namespace NxtWallet
                     }
                     else
                     {
-                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(currentBlockId);
+                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
                     }
                     
                     updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
@@ -117,6 +121,70 @@ namespace NxtWallet
             }
         }
 
+        private async Task CheckMsReserveIncreaseTransactions(List<Transaction> newTransactions)
+        {
+            foreach (var reserveTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+                        .Cast<MsReserveIncreaseTransaction>())
+            {
+                var attachment = (MonetarySystemReserveIncreaseAttachment) reserveTransaction.Attachment;
+                try
+                {
+                    var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
+                    reserveTransaction.IssuanceHeight = currency.IssuanceHeight;
+                    reserveTransaction.NqtAmount = currency.ReserveSupply*attachment.AmountPerUnit.Nqt;
+                }
+                catch (NxtException e)
+                {
+                    if (e.Message != "Unknown currency")
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        private async Task CheckMsUndoCrowdfundingTransaction(IEnumerable<Transaction> knownTransactions, 
+            BlockchainStatus blockchainStatus, ICollection<Transaction> newTransactions)
+        {
+            foreach (var reserveTransaction in knownTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+                            .Cast<MsReserveIncreaseTransaction>()
+                            .Where(t => t.IssuanceHeight < blockchainStatus.NumberOfBlocks))
+            {
+                try
+                {
+                    await _nxtServer.GetCurrencyAsync((ulong) reserveTransaction.CurrencyId);
+                    continue;
+                }
+                catch (NxtException e)
+                {
+                    if (e.Message != "Unknown currency")
+                    {
+                        throw;
+                    }
+                }
+
+                var block = await _nxtServer.GetBlockAsync(reserveTransaction.IssuanceHeight);
+
+                var transaction = new MsUndoCrowdfundingTransaction
+                {
+                    TransactionType = TransactionType.CurrencyUndoCrowdfunding,
+                    NqtAmount = reserveTransaction.NqtAmount,
+                    AccountFrom = "System Generated",
+                    AccountTo = _walletRepository.NxtAccount.AccountRs,
+                    NxtId = null,
+                    Height = reserveTransaction.IssuanceHeight,
+                    Timestamp = block.Timestamp,
+                    Message = "[Currency Crowdfunding Cancellation]",
+                    ReserveIncreaseNxtId = (long) (reserveTransaction.NxtId ?? 0),
+                    IsConfirmed = true,
+                    UserIsTransactionSender = false,
+                    UserIsTransactionRecipient = true
+                };
+
+                newTransactions.Add(transaction);
+            }
+        }
+
         private static void CheckDgsRefundTransactions(List<Transaction> newTransactions)
         {
             foreach (
@@ -128,12 +196,12 @@ namespace NxtWallet
         }
 
         private bool BalancesMatch(List<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
-            IReadOnlyList<Transaction> nxtTransactions, IEnumerable<Transaction> newTransactions,
+            IReadOnlyList<Transaction> nxtTransactions, IReadOnlyList<Transaction> newTransactions,
             long balanceResult)
         {
             updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions,
                 nxtTransactions, newTransactions));
-            var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions,
+            var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions,
                 knownTransactions, updatedTransactions, balanceResult);
             return balancesMatch;
         }

@@ -101,41 +101,65 @@ namespace NxtWallet
                     }
                     return transaction;
                 }
+                case (int)TransactionType.ReserveIncrease:
+                {
+                    var transaction = new MsReserveIncreaseTransaction();
+                    if (!string.IsNullOrEmpty(transactionDto.Extra))
+                    {
+                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
+                    }
+                    return transaction;
+                }
+                case (int)TransactionType.CurrencyUndoCrowdfunding:
+                {
+                    var transaction = new MsUndoCrowdfundingTransaction();
+                    if (!string.IsNullOrEmpty(transactionDto.Extra))
+                    {
+                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
+                    }
+                    return transaction;
+                }
             }
             return new Transaction();
         }
 
         private static Transaction GetTransactionObject(NxtLib.Transaction nxtTransaction)
         {
-            if (nxtTransaction.SubType == TransactionSubType.DigitalGoodsPurchase)
+            switch (nxtTransaction.SubType)
             {
-                var attachment = (DigitalGoodsPurchaseAttachment) nxtTransaction.Attachment;
-
-                return new DgsPurchaseTransaction
+                case TransactionSubType.DigitalGoodsPurchase:
                 {
-                    DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp
-                };
+                    var attachment = (DigitalGoodsPurchaseAttachment) nxtTransaction.Attachment;
+
+                    return new DgsPurchaseTransaction
+                    {
+                        DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp
+                    };
+                }
+                case TransactionSubType.MonetarySystemReserveIncrease:
+                {
+                    var attachment = (MonetarySystemReserveIncreaseAttachment) nxtTransaction.Attachment;
+
+                    return new MsReserveIncreaseTransaction
+                    {
+                        CurrencyId = (long) attachment.CurrencyId
+                    };
+                }
             }
             return new Transaction();
         }
 
         private static string EncodeExtra(Transaction transaction)
         {
-            switch (transaction.TransactionType)
+            if (transaction.TransactionType == TransactionType.DigitalGoodsPurchase ||
+                transaction.TransactionType == TransactionType.DigitalGoodsPurchaseExpired ||
+                transaction.TransactionType == TransactionType.ReserveIncrease ||
+                transaction.TransactionType == TransactionType.CurrencyUndoCrowdfunding)
             {
-                case TransactionType.DigitalGoodsPurchase:
-                {
-                    var purchase = (DgsPurchaseTransaction) transaction;
-                    var json = JsonConvert.SerializeObject(purchase, Formatting.None);
-                    return json;
-                }
-                case TransactionType.DigitalGoodsPurchaseExpired:
-                {
-                    var expired = (DgsPurchaseExpiredTransaction) transaction;
-                    var json = JsonConvert.SerializeObject(expired, Formatting.None);
-                    return json;
-                }
+                var json = JsonConvert.SerializeObject(transaction, Formatting.None);
+                return json;
             }
+
             return string.Empty;
         }
 
