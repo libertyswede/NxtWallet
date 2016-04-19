@@ -73,7 +73,7 @@ namespace NxtWallet
                 {
                     var attachment = (ColoredCoinsAssetTransferAttachment) newTransaction.Attachment;
                     var asset = await GetOrAddAsset(attachment.AssetId);
-                    var deltaQuantity = attachment.QuantityQnt * (newTransaction.UserIsRecipient ? 1 : -1);
+                    var deltaQuantity = attachment.QuantityQnt * (newTransaction.UserIsTransactionRecipient ? 1 : -1);
                     var ownership = CreateAssetOwnership(deltaQuantity, newTransaction, asset);
                     _newOwnerships.Add(ownership);
                 }

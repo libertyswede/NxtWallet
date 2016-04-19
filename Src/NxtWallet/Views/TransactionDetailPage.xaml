@@ -4,11 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nxtWallet="using:NxtWallet"
     mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="400"
     DataContext="{Binding Path=TransactionDetailViewModel, Source={StaticResource Ioc}}">
     <Page.Resources>
         <x:Double x:Key="TextBlockFontNormalSize">16</x:Double>
         <x:Double x:Key="TextBlockFontSmallSize">12</x:Double>
+        <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisiblityConverter" />
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
@@ -52,9 +54,9 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,40,0,20" FontSize="21.333" >
+        <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.Transaction.NxtId.HasValue, Converter={StaticResource BoolToVisiblityConverter}}" Margin="0,40,0,20" FontSize="21.333" >
             <Run Text="Transaction:" />
-            <Hyperlink NavigateUri="{x:Bind ViewModel.TransactionLink}" ><Run Text="{x:Bind ViewModel.Transaction.NxtId}" /></Hyperlink>
+            <Hyperlink NavigateUri="{x:Bind ViewModel.TransactionLink}" ><Run Text="{x:Bind ViewModel.Transaction.NxtId.Value}" /></Hyperlink>
         </TextBlock>
         <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
             <Grid >

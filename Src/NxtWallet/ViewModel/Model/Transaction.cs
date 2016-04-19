@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
+using Newtonsoft.Json;
 using NxtLib;
 
 namespace NxtWallet.ViewModel.Model
@@ -9,46 +10,95 @@ namespace NxtWallet.ViewModel.Model
     public class Transaction : ObservableObject, IEquatable<Transaction>, ILedgerEntry
     {
         private bool _isConfirmed;
-        private bool _userIsRecipient;
-        private bool _userIsSender;
+        private bool _userIsTransactionRecipient;
+        private bool _userIsTransactionSender;
 
+        [JsonIgnore]
         public int Id { get; set; }
-        public ulong NxtId { get; set; }
+
+        [JsonIgnore]
+        public ulong? NxtId { get; set; }
+
+        [JsonIgnore]
         public DateTime Timestamp { get; set; }
+
+        [JsonIgnore]
         public long NqtAmount { get; set; }
-        public string FormattedAmount => (!UserIsSender || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
+
+        [JsonIgnore]
+        public string FormattedAmount => (UserIsAmountRecipient || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
+
+        [JsonIgnore]
         public string FormattedAmountAbsolute => (NqtAmount / (decimal)100000000).ToFormattedString();
+
+        [JsonIgnore]
         public long NqtFee { get; set; }
-        public string FormattedFee => UserIsSender ? "-" + FormattedFeeAbsolute : string.Empty;
+
+        [JsonIgnore]
+        public string FormattedFee => UserIsTransactionSender ? "-" + FormattedFeeAbsolute : string.Empty;
+
+        [JsonIgnore]
         public string FormattedFeeAbsolute => (NqtFee / (decimal)100000000).ToFormattedString();
+
+        [JsonIgnore]
         public long NqtBalance { get; set; }
+
+        [JsonIgnore]
         public string FormattedBalance => (NqtBalance / (decimal)100000000).ToFormattedString();
+
+        [JsonIgnore]
         public string AccountFrom { get; set; }
+
+        [JsonIgnore]
         public string ContactListAccountFrom { get; private set; }
+
+        [JsonIgnore]
         public string AccountTo { get; set; }
+
+        [JsonIgnore]
         public string ContactListAccountTo { get; private set; }
+
+        [JsonIgnore]
         public string Message { get; set; }
+
+        [JsonIgnore]
         public TransactionType TransactionType { get; set; }
+
+        [JsonIgnore]
         public int Height { get; set; }
+
+        [JsonIgnore]
         public Attachment Attachment { get; set; }
-        public bool UserIsRecipient
+
+        [JsonIgnore]
+        public string Extra { get; set; }
+
+        [JsonIgnore]
+        public bool UserIsTransactionRecipient
         {
-            get { return _userIsRecipient; }
+            get { return _userIsTransactionRecipient; }
             set
             {
-                _userIsRecipient = value;
-                ContactListAccountTo = _userIsRecipient ? "you" : AccountTo;
+                _userIsTransactionRecipient = value;
+                ContactListAccountTo = _userIsTransactionRecipient ? "you" : AccountTo;
             }
         }
-        public bool UserIsSender
+
+        [JsonIgnore]
+        public bool UserIsTransactionSender
         {
-            get { return _userIsSender; }
+            get { return _userIsTransactionSender; }
             set
             {
-                _userIsSender = value;
-                ContactListAccountFrom = _userIsSender ? "you" : AccountFrom;
+                _userIsTransactionSender = value;
+                ContactListAccountFrom = _userIsTransactionSender ? "you" : AccountFrom;
             }
         }
+
+        [JsonIgnore]
+        public bool UserIsAmountRecipient => UserIsAmountRecipientCalculation();
+
+        [JsonIgnore]
         public bool IsConfirmed
         {
             get { return _isConfirmed; }
@@ -57,11 +107,11 @@ namespace NxtWallet.ViewModel.Model
 
         public void UpdateWithContactInfo(IList<Contact> contacts)
         {
-            if (!UserIsSender)
+            if (!UserIsTransactionSender)
             {
                 ContactListAccountFrom = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom))?.Name ?? AccountFrom;
             }
-            if (!UserIsRecipient && AccountTo != null)
+            if (!UserIsTransactionRecipient && AccountTo != null)
             {
                 ContactListAccountTo = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))?.Name ?? AccountTo;
             }
@@ -71,11 +121,11 @@ namespace NxtWallet.ViewModel.Model
         {
             Contact contact;
             
-            if (!UserIsSender)
+            if (!UserIsTransactionSender)
             {
                 ContactListAccountFrom = contacts.TryGetValue(AccountFrom, out contact) ? contact.Name : AccountFrom;
             }
-            if (!UserIsRecipient && AccountTo != null)
+            if (!UserIsTransactionRecipient && AccountTo != null)
             {
                 ContactListAccountTo = contacts.TryGetValue(AccountTo, out contact) ? contact.Name : AccountTo;
             }
@@ -122,9 +172,13 @@ namespace NxtWallet.ViewModel.Model
             NqtBalance = balance;
         }
 
-        bool ILedgerEntry.UserIsSender()
+        private bool UserIsAmountRecipientCalculation()
         {
-            return UserIsSender;
+            if (TransactionType == TransactionType.DividendPayment)
+            {
+                return !UserIsTransactionSender;
+            }
+            return UserIsTransactionRecipient != (TransactionType == TransactionType.DigitalGoodsDelivery);
         }
     }
 
@@ -196,6 +250,7 @@ namespace NxtWallet.ViewModel.Model
 
         // Technically not transactions
         AssetTrade = 1001,
-        ForgeIncome = 1002
+        ForgeIncome = 1002,
+        DigitalGoodsPurchaseExpired = 1003
     }
 }

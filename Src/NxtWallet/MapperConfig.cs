@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AutoMapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NxtLib;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
@@ -23,16 +25,19 @@ namespace NxtWallet
                 cfg.CreateMap<ContactDto, Contact>();
                 cfg.CreateMap<Contact, ContactDto>();
                 cfg.CreateMap<TransactionDto, Transaction>()
-                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (ulong)src.NxtId))
+                    .ConstructUsing(GetTransactionObject)
+                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (ulong?)src.NxtId))
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)src.TransactionType))
-                    .AfterMap((src, dest) => dest.UserIsRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<Transaction, TransactionDto>()
-                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long)src.NxtId))
-                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (int)src.TransactionType));
+                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long?)src.NxtId))
+                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (int)src.TransactionType))
+                    .AfterMap((src, dest) => dest.Extra = EncodeExtra(src));
 
                 cfg.CreateMap<NxtLib.Transaction, Transaction>()
+                    .ConstructUsing(GetTransactionObject)
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.TransactionId ?? 0))
                     .ForMember(dest => dest.Message, opt => opt.MapFrom(src => GetMessage(src)))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Amount.Nqt))
@@ -41,8 +46,8 @@ namespace NxtWallet
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null))
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)(int)src.SubType))
-                    .AfterMap((src, dest) => dest.UserIsRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<NxtLib.AssetExchange.AssetTradeInfo, AssetTradeTransaction>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.BuyerRs.Equals(accountRs) ? src.AskOrder : src.BidOrder)) // buyer makes the bidorder
@@ -55,8 +60,8 @@ namespace NxtWallet
                     .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.AssetTrade))
                     .ForMember(dest => dest.AssetNxtId, opt => opt.MapFrom(src => src.AssetId))
                     .ForMember(dest => dest.QuantityQnt, opt => opt.MapFrom(src => src.QuantityQnt))
-                    .AfterMap((src, dest) => dest.UserIsRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<Asset, AssetDto>();
 
@@ -74,6 +79,66 @@ namespace NxtWallet
             return _configuration;
         }
 
+        private static Transaction GetTransactionObject(TransactionDto transactionDto)
+        {
+            switch (transactionDto.TransactionType)
+            {
+                case (int) TransactionType.DigitalGoodsPurchase:
+                {
+                    var transaction = new DgsPurchaseTransaction();
+                    if (!string.IsNullOrEmpty(transactionDto.Extra))
+                    {
+                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
+                    }
+                    return transaction;
+                }
+                case (int) TransactionType.DigitalGoodsPurchaseExpired:
+                {
+                    var transaction = new DgsPurchaseExpiredTransaction();
+                    if (!string.IsNullOrEmpty(transactionDto.Extra))
+                    {
+                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
+                    }
+                    return transaction;
+                }
+            }
+            return new Transaction();
+        }
+
+        private static Transaction GetTransactionObject(NxtLib.Transaction nxtTransaction)
+        {
+            if (nxtTransaction.SubType == TransactionSubType.DigitalGoodsPurchase)
+            {
+                var attachment = (DigitalGoodsPurchaseAttachment) nxtTransaction.Attachment;
+
+                return new DgsPurchaseTransaction
+                {
+                    DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp
+                };
+            }
+            return new Transaction();
+        }
+
+        private static string EncodeExtra(Transaction transaction)
+        {
+            switch (transaction.TransactionType)
+            {
+                case TransactionType.DigitalGoodsPurchase:
+                {
+                    var purchase = (DgsPurchaseTransaction) transaction;
+                    var json = JsonConvert.SerializeObject(purchase, Formatting.None);
+                    return json;
+                }
+                case TransactionType.DigitalGoodsPurchaseExpired:
+                {
+                    var expired = (DgsPurchaseExpiredTransaction) transaction;
+                    var json = JsonConvert.SerializeObject(expired, Formatting.None);
+                    return json;
+                }
+            }
+            return string.Empty;
+        }
+
         private static string GetMessage(NxtLib.Transaction transaction)
         {
             if (transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
@@ -81,7 +146,7 @@ namespace NxtWallet
             {
                 return transaction.Message?.MessageText;
             }
-            var input = "[" + (TransactionType) (int) transaction.SubType + "]";
+            var input = "[" + (TransactionType)(int)transaction.SubType + "]";
             return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
     }

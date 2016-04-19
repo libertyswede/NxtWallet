@@ -50,20 +50,21 @@ namespace NxtWallet.Migrations
                     table.PrimaryKey("PK_SettingDto", x => x.Id);
                 });
             migrationBuilder.CreateTable(
-                name: "Transaction",
+                name: "TransactionDto",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     AccountFrom = table.Column<string>(nullable: false),
                     AccountTo = table.Column<string>(nullable: true),
+                    Extra = table.Column<string>(nullable: true),
                     Height = table.Column<int>(nullable: false),
                     IsConfirmed = table.Column<bool>(nullable: false, defaultValue: true),
                     Message = table.Column<string>(nullable: true),
                     NqtAmount = table.Column<long>(nullable: false),
                     NqtBalance = table.Column<long>(nullable: false),
                     NqtFee = table.Column<long>(nullable: false),
-                    NxtId = table.Column<long>(nullable: false),
+                    NxtId = table.Column<long>(nullable: true),
                     Timestamp = table.Column<DateTime>(nullable: false),
                     TransactionType = table.Column<int>(nullable: false)
                 },
@@ -96,7 +97,7 @@ namespace NxtWallet.Migrations
                     table.ForeignKey(
                         name: "FK_AssetOwnershipDto_TransactionDto_TransactionId",
                         column: x => x.TransactionId,
-                        principalTable: "Transaction",
+                        principalTable: "TransactionDto",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -108,7 +109,7 @@ namespace NxtWallet.Migrations
             migrationBuilder.DropTable("Contact");
             migrationBuilder.DropTable("Setting");
             migrationBuilder.DropTable("AssetDto");
-            migrationBuilder.DropTable("Transaction");
+            migrationBuilder.DropTable("TransactionDto");
         }
     }
 }

@@ -57,60 +57,47 @@ namespace NxtWallet
                 var updatedTransactions = new List<Transaction>();
                 try
                 {
-                    var currentBlockId = await _nxtServer.GetCurrentBlockId();
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
+                    var currentBlockId = await _nxtServer.GetCurrentBlockId();
                     var nxtTransactions = (await _nxtServer.GetTransactionsAsync()).ToList();
                     var balanceResult = await _nxtServer.GetBalanceAsync();
 
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
-                    
-                    // a. If hashes dont match
+                    var allTransactions = newTransactions.Union(knownTransactions).ToList();
+
+                    CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
+                    CheckSentDgsPurchaseTransactions(newTransactions);
+
                     var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions,
                         knownTransactions, updatedTransactions, balanceResult);
                     if (!balancesMatch)
                     {
-                        // b. Fetch asset trades
-                        var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
-                        var newTrades = tradesResult.Except(knownTransactions).ToList();
-                        newTransactions.AddRange(newTrades);
+                        await CheckAssetTrades(knownTransactions, newTransactions);
 
-                        if (tradesResult.Any())
-                        {
-                            await _walletRepository.UpdateLastAssetTrade(tradesResult.Max(t => t.Timestamp).AddSeconds(1));
-                        }
-
-                        // c. Fetch MS currency trades
+                        // c. TODO: Fetch MS currency trades
                     }
 
-                    // d. includes transfer, trades, divs and asset deletes
-                    await _assetTracker.UpdateAssetOwnership(newTransactions);
                     await CheckSentDividendTransactions(newTransactions);
 
                     if (!balancesMatch && !_balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions, 
                         knownTransactions, updatedTransactions, balanceResult))
                     {
-                        // e. Still no match, check for received dividens and forge income
                         var blockReply = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
-                        var assets = (await _assetTracker.GetOwnedAssetsSince(blockReply.Height))
-                            .Where(a => a.Account != _walletRepository.NxtAccount.AccountRs);
-
-                        foreach (var asset in assets)
-                        {
-                            var dividendTransactions = await _nxtServer.GetDividendTransactionsAsync(asset.Account, blockReply.Timestamp);
-                            foreach (var dividendTransaction in dividendTransactions)
-                            {
-                                var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
-                                var ownership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
-                                if (ownership?.BalanceQnt > 0)
-                                {
-                                    dividendTransaction.NqtAmount = attachment.AmountPerQnt.Nqt * ownership.BalanceQnt;
-                                    newTransactions.Add(dividendTransaction);
-                                }
-                            }
-                        }
-
+                        await CheckReceivedDividendTransactions(knownTransactions, newTransactions, blockReply);
                         var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(blockReply.Timestamp);
                         newTransactions.AddRange(forgeTransactions);
+                        await CheckExpiredDgsPurchases(allTransactions, newTransactions);
+
+                        if (_balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions,
+                            knownTransactions, updatedTransactions, balanceResult))
+                        {
+                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(currentBlockId);
+                        }
+                        else
+                        {
+                            // WTF?! Balances still don't match!!
+                            throw new Exception("Fatal Fucking Error Baby!");
+                        }
                     }
                     else
                     {
@@ -121,7 +108,6 @@ namespace NxtWallet
                     updatedTransactions.AddRange(await HandleNewTransactions(newTransactions, knownTransactions));
                     await HandleUpdatedTransactions(updatedTransactions);
                     await HandleBalance(balanceResult, newTransactions, knownTransactions);
-
                     await _assetTracker.SaveOwnerships();
 
                     await Task.Delay(_walletRepository.SleepTime, token);
@@ -133,22 +119,137 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckSentDividendTransactions(List<Transaction> newTransactions)
+        private async Task CheckAssetTrades(IEnumerable<Transaction> knownTransactions, List<Transaction> newTransactions)
         {
-            if (newTransactions.Any(t => t.TransactionType == TransactionType.DividendPayment))
+            var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
+            var newTrades = tradesResult.Except(knownTransactions).ToList();
+            newTransactions.AddRange(newTrades);
+
+            if (tradesResult.Any())
             {
-                var dividendTransactions =
-                    newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment).ToList();
-                foreach (var dividendTransaction in dividendTransactions)
+                await _walletRepository.UpdateLastAssetTrade(tradesResult.Max(t => t.Timestamp).AddSeconds(1));
+            }
+        }
+
+        private async Task CheckExpiredDgsPurchases(IReadOnlyCollection<Transaction> allTransactions, ICollection<Transaction> newTransactions)
+        {
+            var undeliveredPurchases = allTransactions
+                .Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchase && t.UserIsTransactionSender)
+                .Select(t => (DgsPurchaseTransaction) t)
+                .Where(t => !t.DeliveryTransactionNxtId.HasValue)
+                .ToList();
+
+            var expiredTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchaseExpired)
+                    .Cast<DgsPurchaseExpiredTransaction>()
+                    .ToList();
+
+            foreach (var undeliveredPurchase in undeliveredPurchases)
+            {
+                if (expiredTransactions.Any(t => undeliveredPurchase.NxtId.HasValue && t.PurchaseTransactionNxtId == (long) undeliveredPurchase.NxtId.Value))
+                {
+                    continue;
+                }
+
+                var isPurchaseExpired = await _nxtServer.GetIsPurchaseExpired(undeliveredPurchase.NxtId.Value);
+
+                if (isPurchaseExpired)
+                {
+                    var expiredTransaction = new DgsPurchaseExpiredTransaction
+                    {
+                        TransactionType = TransactionType.DigitalGoodsPurchaseExpired,
+                        NxtId = null,
+                        AccountFrom = undeliveredPurchase.AccountTo,
+                        Height = undeliveredPurchase.Height,
+                        IsConfirmed = true,
+                        NqtAmount = undeliveredPurchase.NqtAmount,
+                        AccountTo = undeliveredPurchase.AccountFrom,
+                        Message = "[Digital Goods Purchase Expired]",
+                        Timestamp = undeliveredPurchase.DeliveryDeadlineTimestamp,
+                        PurchaseTransactionNxtId = (long) undeliveredPurchase.NxtId,
+                        NqtFee = 0
+                    };
+                    expiredTransaction.UserIsTransactionSender = _walletRepository.NxtAccount.AccountRs.Equals(expiredTransaction.AccountFrom);
+                    expiredTransaction.UserIsTransactionRecipient = _walletRepository.NxtAccount.AccountRs.Equals(expiredTransaction.AccountTo);
+
+                    newTransactions.Add(expiredTransaction);
+                }
+            }
+        }
+
+        private async Task CheckReceivedDividendTransactions(
+            IReadOnlyCollection<Transaction> knownTransactions, ICollection<Transaction> newTransactions,
+            Block<ulong> block)
+        {
+            var assets = (await _assetTracker.GetOwnedAssetsSince(block.Height))
+                .Where(a => a.Account != _walletRepository.NxtAccount.AccountRs);
+
+            foreach (var asset in assets)
+            {
+                var dividendTransactions = await _nxtServer.GetDividendTransactionsAsync(asset.Account, block.Timestamp);
+                foreach (var dividendTransaction in dividendTransactions.Except(knownTransactions))
                 {
                     var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
-                    var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
-                    var quantityQnt = await _assetTracker.GetAssetQuantity(attachment.AssetId, attachment.Height);
-
-                    var recipientQnt = quantityQnt - myOwnership.BalanceQnt;
-                    var expenseNqt = attachment.AmountPerQnt.Nqt*recipientQnt;
-                    dividendTransaction.NqtAmount = expenseNqt;
+                    var ownership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
+                    if (ownership?.BalanceQnt > 0)
+                    {
+                        dividendTransaction.NqtAmount = attachment.AmountPerQnt.Nqt*ownership.BalanceQnt;
+                        newTransactions.Add(dividendTransaction);
+                    }
                 }
+            }
+        }
+
+        private static void CheckDgsDeliveryTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions, List<Transaction> updatedTransactions)
+        {
+            foreach (var deliveryTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery).ToList())
+            {
+                // Find & update the payment transaction
+                var deliveryAttachment = (DigitalGoodsDeliveryAttachment) deliveryTransaction.Attachment;
+                var purchaseTransaction = (DgsPurchaseTransaction) knownTransactions
+                    .SingleOrDefault(t => t.NxtId == deliveryAttachment.Purchase);
+
+                if (purchaseTransaction != null)
+                {
+                    updatedTransactions.Add(purchaseTransaction);
+                }
+                else
+                {
+                    purchaseTransaction = (DgsPurchaseTransaction) newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
+                }
+                purchaseTransaction.DeliveryTransactionNxtId = (long) (deliveryTransaction.NxtId ?? 0);
+
+                // If I am delivering, update the amount with what the customer is paying
+                if (deliveryTransaction.UserIsTransactionSender)
+                {
+                    var purchaseAttachment = (DigitalGoodsPurchaseAttachment) purchaseTransaction.Attachment;
+                    var amount = purchaseAttachment.Price.Nqt*purchaseAttachment.Quantity -
+                                 deliveryAttachment.Discount.Nqt;
+                    deliveryTransaction.NqtAmount = amount;
+                }
+            }
+        }
+
+        private static void CheckSentDgsPurchaseTransactions(IEnumerable<Transaction> newTransactions)
+        {
+            foreach (var transaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchase && t.UserIsTransactionSender))
+            {
+                var attachment = (DigitalGoodsPurchaseAttachment) transaction.Attachment;
+                transaction.NqtAmount += attachment.Price.Nqt*attachment.Quantity;
+            }
+        }
+
+        private async Task CheckSentDividendTransactions(List<Transaction> newTransactions)
+        {
+            await _assetTracker.UpdateAssetOwnership(newTransactions);
+            foreach (var dividendTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment && t.UserIsTransactionSender).ToList())
+            {
+                var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
+                var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
+                var quantityQnt = await _assetTracker.GetAssetQuantity(attachment.AssetId, attachment.Height);
+
+                var shareholdersQnt = quantityQnt - myOwnership.BalanceQnt;
+                var expenseNqt = attachment.AmountPerQnt.Nqt*shareholdersQnt;
+                dividendTransaction.NqtAmount = expenseNqt;
             }
         }
 
@@ -184,7 +285,7 @@ namespace NxtWallet
         private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions, List<Transaction> knownTransactions)
         {
             var unconfirmedBalanceNqt = newTransactions.Union(knownTransactions)
-                .Where(t => t.UserIsRecipient && !t.IsConfirmed)
+                .Where(t => t.UserIsTransactionRecipient && !t.IsConfirmed)
                 .Sum(t => t.NqtAmount);
 
             var balanceNqt = unconfirmedBalanceNqt + confirmedBalanceNqt;

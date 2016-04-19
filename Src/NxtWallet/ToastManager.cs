@@ -25,7 +25,7 @@ namespace NxtWallet
         {
             _backgroundRunner.TransactionAdded += (sender, transaction) =>
             {
-                if (transaction.UserIsRecipient && _walletRepository.NotificationsEnabled)
+                if (transaction.UserIsTransactionRecipient && _walletRepository.NotificationsEnabled)
                     PopNewTransactionToast(transaction);
             };
         }

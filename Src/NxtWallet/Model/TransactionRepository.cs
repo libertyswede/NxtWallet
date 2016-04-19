@@ -69,7 +69,7 @@ namespace NxtWallet.Model
                     context.Transactions.Add(transaction);
                 }
                 await context.SaveChangesAsync();
-                transactionDtos.ForEach(dto => transactionList.Single(t => t.NxtId == (ulong)dto.NxtId).Id = dto.Id);
+                transactionDtos.ForEach(dto => transactionList.Single(t => t.NxtId == (ulong?)dto.NxtId).Id = dto.Id); // TODO: This will crash if > 1 null value
             }
         }
 

@@ -1,13 +1,11 @@
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NxtWallet.Model
 {
-    [Table("Transaction")]
     public class TransactionDto : IEquatable<TransactionDto>
     {
         public int Id { get; set; }
-        public long NxtId { get; set; }
+        public long? NxtId { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
         public long NqtFee { get; set; }
@@ -18,6 +16,7 @@ namespace NxtWallet.Model
         public bool IsConfirmed { get; set; }
         public int TransactionType { get; set; }
         public int Height { get; set; }
+        public string Extra { get; set; }
 
         public override bool Equals(object obj)
         {

@@ -73,5 +73,15 @@ namespace NxtWallet
         {
             return Task.FromResult(new List<Transaction>().AsEnumerable());
         }
+
+        public Task<Transaction> GetTransactionAsync(ulong transactionId)
+        {
+            return Task.FromResult(new Transaction());
+        }
+
+        public Task<bool> GetIsPurchaseExpired(ulong purchaseId)
+        {
+            return Task.FromResult(false);
+        }
     }
 }

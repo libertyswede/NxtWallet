@@ -37,6 +37,8 @@ namespace NxtWallet
         Task<Asset> GetAssetAsync(ulong assetId);
         void UpdateNxtServer(string newServerAddress);
         Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp);
+        Task<Transaction> GetTransactionAsync(ulong transactionId);
+        Task<bool> GetIsPurchaseExpired(ulong purchaseId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -131,6 +133,48 @@ namespace NxtWallet
             }
             IsOnline = true;
             return 0;
+        }
+
+        public async Task<Transaction> GetTransactionAsync(ulong transactionId)
+        {
+            try
+            {
+                var transactionService = _serviceFactory.CreateTransactionService();
+                var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId));
+                IsOnline = true;
+                return _mapper.Map<Transaction>(transactionReply);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<bool> GetIsPurchaseExpired(ulong purchaseId)
+        {
+            try
+            {
+                var dgsService = _serviceFactory.CreateDigitalGoodsStoreService();
+                var purchaseReply = await dgsService.GetPurchase(purchaseId);
+                IsOnline = true;
+                return purchaseReply.Pending == false && purchaseReply.GoodsData == null;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
@@ -288,7 +332,7 @@ namespace NxtWallet
                     Timestamp = block.Timestamp,
                     TransactionType = TransactionType.ForgeIncome,
                     Message = "[Forge Income]",
-                    UserIsRecipient = true
+                    UserIsTransactionRecipient = true
                 });
 
                 IsOnline = true;

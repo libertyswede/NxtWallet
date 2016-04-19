@@ -35,12 +35,12 @@ namespace NxtWallet
             }
             var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;
             var unconfirmedSum = allOrderedTransactions.Where(t => !t.IsConfirmed)
-                .Sum(t => t.UserIsRecipient ? t.NqtAmount : -t.NqtAmount);
+                .Sum(t => t.UserIsTransactionRecipient ? t.NqtAmount : -t.NqtAmount);
             var equals = balanceResult + unconfirmedSum == lastTxBalance;
             return equals;
         }
 
-        private IEnumerable<T> UpdateSubsequentEntryBalances<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
+        private static IEnumerable<T> UpdateSubsequentEntryBalances<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
         {
             var updatedEntries = new HashSet<T>();
 
@@ -53,13 +53,20 @@ namespace NxtWallet
             return updatedEntries;
         }
 
-        private void UpdateEntryBalance<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
+        private static void UpdateEntryBalance<T>(T entry, IList<T> allOrderedEntries) where T : ILedgerEntry
         {
             var previousBalance = GetPreviousEntry(entry, allOrderedEntries)?.GetBalance() ?? 0;
 
-            if (entry.UserIsSender())
+            if (entry.UserIsTransactionSender)
             {
-                entry.SetBalance(previousBalance - (entry.GetAmount() + entry.GetFee()));
+                if (!entry.UserIsAmountRecipient)
+                {
+                    entry.SetBalance(previousBalance - (entry.GetAmount() + entry.GetFee()));
+                }
+                else
+                {
+                    entry.SetBalance(previousBalance + entry.GetAmount() - entry.GetFee());
+                }
             }
             else
             {

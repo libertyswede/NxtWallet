@@ -13,6 +13,8 @@ namespace NxtWallet.ViewModel.Model
         public int AssetDecimals { get; set; }
         public int Height { get; set; }
         public Transaction Transaction { get; set; }
+        public bool UserIsTransactionSender => false;
+        public bool UserIsAmountRecipient => true;
 
         public override bool Equals(object obj)
         {
@@ -62,11 +64,6 @@ namespace NxtWallet.ViewModel.Model
         public void SetBalance(long balance)
         {
             BalanceQnt = balance;
-        }
-
-        public bool UserIsSender()
-        {
-            return false;
         }
     }
 }

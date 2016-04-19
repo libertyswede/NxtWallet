@@ -96,10 +96,6 @@ namespace NxtWallet.Model
         private static void OnTransactionCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TransactionDto>()
-                .Property(t => t.NxtId)
-                .IsRequired();
-
-            modelBuilder.Entity<TransactionDto>()
                 .Property(t => t.Timestamp)
                 .IsRequired();
 
