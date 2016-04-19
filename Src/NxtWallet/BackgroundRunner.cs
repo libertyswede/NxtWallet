@@ -65,11 +65,11 @@ namespace NxtWallet
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
                     var allTransactions = newTransactions.Union(knownTransactions).ToList();
 
+                    CheckDgsRefundTransactions(newTransactions);
                     CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
                     CheckSentDgsPurchaseTransactions(newTransactions);
 
-                    var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions,
-                        knownTransactions, updatedTransactions, balanceResult);
+                    var balancesMatch = BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult);
                     if (!balancesMatch)
                     {
                         await CheckAssetTrades(knownTransactions, newTransactions);
@@ -79,8 +79,7 @@ namespace NxtWallet
 
                     await CheckSentDividendTransactions(newTransactions);
 
-                    if (!balancesMatch && !_balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions, 
-                        knownTransactions, updatedTransactions, balanceResult))
+                    if (!balancesMatch && !BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                     {
                         var blockReply = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
                         await CheckReceivedDividendTransactions(knownTransactions, newTransactions, blockReply);
@@ -88,8 +87,7 @@ namespace NxtWallet
                         newTransactions.AddRange(forgeTransactions);
                         await CheckExpiredDgsPurchases(allTransactions, newTransactions);
 
-                        if (_balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions,
-                            knownTransactions, updatedTransactions, balanceResult))
+                        if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                         {
                             await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(currentBlockId);
                         }
@@ -117,6 +115,27 @@ namespace NxtWallet
                     // ignore
                 }
             }
+        }
+
+        private static void CheckDgsRefundTransactions(List<Transaction> newTransactions)
+        {
+            foreach (
+                var refundTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsRefund))
+            {
+                var attachment = (DigitalGoodsRefundAttachment) refundTransaction.Attachment;
+                refundTransaction.NqtAmount += attachment.Refund.Nqt;
+            }
+        }
+
+        private bool BalancesMatch(List<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
+            IReadOnlyList<Transaction> nxtTransactions, IEnumerable<Transaction> newTransactions,
+            long balanceResult)
+        {
+            updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions,
+                nxtTransactions, newTransactions));
+            var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(nxtTransactions,
+                knownTransactions, updatedTransactions, balanceResult);
+            return balancesMatch;
         }
 
         private async Task CheckAssetTrades(IEnumerable<Transaction> knownTransactions, List<Transaction> newTransactions)
