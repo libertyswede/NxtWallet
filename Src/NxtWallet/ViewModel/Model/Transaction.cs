@@ -178,7 +178,8 @@ namespace NxtWallet.ViewModel.Model
             {
                 return !UserIsTransactionSender;
             }
-            if (TransactionType == TransactionType.CurrencyUndoCrowdfunding)
+            if (TransactionType == TransactionType.CurrencyUndoCrowdfunding ||
+                TransactionType == TransactionType.ReserveClaim)
             {
                 return true;
             }
@@ -267,9 +268,9 @@ namespace NxtWallet.ViewModel.Model
     //    BLOCK_GENERATED(1, false), ------------------------------ Supported
     //    REJECT_PHASED_TRANSACTION(2, true),  -------------------- Not supported
     //    TRANSACTION_FEE(50, true), ------------------------------ Supported
-    //    // TYPE_PAYMENT            ------------------------------ N/A
+    //    // TYPE_PAYMENT 
     //    ORDINARY_PAYMENT(3, true), ------------------------------ Supported
-    //    // TYPE_MESSAGING          ------------------------------ N/A
+    //    // TYPE_MESSAGING
     //    ACCOUNT_INFO(4, true),     ------------------------------ Supported
     //    ALIAS_ASSIGNMENT(5, true), ------------------------------ Supported
     //    ALIAS_BUY(6, true),        ------------------------------ Supported
@@ -282,7 +283,7 @@ namespace NxtWallet.ViewModel.Model
     //    VOTE_CASTING(13, true),    ------------------------------ Not supported
     //    ACCOUNT_PROPERTY(56, true),  ---------------------------- Supported
     //    ACCOUNT_PROPERTY_DELETE(57, true),  --------------------- Supported
-    //    // TYPE_COLORED_COINS      ------------------------------ N/A
+    //    // TYPE_COLORED_COINS
     //    ASSET_ASK_ORDER_CANCELLATION(14, true),  ---------------- Supported
     //    ASSET_ASK_ORDER_PLACEMENT(15, true),  ------------------- Supported
     //    ASSET_BID_ORDER_CANCELLATION(16, true),  ---------------- Supported
@@ -292,7 +293,7 @@ namespace NxtWallet.ViewModel.Model
     //    ASSET_TRADE(20, true),     ------------------------------ Supported
     //    ASSET_TRANSFER(21, true),  ------------------------------ Supported
     //    ASSET_DELETE(49, true),    ------------------------------ Supported
-    //    // TYPE_DIGITAL_GOODS      ------------------------------ N/A
+    //    // TYPE_DIGITAL_GOODS
     //    DIGITAL_GOODS_DELISTED(22, true), ------------------------ Supported
     //    DIGITAL_GOODS_DELISTING(23, true), ----------------------- Supported
     //    DIGITAL_GOODS_DELIVERY(24, true), ------------------------ Supported
@@ -317,7 +318,7 @@ namespace NxtWallet.ViewModel.Model
     //    CURRENCY_OFFER_EXPIRED(40, true),  -----------------------
     //    CURRENCY_OFFER_REPLACED(41, true),  ----------------------
     //    CURRENCY_PUBLISH_EXCHANGE_OFFER(42, true),  --------------
-    //    CURRENCY_RESERVE_CLAIM(43, true),  -----------------------
+    //    CURRENCY_RESERVE_CLAIM(43, true),  -----------------------  Supported
     //    CURRENCY_RESERVE_INCREASE(44, true),  --------------------  Supported
     //    CURRENCY_TRANSFER(45, true),  ----------------------------
     //    CURRENCY_UNDO_CROWDFUNDING(46, true),  -------------------  Supported

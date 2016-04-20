@@ -71,6 +71,7 @@ namespace NxtWallet
                     CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
                     CheckSentDgsPurchaseTransactions(newTransactions);
                     await CheckMsReserveIncreaseTransactions(newTransactions);
+                    await CheckMsReserveClaimTransactions(newTransactions);
 
                     var balancesMatch = BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult);
                     if (!balancesMatch)
@@ -118,6 +119,16 @@ namespace NxtWallet
                 {
                     // ignore
                 }
+            }
+        }
+
+        private async Task CheckMsReserveClaimTransactions(List<Transaction> newTransactions)
+        {
+            foreach (var claimTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
+            {
+                var attachment = (MonetarySystemReserveClaimAttachment) claimTransaction.Attachment;
+                var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
+                claimTransaction.NqtAmount = attachment.Units/(long) Math.Pow(10, currency.Decimals)*100000000;
             }
         }
 
