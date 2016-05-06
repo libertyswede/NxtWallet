@@ -20,6 +20,7 @@ namespace NxtWallet.Model
         private const string NotificationsEnabledKey = "notificationsEnabled";
         private const string LastAssetTradeKey = "lastAssetTrade";
         private const string LastBalanceMatchBlockIdKey = "lastBalanceMatchBlockId";
+        private const string LastCurrencyExchangeKey = "lastCurrencyExchange";
 
         public AccountWithPublicKey NxtAccount { get; private set; }
         public string NxtServer { get; private set; }
@@ -30,6 +31,7 @@ namespace NxtWallet.Model
         public ulong LastBalanceMatchBlockId { get; private set; }
         public string Balance { get; private set; }
         public DateTime LastAssetTrade { get; private set; }
+        public DateTime LastCurrencyExchange { get; private set; }
 
         public async Task LoadAsync()
         {
@@ -47,6 +49,7 @@ namespace NxtWallet.Model
                 BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
                 NotificationsEnabled = ReadOrGenerate(dbSettings, context, NotificationsEnabledKey, () => true);
                 LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
+                LastCurrencyExchange = ReadOrGenerateDateTime(dbSettings, context, LastCurrencyExchangeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
 
                 NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
                 await context.SaveChangesAsync();
@@ -57,6 +60,12 @@ namespace NxtWallet.Model
         {
             await Update(LastAssetTradeKey, newTimestamp.ToString("O"));
             LastAssetTrade = newTimestamp;
+        }
+
+        public async Task UpdateLastCurrencyExchange(DateTime newTimestamp)
+        {
+            await Update(LastCurrencyExchangeKey, newTimestamp.ToString("O"));
+            LastCurrencyExchange = newTimestamp;
         }
 
         public async Task UpdateBalanceAsync(string balance)

@@ -15,6 +15,7 @@ namespace NxtWallet.Model
         bool NotificationsEnabled { get; }
         ulong LastBalanceMatchBlockId { get; }
         DateTime LastAssetTrade { get; }
+        DateTime LastCurrencyExchange { get; }
 
         Task LoadAsync();
         Task UpdateBalanceAsync(string balance);
@@ -22,6 +23,7 @@ namespace NxtWallet.Model
         Task UpdateBackupCompleted(bool completed);
         Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
         Task UpdateLastAssetTrade(DateTime newTimestamp);
+        Task UpdateLastCurrencyExchange(DateTime newTimestamp);
         Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId);
     }
 }

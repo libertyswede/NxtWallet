@@ -29,12 +29,12 @@ namespace NxtWallet.ViewModel
             };
             backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.NxtId);
+                var existingTransaction = Transactions.Single(t => t.Equals(transaction));
                 existingTransaction.NqtBalance = transaction.NqtBalance;
             };
             backgroundRunner.TransactionConfirmationUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.NxtId == transaction.NxtId);
+                var existingTransaction = Transactions.Single(t => t.Equals(transaction));
                 existingTransaction.IsConfirmed = transaction.IsConfirmed;
             };
 

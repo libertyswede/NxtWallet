@@ -67,6 +67,11 @@ namespace NxtWallet
             return Task.FromResult(new List<Transaction>().AsEnumerable());
         }
 
+        public Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp)
+        {
+            return Task.FromResult(new List<MsCurrencyExchangeTransaction>().AsEnumerable());
+        }
+
         public Task<Asset> GetAssetAsync(ulong assetId)
         {
             return Task.FromResult(new Asset());

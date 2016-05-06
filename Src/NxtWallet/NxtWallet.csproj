@@ -118,6 +118,7 @@
       <DependentUpon>20160419123036_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
+    <Compile Include="MsCurrencyTracker.cs" />
     <Compile Include="ViewModel\Model\DgsPurchaseExpiredTransaction.cs" />
     <Compile Include="ViewModel\Model\DgsPurchaseTransaction.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -155,6 +156,9 @@
     <Compile Include="ViewModel\Model\AssetOwnership.cs" />
     <Compile Include="ViewModel\Model\AssetTradeTransaction.cs" />
     <Compile Include="ViewModel\Model\Contact.cs" />
+    <Compile Include="ViewModel\Model\MsExchangeOfferExpiredTransaction.cs" />
+    <Compile Include="ViewModel\Model\MsCurrencyExchangeTransaction.cs" />
+    <Compile Include="ViewModel\Model\MsPublishExchangeOfferTransaction.cs" />
     <Compile Include="ViewModel\Model\MsReserveIncreaseTransaction.cs" />
     <Compile Include="ViewModel\Model\MsUndoCrowdfundingTransaction.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />

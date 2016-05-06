@@ -34,6 +34,7 @@ namespace NxtWallet
         private readonly IWalletRepository _walletRepository;
         private readonly IContactRepository _contactRepository;
         private readonly IAssetTracker _assetTracker;
+        private readonly IMsCurrencyTracker _msCurrencyTracker;
 
         public event TransactionHandler TransactionConfirmationUpdated;
         public event TransactionHandler TransactionBalanceUpdated;
@@ -42,7 +43,7 @@ namespace NxtWallet
 
         public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
             IBalanceCalculator balanceCalculator, IWalletRepository walletRepository,
-            IContactRepository contactRepository, IAssetTracker assetTracker)
+            IContactRepository contactRepository, IAssetTracker assetTracker, IMsCurrencyTracker msCurrencyTracker)
         {
             _nxtServer = nxtServer;
             _transactionRepository = transactionRepository;
@@ -50,6 +51,7 @@ namespace NxtWallet
             _walletRepository = walletRepository;
             _contactRepository = contactRepository;
             _assetTracker = assetTracker;
+            _msCurrencyTracker = msCurrencyTracker;
         }
 
         public async Task Run(CancellationToken token)
@@ -77,11 +79,11 @@ namespace NxtWallet
                     if (!balancesMatch)
                     {
                         await CheckAssetTrades(knownTransactions, newTransactions);
-
-                        // c. TODO: Fetch MS currency trades
+                        await CheckMsExchanges(allTransactions, newTransactions, updatedTransactions);
                     }
 
                     await CheckSentDividendTransactions(newTransactions);
+                    await CheckExpiredExchangeOffers(newTransactions, allTransactions, updatedTransactions, blockchainStatus.NumberOfBlocks-1);
 
                     if (!balancesMatch && !BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                     {
@@ -91,7 +93,7 @@ namespace NxtWallet
                         newTransactions.AddRange(forgeTransactions);
                         await CheckExpiredDgsPurchases(allTransactions, newTransactions);
                         await CheckMsUndoCrowdfundingTransaction(knownTransactions, blockchainStatus, newTransactions);
-
+                        
                         if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                         {
                             await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
@@ -122,7 +124,19 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckMsReserveClaimTransactions(List<Transaction> newTransactions)
+        private async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions,
+            List<Transaction> newTransactions, ICollection<Transaction> updatedTransactions)
+        {
+            await _msCurrencyTracker.CheckMsExchanges(allTransactions, newTransactions, updatedTransactions);
+        }
+
+        private async Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions, 
+            List<Transaction> updatedTransactions, int currentHeight)
+        {
+            await _msCurrencyTracker.CheckExpiredExchangeOffers(newTransactions, allTransactions, updatedTransactions, currentHeight);
+        }
+
+        private async Task CheckMsReserveClaimTransactions(IEnumerable<Transaction> newTransactions)
         {
             foreach (var claimTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
             {
@@ -132,7 +146,7 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckMsReserveIncreaseTransactions(List<Transaction> newTransactions)
+        private async Task CheckMsReserveIncreaseTransactions(IEnumerable<Transaction> newTransactions)
         {
             foreach (var reserveTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
                         .Cast<MsReserveIncreaseTransaction>())

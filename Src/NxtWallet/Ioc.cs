@@ -51,6 +51,7 @@ namespace NxtWallet
             SimpleIoc.Default.Register<IBackupDoneDialog, BackupDoneDialog>();
             SimpleIoc.Default.Register<IAssetRepository, AssetRepository>();
             SimpleIoc.Default.Register<IAssetTracker, AssetTracker>();
+            SimpleIoc.Default.Register<IMsCurrencyTracker, MsCurrencyTracker>();
             SimpleIoc.Default.Register<IServiceFactory>(() => new ServiceFactory(repo.NxtServer));
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();

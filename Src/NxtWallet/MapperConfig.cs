@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using AutoMapper;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NxtLib;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
@@ -63,6 +62,20 @@ namespace NxtWallet
                     .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
                     .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
 
+                cfg.CreateMap<NxtLib.MonetarySystem.CurrencyExchange, MsCurrencyExchangeTransaction>()
+                    .ForMember(dest => dest.Message, opt => opt.UseValue("[Currency Exchange]"))
+                    .ForMember(dest => dest.OfferNxtId, opt => opt.MapFrom(src => (long) src.OfferId))
+                    .ForMember(dest => dest.TransactionNxtId, opt => opt.MapFrom(src => (long) src.TransactionId))
+                    .ForMember(dest => dest.Units, opt => opt.MapFrom(src => src.Units))
+                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt)) // TODO: Assumption
+                    .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs))
+                    .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs))
+                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Units*src.Rate.Nqt))
+                    .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
+                    .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.CurrencyExchange))
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
+
                 cfg.CreateMap<Asset, AssetDto>();
 
                 cfg.CreateMap<AssetDto, Asset>();
@@ -85,42 +98,43 @@ namespace NxtWallet
             {
                 case (int) TransactionType.DigitalGoodsPurchase:
                 {
-                    var transaction = new DgsPurchaseTransaction();
-                    if (!string.IsNullOrEmpty(transactionDto.Extra))
-                    {
-                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
-                    }
-                    return transaction;
+                    return PopulateObject(new DgsPurchaseTransaction(), transactionDto);
                 }
                 case (int) TransactionType.DigitalGoodsPurchaseExpired:
                 {
-                    var transaction = new DgsPurchaseExpiredTransaction();
-                    if (!string.IsNullOrEmpty(transactionDto.Extra))
-                    {
-                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
-                    }
-                    return transaction;
+                    return PopulateObject(new DgsPurchaseExpiredTransaction(), transactionDto);
                 }
                 case (int)TransactionType.ReserveIncrease:
                 {
-                    var transaction = new MsReserveIncreaseTransaction();
-                    if (!string.IsNullOrEmpty(transactionDto.Extra))
-                    {
-                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
-                    }
-                    return transaction;
+                    return PopulateObject(new MsReserveIncreaseTransaction(), transactionDto);
                 }
                 case (int)TransactionType.CurrencyUndoCrowdfunding:
                 {
-                    var transaction = new MsUndoCrowdfundingTransaction();
-                    if (!string.IsNullOrEmpty(transactionDto.Extra))
-                    {
-                        JsonConvert.PopulateObject(transactionDto.Extra, transaction);
-                    }
-                    return transaction;
+                    return PopulateObject(new MsUndoCrowdfundingTransaction(), transactionDto);
+                }
+                case (int)TransactionType.CurrencyExchange:
+                {
+                    return PopulateObject(new MsCurrencyExchangeTransaction(), transactionDto);
+                }
+                case (int)TransactionType.CurrencyOfferExpired:
+                {
+                    return PopulateObject(new MsExchangeOfferExpiredTransaction(), transactionDto);
+                }
+                case (int)TransactionType.PublishExchangeOffer:
+                {
+                    return PopulateObject(new MsPublishExchangeOfferTransaction(), transactionDto);
                 }
             }
             return new Transaction();
+        }
+
+        private static Transaction PopulateObject(Transaction transaction, TransactionDto transactionDto)
+        {
+            if (!string.IsNullOrEmpty(transactionDto.Extra))
+            {
+                JsonConvert.PopulateObject(transactionDto.Extra, transaction);
+            }
+            return transaction;
         }
 
         private static Transaction GetTransactionObject(NxtLib.Transaction nxtTransaction)
@@ -145,6 +159,24 @@ namespace NxtWallet
                         CurrencyId = (long) attachment.CurrencyId
                     };
                 }
+                case TransactionSubType.MonetarySystemPublishExchangeOffer:
+                {
+                    var attachment = (MonetarySystemPublishExchangeOfferAttachment) nxtTransaction.Attachment;
+                    nxtTransaction.Amount = Amount.CreateAmountFromNqt(attachment.BuyRate.Nqt * attachment.InitialBuySupply);
+
+                    return new MsPublishExchangeOfferTransaction
+                    {
+                        CurrencyId = (long)attachment.CurrencyId,
+                        ExpirationHeight = attachment.ExpirationHeight,
+                        IsExpired = false,
+                        BuyLimit = attachment.TotalBuyLimit,
+                        BuySupply = attachment.InitialBuySupply,
+                        BuyRateNqt = attachment.BuyRate.Nqt,
+                        SellLimit = attachment.TotalSellLimit,
+                        SellSupply = attachment.InitialSellSupply,
+                        SellRateNqt = attachment.SellRate.Nqt
+                    };
+                }
             }
             return new Transaction();
         }
@@ -154,7 +186,10 @@ namespace NxtWallet
             if (transaction.TransactionType == TransactionType.DigitalGoodsPurchase ||
                 transaction.TransactionType == TransactionType.DigitalGoodsPurchaseExpired ||
                 transaction.TransactionType == TransactionType.ReserveIncrease ||
-                transaction.TransactionType == TransactionType.CurrencyUndoCrowdfunding)
+                transaction.TransactionType == TransactionType.CurrencyUndoCrowdfunding ||
+                transaction.TransactionType == TransactionType.CurrencyExchange ||
+                transaction.TransactionType == TransactionType.CurrencyOfferExpired ||
+                transaction.TransactionType == TransactionType.PublishExchangeOffer)
             {
                 var json = JsonConvert.SerializeObject(transaction, Formatting.None);
                 return json;

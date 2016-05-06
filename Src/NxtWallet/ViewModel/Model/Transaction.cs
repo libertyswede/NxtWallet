@@ -142,7 +142,7 @@ namespace NxtWallet.ViewModel.Model
             return NxtId.GetHashCode();
         }
 
-        public bool Equals(Transaction other)
+        public virtual bool Equals(Transaction other)
         {
             return other?.NxtId == NxtId && other?.TransactionType == TransactionType;
         }
@@ -257,7 +257,9 @@ namespace NxtWallet.ViewModel.Model
         AssetTrade = 1001,
         ForgeIncome = 1002,
         DigitalGoodsPurchaseExpired = 1003,
-        CurrencyUndoCrowdfunding = 1004
+        CurrencyUndoCrowdfunding = 1004,
+        CurrencyExchange = 1005,
+        CurrencyOfferExpired = 1006
     }
 
     // NRS Account Ledger Events
@@ -306,28 +308,28 @@ namespace NxtWallet.ViewModel.Model
     //    DIGITAL_GOODS_REFUND(31, true),  ------------------------- Supported
     //    // TYPE_ACCOUNT_CONTROL
     //    ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING(32, true),  ---- Supported
-    //    ACCOUNT_CONTROL_PHASING_ONLY(55, true),  -----------------  Supported
+    //    ACCOUNT_CONTROL_PHASING_ONLY(55, true),  ----------------- Supported
     //    // TYPE_CURRENCY
     //    CURRENCY_DELETION(33, true),  ----------------------------  
     //    CURRENCY_DISTRIBUTION(34, true),  ------------------------  
     //    CURRENCY_EXCHANGE(35, true),  ----------------------------
     //    CURRENCY_EXCHANGE_BUY(36, true),  ------------------------
     //    CURRENCY_EXCHANGE_SELL(37, true),  -----------------------
-    //    CURRENCY_ISSUANCE(38, true),  ----------------------------
+    //    CURRENCY_ISSUANCE(38, true),  ----------------------------  Supported
     //    CURRENCY_MINTING(39, true),  -----------------------------
     //    CURRENCY_OFFER_EXPIRED(40, true),  -----------------------
     //    CURRENCY_OFFER_REPLACED(41, true),  ----------------------
-    //    CURRENCY_PUBLISH_EXCHANGE_OFFER(42, true),  --------------
+    //    CURRENCY_PUBLISH_EXCHANGE_OFFER(42, true),  --------------  Supported
     //    CURRENCY_RESERVE_CLAIM(43, true),  -----------------------  Supported
     //    CURRENCY_RESERVE_INCREASE(44, true),  --------------------  Supported
-    //    CURRENCY_TRANSFER(45, true),  ----------------------------
+    //    CURRENCY_TRANSFER(45, true),  ----------------------------  Supported
     //    CURRENCY_UNDO_CROWDFUNDING(46, true),  -------------------  Supported
     //    // TYPE_DATA
-    //    TAGGED_DATA_UPLOAD(47, true),
-    //    TAGGED_DATA_EXTEND(48, true),
+    //    TAGGED_DATA_UPLOAD(47, true), ----------------------------
+    //    TAGGED_DATA_EXTEND(48, true), ----------------------------
     //    // TYPE_SHUFFLING
-    //    SHUFFLING_REGISTRATION(51, true),
-    //    SHUFFLING_PROCESSING(52, true),
-    //    SHUFFLING_CANCELLATION(53, true),
-    //    SHUFFLING_DISTRIBUTION(54, true);
+    //    SHUFFLING_REGISTRATION(51, true), ------------------------
+    //    SHUFFLING_PROCESSING(52, true), --------------------------
+    //    SHUFFLING_CANCELLATION(53, true), ------------------------
+    //    SHUFFLING_DISTRIBUTION(54, true); ------------------------
 }

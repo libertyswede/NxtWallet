@@ -38,6 +38,7 @@ namespace NxtWallet
         Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
+        Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp);
         Task<Asset> GetAssetAsync(ulong assetId);
         void UpdateNxtServer(string newServerAddress);
         Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp);
@@ -338,8 +339,31 @@ namespace NxtWallet
                 var assetService = _serviceFactory.CreateAssetExchangeService();
                 var trades = await assetService.GetTrades(
                     AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp);
-
+                IsOnline = true;
                 return _mapper.Map<IEnumerable<AssetTradeTransaction>>(trades.Trades);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp)
+        {
+            try
+            {
+                var msService = _serviceFactory.CreateMonetarySystemService();
+                var exchanges = await msService.GetExchanges(
+                    CurrencyOrAccountLocator.ByAccountId(_walletRepository.NxtAccount.AccountRs), 
+                    timestamp: timestamp, includeCurrencyInfo: true);
+                IsOnline = true;
+                return _mapper.Map<IEnumerable<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
             }
             catch (HttpRequestException e)
             {
