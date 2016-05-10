@@ -133,7 +133,7 @@ namespace NxtWallet
         private async Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions, 
             List<Transaction> updatedTransactions, int currentHeight)
         {
-            await _msCurrencyTracker.CheckExpiredExchangeOffers(newTransactions, allTransactions, updatedTransactions, currentHeight);
+            await _msCurrencyTracker.ExpireExchangeOffers(allTransactions, newTransactions, updatedTransactions, currentHeight);
         }
 
         private async Task CheckMsReserveClaimTransactions(IEnumerable<Transaction> newTransactions)

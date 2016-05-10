@@ -24,7 +24,7 @@ namespace NxtWallet.ViewModel.Model
 
         public override bool Equals(Transaction other)
         {
-            var transaction = obj as MsUndoCrowdfundingTransaction;
+            var transaction = other as MsUndoCrowdfundingTransaction;
             return transaction != null && Equals(transaction);
         }
 

@@ -11,7 +11,7 @@ namespace NxtWallet
     {
         Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions, 
             ICollection<Transaction> updatedTransactions);
-        Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions,
+        Task ExpireExchangeOffers(List<Transaction> allTransactions, List<Transaction> newTransactions,
             List<Transaction> updatedTransactions, int currentHeight);
     }
 
@@ -26,17 +26,18 @@ namespace NxtWallet
             _walletRepository = walletRepository;
         }
 
-        public async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions, ICollection<Transaction> updatedTransactions)
+        public async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions, 
+            ICollection<Transaction> updatedTransactions)
         {
-            var exchangeTransactions = (await _nxtServer.GetExchanges(_walletRepository.LastCurrencyExchange)).ToList();
+            var exchangeTransactions = await GetExchangeTransactions();
 
-            foreach (var exchangeTransaction in exchangeTransactions.OrderBy(t => t.Height))
+            foreach (var exchangeTransaction in exchangeTransactions)
             {
-                var otherTransaction = allTransactions.SingleOrDefault(t => t.NxtId == (ulong)exchangeTransaction.OfferNxtId);
-                if (otherTransaction != null)
+                var contraTransaction = allTransactions.SingleOrDefault(t => t.NxtId == (ulong)exchangeTransaction.OfferNxtId);
+                if (contraTransaction != null)
                 {
                     exchangeTransaction.NxtId = (ulong)exchangeTransaction.TransactionNxtId;
-                    var offerTransaction = (MsPublishExchangeOfferTransaction)otherTransaction;
+                    var offerTransaction = (MsPublishExchangeOfferTransaction)contraTransaction;
 
                     // I am selling currency through ExchangeOffer
                     if (exchangeTransaction.UserIsAmountRecipient)
@@ -55,7 +56,7 @@ namespace NxtWallet
                         offerTransaction.BuySupply -= exchangeTransaction.Units;
                         var excess = Math.Max(offerTransaction.SellSupply + (exchangeTransaction.Units - offerTransaction.SellLimit), 0);
                         offerTransaction.SellSupply += exchangeTransaction.Units - excess;
-                        
+
                         exchangeTransaction.NqtAmount = 0;
                     }
 
@@ -75,33 +76,33 @@ namespace NxtWallet
 
             if (newExchangeTransactions.Any())
             {
-                await
-                    _walletRepository.UpdateLastCurrencyExchange(
-                        newExchangeTransactions.Max(t => t.Timestamp).AddSeconds(1));
+                await _walletRepository.UpdateLastCurrencyExchange(newExchangeTransactions.Max(t => t.Timestamp).AddSeconds(1));
             }
         }
 
-        public async Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions, 
+        private async Task<List<MsCurrencyExchangeTransaction>> GetExchangeTransactions()
+        {
+            return (await _nxtServer.GetExchanges(_walletRepository.LastCurrencyExchange))
+                .OrderBy(t => t.Height)
+                .ToList();
+        }
+
+        public async Task ExpireExchangeOffers(List<Transaction> allTransactions, List<Transaction> newTransactions,
             List<Transaction> updatedTransactions, int currentHeight)
         {
-            var newExchangeOffers = newTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
-                .Cast<MsPublishExchangeOfferTransaction>()
-                .ToList();
+            var newExchangeOffers = GetNewExchangeOffers(newTransactions);
 
-            foreach (var newExchangeOffer in newExchangeOffers.OrderBy(t => t.Height))
+            foreach (var newExchangeOffer in newExchangeOffers)
             {
                 var previousExchangeOffer = GetTransactionAtHeight(allTransactions, newExchangeOffer.Height - 1, newExchangeOffer.CurrencyId);
                 if (previousExchangeOffer != null)
                 {
-                    ExpireOffer(previousExchangeOffer, newTransactions, allTransactions, newExchangeOffer.Height, newExchangeOffer.Timestamp.AddSeconds(-1));
+                    var expiredTime = newExchangeOffer.Timestamp.AddSeconds(-1);
+                    ExpireOffer(previousExchangeOffer, newTransactions, allTransactions, newExchangeOffer.Height, expiredTime);
                     updatedTransactions.Add(previousExchangeOffer);
                 }
             }
-
-            var exchangeOffers = allTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
-                .Cast<MsPublishExchangeOfferTransaction>()
-                .Where(t => !t.IsExpired && t.ExpirationHeight < currentHeight)
-                .ToList();
+            var exchangeOffers = GetAllOffersToExpire(allTransactions, currentHeight);
 
             foreach (var exchangeOffer in exchangeOffers)
             {
@@ -109,6 +110,22 @@ namespace NxtWallet
                 ExpireOffer(exchangeOffer, newTransactions, allTransactions, exchangeOffer.ExpirationHeight, block.Timestamp);
                 updatedTransactions.Add(exchangeOffer);
             }
+        }
+
+        private static List<MsPublishExchangeOfferTransaction> GetAllOffersToExpire(List<Transaction> allTransactions, int currentHeight)
+        {
+            return allTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
+                .Cast<MsPublishExchangeOfferTransaction>()
+                .Where(t => !t.IsExpired && t.ExpirationHeight < currentHeight)
+                .ToList();
+        }
+
+        private static List<MsPublishExchangeOfferTransaction> GetNewExchangeOffers(List<Transaction> newTransactions)
+        {
+            return newTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
+                .Cast<MsPublishExchangeOfferTransaction>()
+                .OrderBy(t => t.Height)
+                .ToList();
         }
 
         private void ExpireOffer(MsPublishExchangeOfferTransaction exchangeOffer, List<Transaction> newTransactions, 
@@ -138,14 +155,6 @@ namespace NxtWallet
             }
 
             exchangeOffer.IsExpired = true;
-        }
-
-        private void ReplaceOffer(MsPublishExchangeOfferTransaction previousOffer, MsPublishExchangeOfferTransaction offerTransaction)
-        {
-            
-
-            // Create new offer
-            throw new NotImplementedException();
         }
 
         private MsPublishExchangeOfferTransaction GetTransactionAtHeight(IList<Transaction> allTransactions, int height, long currencyId)
