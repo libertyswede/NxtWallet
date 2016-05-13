@@ -7,7 +7,8 @@ namespace NxtWallet
     public interface IBalanceCalculator
     {
         IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> allEntries) where T : ILedgerEntry;
-        bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions, List<Transaction> updatedTransactions, long balanceResult);
+        bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions, 
+            HashSet<Transaction> updatedTransactions, long balanceResult);
     }
 
     public class BalanceCalculator : IBalanceCalculator
@@ -23,7 +24,7 @@ namespace NxtWallet
         }
 
         public bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions,
-            List<Transaction> updatedTransactions, long balanceResult)
+            HashSet<Transaction> updatedTransactions, long balanceResult)
         {
             newTransactions = newTransactions.Except(knownTransactions).ToList();
             var allOrderedTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
@@ -31,7 +32,7 @@ namespace NxtWallet
             if (newTransactions.Any())
             {
                 var updated = Calculate(newTransactions, allOrderedTransactions);
-                updatedTransactions.AddRange(updated);
+                updated.ToList().ForEach(t => updatedTransactions.Add(t));
             }
             var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;
             var unconfirmedSum = allOrderedTransactions.Where(t => !t.IsConfirmed)

@@ -58,7 +58,7 @@ namespace NxtWallet
         {
             while (!token.IsCancellationRequested)
             {
-                var updatedTransactions = new List<Transaction>();
+                var updatedTransactions = new HashSet<Transaction>();
                 try
                 {
                     var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
@@ -108,9 +108,11 @@ namespace NxtWallet
                     {
                         await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
                     }
-                    
-                    updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions));
-                    updatedTransactions.AddRange(await HandleNewTransactions(newTransactions, knownTransactions));
+
+                    GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions)
+                        .Union(await HandleNewTransactions(newTransactions, knownTransactions))
+                        .ToList()
+                        .ForEach(t => updatedTransactions.Add(t));
                     await HandleUpdatedTransactions(updatedTransactions);
                     await HandleBalance(balanceResult, newTransactions, knownTransactions);
                     await _assetTracker.SaveOwnerships();
@@ -125,13 +127,13 @@ namespace NxtWallet
         }
 
         private async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions,
-            List<Transaction> newTransactions, ICollection<Transaction> updatedTransactions)
+            List<Transaction> newTransactions, HashSet<Transaction> updatedTransactions)
         {
             await _msCurrencyTracker.CheckMsExchanges(allTransactions, newTransactions, updatedTransactions);
         }
 
         private async Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions, 
-            List<Transaction> updatedTransactions, int currentHeight)
+            HashSet<Transaction> updatedTransactions, int currentHeight)
         {
             await _msCurrencyTracker.ExpireExchangeOffers(allTransactions, newTransactions, updatedTransactions, currentHeight);
         }
@@ -220,12 +222,12 @@ namespace NxtWallet
             }
         }
 
-        private bool BalancesMatch(List<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
+        private bool BalancesMatch(HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
             IReadOnlyList<Transaction> nxtTransactions, IReadOnlyList<Transaction> newTransactions,
             long balanceResult)
         {
-            updatedTransactions.AddRange(GetTransactionsWithUpdatedConfirmation(knownTransactions,
-                nxtTransactions, newTransactions));
+            GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions)
+                .ForEach(t => updatedTransactions.Add(t));
             var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions,
                 knownTransactions, updatedTransactions, balanceResult);
             return balancesMatch;
@@ -311,7 +313,8 @@ namespace NxtWallet
             }
         }
 
-        private static void CheckDgsDeliveryTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions, List<Transaction> updatedTransactions)
+        private static void CheckDgsDeliveryTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions, 
+            HashSet<Transaction> updatedTransactions)
         {
             foreach (var deliveryTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery).ToList())
             {
@@ -365,10 +368,13 @@ namespace NxtWallet
             }
         }
 
-        private async Task HandleUpdatedTransactions(List<Transaction> updatedTransactions)
+        private async Task HandleUpdatedTransactions(HashSet<Transaction> updatedTransactions)
         {
             await _transactionRepository.UpdateTransactionsAsync(updatedTransactions.Distinct());
-            updatedTransactions.ForEach(OnTransactionConfirmationUpdated);
+            foreach (var updatedTransaction in updatedTransactions)
+            {
+                OnTransactionConfirmationUpdated(updatedTransaction);
+            }
         }
 
         private async Task<IEnumerable<Transaction>> HandleNewTransactions(List<Transaction> newTransactions, IEnumerable<Transaction> knownTransactions)

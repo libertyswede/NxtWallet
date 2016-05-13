@@ -67,7 +67,7 @@ namespace NxtWallet
                     .ForMember(dest => dest.OfferNxtId, opt => opt.MapFrom(src => (long) src.OfferId))
                     .ForMember(dest => dest.TransactionNxtId, opt => opt.MapFrom(src => (long) src.TransactionId))
                     .ForMember(dest => dest.Units, opt => opt.MapFrom(src => src.Units))
-                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt)) // TODO: Assumption
+                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(0))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Units*src.Rate.Nqt))

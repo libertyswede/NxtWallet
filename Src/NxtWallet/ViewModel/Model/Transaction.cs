@@ -179,7 +179,8 @@ namespace NxtWallet.ViewModel.Model
                 return !UserIsTransactionSender;
             }
             if (TransactionType == TransactionType.CurrencyUndoCrowdfunding ||
-                TransactionType == TransactionType.ReserveClaim)
+                TransactionType == TransactionType.ReserveClaim ||
+                TransactionType == TransactionType.ExchangeSell)
             {
                 return true;
             }
@@ -312,13 +313,13 @@ namespace NxtWallet.ViewModel.Model
     //    // TYPE_CURRENCY
     //    CURRENCY_DELETION(33, true),  ----------------------------  
     //    CURRENCY_DISTRIBUTION(34, true),  ------------------------  
-    //    CURRENCY_EXCHANGE(35, true),  ----------------------------
-    //    CURRENCY_EXCHANGE_BUY(36, true),  ------------------------
-    //    CURRENCY_EXCHANGE_SELL(37, true),  -----------------------
+    //    CURRENCY_EXCHANGE(35, true),  ----------------------------  Supported
+    //    CURRENCY_EXCHANGE_BUY(36, true),  ------------------------  Supported
+    //    CURRENCY_EXCHANGE_SELL(37, true),  -----------------------  Supported
     //    CURRENCY_ISSUANCE(38, true),  ----------------------------  Supported
-    //    CURRENCY_MINTING(39, true),  -----------------------------
-    //    CURRENCY_OFFER_EXPIRED(40, true),  -----------------------
-    //    CURRENCY_OFFER_REPLACED(41, true),  ----------------------
+    //    CURRENCY_MINTING(39, true),  -----------------------------  
+    //    CURRENCY_OFFER_EXPIRED(40, true),  -----------------------  Supported
+    //    CURRENCY_OFFER_REPLACED(41, true),  ----------------------  Supported
     //    CURRENCY_PUBLISH_EXCHANGE_OFFER(42, true),  --------------  Supported
     //    CURRENCY_RESERVE_CLAIM(43, true),  -----------------------  Supported
     //    CURRENCY_RESERVE_INCREASE(44, true),  --------------------  Supported

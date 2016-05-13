@@ -9,10 +9,10 @@ namespace NxtWallet
 {
     public interface IMsCurrencyTracker
     {
-        Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions, 
-            ICollection<Transaction> updatedTransactions);
+        Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions,
+            HashSet<Transaction> updatedTransactions);
         Task ExpireExchangeOffers(List<Transaction> allTransactions, List<Transaction> newTransactions,
-            List<Transaction> updatedTransactions, int currentHeight);
+            HashSet<Transaction> updatedTransactions, int currentHeight);
     }
 
     public class MsCurrencyTracker : IMsCurrencyTracker
@@ -26,19 +26,20 @@ namespace NxtWallet
             _walletRepository = walletRepository;
         }
 
-        public async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions, 
-            ICollection<Transaction> updatedTransactions)
+        public async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions,
+            HashSet<Transaction> updatedTransactions)
         {
             var exchangeTransactions = await GetExchangeTransactions();
+            var offerTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
+                .Cast<MsPublishExchangeOfferTransaction>()
+                .ToList();
 
             foreach (var exchangeTransaction in exchangeTransactions)
             {
-                var contraTransaction = allTransactions.SingleOrDefault(t => t.NxtId == (ulong)exchangeTransaction.OfferNxtId);
-                if (contraTransaction != null)
+                exchangeTransaction.NxtId = (ulong)exchangeTransaction.TransactionNxtId;
+                var offerTransaction = offerTransactions.SingleOrDefault(t => t.NxtId == (ulong)exchangeTransaction.OfferNxtId);
+                if (offerTransaction != null)
                 {
-                    exchangeTransaction.NxtId = (ulong)exchangeTransaction.TransactionNxtId;
-                    var offerTransaction = (MsPublishExchangeOfferTransaction)contraTransaction;
-
                     // I am selling currency through ExchangeOffer
                     if (exchangeTransaction.UserIsAmountRecipient)
                     {
@@ -64,7 +65,10 @@ namespace NxtWallet
                 }
                 else
                 {
-                    exchangeTransaction.NxtId = (ulong)exchangeTransaction.OfferNxtId;
+                    var existingExchangeTransaction = allTransactions.Single(t => t.NxtId == exchangeTransaction.NxtId);
+                    existingExchangeTransaction.NqtAmount += exchangeTransaction.NqtAmount;
+                    exchangeTransaction.NqtAmount = 0;
+                    updatedTransactions.Add(existingExchangeTransaction);
                 }
             }
 
@@ -74,9 +78,9 @@ namespace NxtWallet
                 .ToList();
             newTransactions.AddRange(newExchangeTransactions);
 
-            if (newExchangeTransactions.Any())
+            if (exchangeTransactions.Any())
             {
-                await _walletRepository.UpdateLastCurrencyExchange(newExchangeTransactions.Max(t => t.Timestamp).AddSeconds(1));
+                await _walletRepository.UpdateLastCurrencyExchange(exchangeTransactions.Max(t => t.Timestamp).AddSeconds(1));
             }
         }
 
@@ -88,7 +92,7 @@ namespace NxtWallet
         }
 
         public async Task ExpireExchangeOffers(List<Transaction> allTransactions, List<Transaction> newTransactions,
-            List<Transaction> updatedTransactions, int currentHeight)
+            HashSet<Transaction> updatedTransactions, int currentHeight)
         {
             var newExchangeOffers = GetNewExchangeOffers(newTransactions);
 
