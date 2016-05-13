@@ -311,13 +311,13 @@ namespace NxtWallet.ViewModel.Model
     //    ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING(32, true),  ---- Supported
     //    ACCOUNT_CONTROL_PHASING_ONLY(55, true),  ----------------- Supported
     //    // TYPE_CURRENCY
-    //    CURRENCY_DELETION(33, true),  ----------------------------  
+    //    CURRENCY_DELETION(33, true),  ----------------------------  Supported
     //    CURRENCY_DISTRIBUTION(34, true),  ------------------------  N/A
     //    CURRENCY_EXCHANGE(35, true),  ----------------------------  Supported
     //    CURRENCY_EXCHANGE_BUY(36, true),  ------------------------  Supported
     //    CURRENCY_EXCHANGE_SELL(37, true),  -----------------------  Supported
     //    CURRENCY_ISSUANCE(38, true),  ----------------------------  Supported
-    //    CURRENCY_MINTING(39, true),  -----------------------------  
+    //    CURRENCY_MINTING(39, true),  -----------------------------  Supported
     //    CURRENCY_OFFER_EXPIRED(40, true),  -----------------------  Supported
     //    CURRENCY_OFFER_REPLACED(41, true),  ----------------------  Supported
     //    CURRENCY_PUBLISH_EXCHANGE_OFFER(42, true),  --------------  Supported
