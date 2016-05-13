@@ -312,7 +312,7 @@ namespace NxtWallet.ViewModel.Model
     //    ACCOUNT_CONTROL_PHASING_ONLY(55, true),  ----------------- Supported
     //    // TYPE_CURRENCY
     //    CURRENCY_DELETION(33, true),  ----------------------------  
-    //    CURRENCY_DISTRIBUTION(34, true),  ------------------------  
+    //    CURRENCY_DISTRIBUTION(34, true),  ------------------------  N/A
     //    CURRENCY_EXCHANGE(35, true),  ----------------------------  Supported
     //    CURRENCY_EXCHANGE_BUY(36, true),  ------------------------  Supported
     //    CURRENCY_EXCHANGE_SELL(37, true),  -----------------------  Supported

@@ -11,5 +11,6 @@ namespace NxtWallet.Model
         Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels);
         Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
         Task<bool> HasOutgoingTransactionAsync();
+        Task RemoveTransactionAsync(Transaction transaction);
     }
 }

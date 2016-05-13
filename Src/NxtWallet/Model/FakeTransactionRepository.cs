@@ -60,6 +60,11 @@ namespace NxtWallet.Model
             return Task.CompletedTask;
         }
 
+        public Task RemoveTransactionAsync(Transaction transaction)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
             return Task.CompletedTask;

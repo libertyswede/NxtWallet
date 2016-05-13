@@ -58,6 +58,17 @@ namespace NxtWallet.Model
             }
         }
 
+        public async Task RemoveTransactionAsync(Transaction transaction)
+        {
+            using (var context = new WalletContext())
+            {
+                var transactionDto = _mapper.Map<TransactionDto>(transaction);
+                context.Transactions.Attach(transactionDto);
+                context.Entry(transactionDto).State = EntityState.Deleted;
+                await context.SaveChangesAsync();
+            }
+        }
+
         public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
             var transactionList = transactions.ToList();

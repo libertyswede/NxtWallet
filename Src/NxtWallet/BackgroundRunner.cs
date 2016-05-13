@@ -93,7 +93,8 @@ namespace NxtWallet
                         newTransactions.AddRange(forgeTransactions);
                         await CheckExpiredDgsPurchases(allTransactions, newTransactions);
                         await CheckMsUndoCrowdfundingTransaction(knownTransactions, blockchainStatus, newTransactions);
-                        
+                        await RemovePreviouslyUnconfirmedNowRemovedTransactions(knownTransactions, nxtTransactions);
+
                         if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
                         {
                             await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
@@ -123,6 +124,18 @@ namespace NxtWallet
                 {
                     // ignore
                 }
+            }
+        }
+
+        private async Task RemovePreviouslyUnconfirmedNowRemovedTransactions(List<Transaction> knownTransactions, List<Transaction> nxtTransactions)
+        {
+            // Check unconfirmed existing transactions that has been removed from NRS server
+            var knownUnconfirmed = knownTransactions.Where(t => !t.IsConfirmed).ToList();
+            var unconfirmedToRemove = knownUnconfirmed.Where(ku => !nxtTransactions.Exists(t => t.Equals(ku)));
+            foreach (var unconfirmed in unconfirmedToRemove)
+            {
+                knownTransactions.Remove(unconfirmed);
+                await _transactionRepository.RemoveTransactionAsync(unconfirmed);
             }
         }
 
@@ -422,6 +435,7 @@ namespace NxtWallet
                 .Where(t => t.IsConfirmed == false)
                 .Except(nxtTransactions.Where(t => t.IsConfirmed == false))
                 .Except(newTransactions)
+                .Where(t => nxtTransactions.Contains(t))
                 .ToList();
 
             updatedTransactions.ForEach(t => t.IsConfirmed = true);
