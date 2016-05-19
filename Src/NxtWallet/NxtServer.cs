@@ -53,6 +53,7 @@ namespace NxtWallet
         private readonly IMapper _mapper;
         private bool _isOnline;
         private IServiceFactory _serviceFactory;
+        private ulong requireBlock => _walletRepository.LastBalanceMatchBlockId;
 
         public bool IsOnline
         {
@@ -94,7 +95,7 @@ namespace NxtWallet
             try
             {
                 var blockService = _serviceFactory.CreateBlockService();
-                var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId));
+                var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId), requireBlock: requireBlock);
                 IsOnline = true;
                 return blockReply;
             }
@@ -115,7 +116,7 @@ namespace NxtWallet
             try
             {
                 var blockService = _serviceFactory.CreateBlockService();
-                var blockReply = await blockService.GetBlock(BlockLocator.ByHeight(height));
+                var blockReply = await blockService.GetBlock(BlockLocator.ByHeight(height), requireBlock: requireBlock);
                 IsOnline = true;
                 return blockReply;
             }
@@ -136,7 +137,7 @@ namespace NxtWallet
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
-                var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount);
+                var balanceResult = await accountService.GetBalance(_walletRepository.NxtAccount, requireBlock: requireBlock);
                 IsOnline = true;
                 return balanceResult.UnconfirmedBalance.Nqt;
             }
@@ -167,7 +168,8 @@ namespace NxtWallet
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId));
+                var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId),
+                    requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<Transaction>(transactionReply);
             }
@@ -188,7 +190,7 @@ namespace NxtWallet
             try
             {
                 var dgsService = _serviceFactory.CreateDigitalGoodsStoreService();
-                var purchaseReply = await dgsService.GetPurchase(purchaseId);
+                var purchaseReply = await dgsService.GetPurchase(purchaseId, requireBlock: requireBlock);
                 IsOnline = true;
                 return purchaseReply.Pending == false && purchaseReply.GoodsData == null;
             }
@@ -209,7 +211,7 @@ namespace NxtWallet
             try
             {
                 var msService = _serviceFactory.CreateMonetarySystemService();
-                var currency = await msService.GetCurrency(CurrencyLocator.ByCurrencyId(currencyId));
+                var currency = await msService.GetCurrency(CurrencyLocator.ByCurrencyId(currencyId), requireBlock: requireBlock);
                 IsOnline = true;
                 return currency;
             }
@@ -231,8 +233,10 @@ namespace NxtWallet
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionsTask = transactionService.GetBlockchainTransactions(_walletRepository.NxtAccount, lastTimestamp);
-                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount});
+                var transactionsTask = transactionService.GetBlockchainTransactions(_walletRepository.NxtAccount, 
+                    lastTimestamp, requireBlock: requireBlock);
+                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount},
+                    requireBlock);
 
                 await Task.WhenAll(transactionsTask, unconfirmedTask);
 
@@ -264,7 +268,7 @@ namespace NxtWallet
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactions = await transactionService.GetBlockchainTransactions(
-                    account, timestamp, TransactionSubType.ColoredCoinsDividendPayment);
+                    account, timestamp, TransactionSubType.ColoredCoinsDividendPayment, requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<IEnumerable<Transaction>>(transactions.Transactions);
             }
@@ -316,7 +320,7 @@ namespace NxtWallet
             try
             {
                 var assetService = _serviceFactory.CreateAssetExchangeService();
-                var asset = await assetService.GetAsset(assetId);
+                var asset = await assetService.GetAsset(assetId, requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<Asset>(asset);
             }
@@ -338,7 +342,7 @@ namespace NxtWallet
             {
                 var assetService = _serviceFactory.CreateAssetExchangeService();
                 var trades = await assetService.GetTrades(
-                    AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp);
+                    AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp, requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<IEnumerable<AssetTradeTransaction>>(trades.Trades);
             }
@@ -361,7 +365,7 @@ namespace NxtWallet
                 var msService = _serviceFactory.CreateMonetarySystemService();
                 var exchanges = await msService.GetExchanges(
                     CurrencyOrAccountLocator.ByAccountId(_walletRepository.NxtAccount.AccountRs), 
-                    timestamp: timestamp, includeCurrencyInfo: true);
+                    timestamp: timestamp, includeCurrencyInfo: true, requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<IEnumerable<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
             }
@@ -387,7 +391,7 @@ namespace NxtWallet
             try
             {
                 var assetService = _serviceFactory.CreateAccountService();
-                var accountBlocks = await assetService.GetAccountBlocks(_walletRepository.NxtAccount.AccountRs, timestamp);
+                var accountBlocks = await assetService.GetAccountBlocks(_walletRepository.NxtAccount.AccountRs, timestamp, requireBlock: requireBlock);
 
                 var transactions = accountBlocks.Blocks
                     .Where(b => b.TotalFee.Nqt > 0)

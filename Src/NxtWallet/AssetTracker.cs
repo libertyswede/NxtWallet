@@ -192,7 +192,7 @@ namespace NxtWallet
                 var ownershipList = ownershipsByAsset[assetId];
                 var existingOwnerships = await _assetRepository.GetAssetOwnershipsAsync(assetId, 0);
                 var allOrderedOwnerships = existingOwnerships.Union(ownershipList).Distinct().OrderBy(o => o.Height).ToList();
-                updatedOwnerships.AddRange(_balanceCalculator.Calculate(ownershipList, allOrderedOwnerships));
+                updatedOwnerships.AddRange(_balanceCalculator.Calculate(ownershipList, new List<AssetOwnership>(), allOrderedOwnerships));
             }
             return updatedOwnerships;
         }

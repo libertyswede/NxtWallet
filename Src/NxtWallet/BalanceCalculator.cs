@@ -6,32 +6,46 @@ namespace NxtWallet
 {
     public interface IBalanceCalculator
     {
-        IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> allEntries) where T : ILedgerEntry;
+        IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> removedEntries, 
+            IReadOnlyList<T> allEntries) where T : ILedgerEntry;
+
         bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions, 
-            HashSet<Transaction> updatedTransactions, long balanceResult);
+            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long balanceResult);
     }
 
     public class BalanceCalculator : IBalanceCalculator
     {
-        public IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> allEntries) where T : ILedgerEntry
+        public IEnumerable<T> Calculate<T>(IReadOnlyList<T> newEntries, IReadOnlyList<T> removedEntries, 
+            IReadOnlyList<T> allEntries) where T : ILedgerEntry
         {
             var allOrderedEntries = allEntries.OrderBy(t => t.GetOrder()).ToList();
-            var firstNewEntry = newEntries.OrderBy(t => t.GetOrder()).First();
-            UpdateEntryBalance(firstNewEntry, allOrderedEntries);
-            var updatedEntries = UpdateSubsequentEntryBalances(firstNewEntry, allOrderedEntries);
+            var firstEntryToModify = newEntries.OrderBy(t => t.GetOrder()).First();
+
+            var firstRemovedEntry = removedEntries.OrderBy(t => t.GetOrder()).FirstOrDefault();
+            if (firstRemovedEntry != null)
+            {
+                var subsequentEntry = allOrderedEntries.Where(e => e.GetOrder() > firstRemovedEntry.GetOrder()).FirstOrDefault();
+                if (subsequentEntry != null && subsequentEntry.GetOrder() < firstEntryToModify.GetOrder())
+                {
+                    firstEntryToModify = subsequentEntry;
+                }
+            }
+            
+            UpdateEntryBalance(firstEntryToModify, allOrderedEntries);
+            var updatedEntries = UpdateSubsequentEntryBalances(firstEntryToModify, allOrderedEntries);
             updatedEntries = updatedEntries.Except(newEntries);
             return updatedEntries;
         }
 
         public bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions,
-            HashSet<Transaction> updatedTransactions, long balanceResult)
+            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long balanceResult)
         {
             newTransactions = newTransactions.Except(knownTransactions).ToList();
             var allOrderedTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
 
             if (newTransactions.Any())
             {
-                var updated = Calculate(newTransactions, allOrderedTransactions);
+                var updated = Calculate(newTransactions, removedTransactions, allOrderedTransactions);
                 updated.ToList().ForEach(t => updatedTransactions.Add(t));
             }
             var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;

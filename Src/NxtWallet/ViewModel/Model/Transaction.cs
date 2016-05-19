@@ -282,8 +282,8 @@ namespace NxtWallet.ViewModel.Model
     //    ARBITRARY_MESSAGE(9, true),  ---------------------------- Supported
     //    HUB_ANNOUNCEMENT(10, true),  ---------------------------- Not supported
     //    PHASING_VOTE_CASTING(11, true),  ------------------------ Supported
-    //    POLL_CREATION(12, true),   ------------------------------ Not supported
-    //    VOTE_CASTING(13, true),    ------------------------------ Not supported
+    //    POLL_CREATION(12, true),   ------------------------------ Supported
+    //    VOTE_CASTING(13, true),    ------------------------------ Supported
     //    ACCOUNT_PROPERTY(56, true),  ---------------------------- Supported
     //    ACCOUNT_PROPERTY_DELETE(57, true),  --------------------- Supported
     //    // TYPE_COLORED_COINS
@@ -326,8 +326,8 @@ namespace NxtWallet.ViewModel.Model
     //    CURRENCY_TRANSFER(45, true),  ----------------------------  Supported
     //    CURRENCY_UNDO_CROWDFUNDING(46, true),  -------------------  Supported
     //    // TYPE_DATA
-    //    TAGGED_DATA_UPLOAD(47, true), ----------------------------
-    //    TAGGED_DATA_EXTEND(48, true), ----------------------------
+    //    TAGGED_DATA_UPLOAD(47, true), ----------------------------  Supported
+    //    TAGGED_DATA_EXTEND(48, true), ----------------------------  Supported
     //    // TYPE_SHUFFLING
     //    SHUFFLING_REGISTRATION(51, true), ------------------------
     //    SHUFFLING_PROCESSING(52, true), --------------------------
