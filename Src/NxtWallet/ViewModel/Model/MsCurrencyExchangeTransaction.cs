@@ -10,7 +10,7 @@ namespace NxtWallet.ViewModel.Model
 
         public override bool Equals(object obj)
         {
-            var transaction = obj as MsUndoCrowdfundingTransaction;
+            var transaction = obj as MsCurrencyExchangeTransaction;
             return transaction != null && Equals(transaction);
         }
 
@@ -18,13 +18,13 @@ namespace NxtWallet.ViewModel.Model
         {
             unchecked
             {
-                return (base.GetHashCode() * 397) ^ TransactionNxtId.GetHashCode();
+                return OfferNxtId.GetHashCode() ^ TransactionNxtId.GetHashCode();
             }
         }
 
         public override bool Equals(Transaction other)
         {
-            var transaction = other as MsUndoCrowdfundingTransaction;
+            var transaction = other as MsCurrencyExchangeTransaction;
             return transaction != null && Equals(transaction);
         }
 
