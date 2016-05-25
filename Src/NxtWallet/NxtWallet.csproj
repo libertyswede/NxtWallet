@@ -161,6 +161,9 @@
     <Compile Include="ViewModel\Model\MsPublishExchangeOfferTransaction.cs" />
     <Compile Include="ViewModel\Model\MsReserveIncreaseTransaction.cs" />
     <Compile Include="ViewModel\Model\MsUndoCrowdfundingTransaction.cs" />
+    <Compile Include="ViewModel\Model\ShufflingCreationTransaction.cs" />
+    <Compile Include="ViewModel\Model\ShufflingRefundTransaction.cs" />
+    <Compile Include="ViewModel\Model\ShufflingRegistrationTransaction.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />

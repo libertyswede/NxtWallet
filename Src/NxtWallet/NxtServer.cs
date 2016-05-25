@@ -20,6 +20,7 @@ using NxtWallet.ViewModel.Model;
 using Asset = NxtWallet.ViewModel.Model.Asset;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
+using NxtLib.Shuffling;
 
 namespace NxtWallet
 {
@@ -45,6 +46,7 @@ namespace NxtWallet
         Task<Transaction> GetTransactionAsync(ulong transactionId);
         Task<bool> GetIsPurchaseExpired(ulong purchaseId);
         Task<Currency> GetCurrencyAsync(ulong currencyId);
+        Task<ShufflingData> GetShuffling(ulong shufflingId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -368,6 +370,27 @@ namespace NxtWallet
                     timestamp: timestamp, includeCurrencyInfo: true, requireBlock: requireBlock);
                 IsOnline = true;
                 return _mapper.Map<IEnumerable<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<ShufflingData> GetShuffling(ulong shufflingId)
+        {
+            try
+            {
+                var shufflingService = _serviceFactory.CreateShufflingService();
+                var shuffling = await shufflingService.GetShuffling(shufflingId, false, requireBlock);
+                IsOnline = true;
+                return shuffling;
             }
             catch (HttpRequestException e)
             {

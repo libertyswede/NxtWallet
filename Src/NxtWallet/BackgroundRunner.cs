@@ -10,6 +10,7 @@ using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
+using NxtLib.Shuffling;
 
 namespace NxtWallet
 {
@@ -70,11 +71,10 @@ namespace NxtWallet
                     var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
                     var allTransactions = newTransactions.Union(knownTransactions).ToList();
 
-                    CheckDgsRefundTransactions(newTransactions);
                     CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
-                    CheckSentDgsPurchaseTransactions(newTransactions);
                     await CheckMsReserveIncreaseTransactions(newTransactions);
                     await CheckMsReserveClaimTransactions(newTransactions);
+                    await CheckShufflingRegistrationTransactions(newTransactions);
 
                     var balancesMatch = BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult);
                     if (!balancesMatch)
@@ -92,7 +92,8 @@ namespace NxtWallet
                         var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(lastBalanceMatchBlock.Timestamp);
                         newTransactions.AddRange(forgeTransactions);
                         await CheckExpiredDgsPurchases(allTransactions, newTransactions);
-                        await CheckMsUndoCrowdfundingTransaction(knownTransactions, blockchainStatus, newTransactions);
+                        await CheckMsUndoCrowdfundingTransaction(allTransactions, blockchainStatus, newTransactions);
+                        await CheckFinishedShufflingTransactions(allTransactions, newTransactions, updatedTransactions);
                         var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions(knownTransactions, nxtTransactions);
 
                         if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, 
@@ -125,6 +126,19 @@ namespace NxtWallet
                 {
                     // ignore
                 }
+            }
+        }
+
+        private async Task CheckShufflingRegistrationTransactions(List<Transaction> newTransactions)
+        {
+            var newRegistrationTransactions = newTransactions.Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
+                .Cast<ShufflingRegistrationTransaction>()
+                .ToList();
+
+            foreach (var newRegistrationTransaction in newRegistrationTransactions)
+            {
+                var shuffling = await _nxtServer.GetShuffling((ulong)newRegistrationTransaction.ShufflingId);
+                newRegistrationTransaction.NqtAmount = shuffling.Amount.Nqt;
             }
         }
 
@@ -171,9 +185,10 @@ namespace NxtWallet
                 var attachment = (MonetarySystemReserveIncreaseAttachment) reserveTransaction.Attachment;
                 try
                 {
-                    var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
-                    reserveTransaction.IssuanceHeight = currency.IssuanceHeight;
-                    reserveTransaction.NqtAmount = currency.ReserveSupply*attachment.AmountPerUnit.Nqt;
+                    var createCurrencyTransaction = await _nxtServer.GetTransactionAsync(attachment.CurrencyId);
+                    var issuanceAttachment = (MonetarySystemCurrencyIssuanceAttachment)createCurrencyTransaction.Attachment;
+                    reserveTransaction.IssuanceHeight = issuanceAttachment.IssuanceHeight;
+                    reserveTransaction.NqtAmount = issuanceAttachment.ReserveSupply*attachment.AmountPerUnit.Nqt;
                 }
                 catch (NxtException e)
                 {
@@ -185,12 +200,19 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckMsUndoCrowdfundingTransaction(IEnumerable<Transaction> knownTransactions, 
+        private async Task CheckMsUndoCrowdfundingTransaction(IEnumerable<Transaction> allTransactions, 
             BlockchainStatus blockchainStatus, ICollection<Transaction> newTransactions)
         {
-            foreach (var reserveTransaction in knownTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+            var undoTransactions = allTransactions
+                .Where(t => t.TransactionType == TransactionType.CurrencyUndoCrowdfunding)
+                .Cast<MsUndoCrowdfundingTransaction>()
+                .ToList();
+
+            var reserveTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
                             .Cast<MsReserveIncreaseTransaction>()
-                            .Where(t => t.IssuanceHeight < blockchainStatus.NumberOfBlocks))
+                            .Where(t => t.IssuanceHeight < blockchainStatus.NumberOfBlocks);
+
+            foreach (var reserveTransaction in reserveTransactions)
             {
                 try
                 {
@@ -205,34 +227,28 @@ namespace NxtWallet
                     }
                 }
 
-                var block = await _nxtServer.GetBlockAsync(reserveTransaction.IssuanceHeight);
-
-                var transaction = new MsUndoCrowdfundingTransaction
+                if (!undoTransactions.Any(t => t.ReserveIncreaseNxtId == (long) reserveTransaction.NxtId))
                 {
-                    TransactionType = TransactionType.CurrencyUndoCrowdfunding,
-                    NqtAmount = reserveTransaction.NqtAmount,
-                    AccountFrom = "System Generated",
-                    AccountTo = _walletRepository.NxtAccount.AccountRs,
-                    NxtId = null,
-                    Height = reserveTransaction.IssuanceHeight,
-                    Timestamp = block.Timestamp,
-                    Message = "[Currency Crowdfunding Cancellation]",
-                    ReserveIncreaseNxtId = (long) (reserveTransaction.NxtId ?? 0),
-                    IsConfirmed = true,
-                    UserIsTransactionSender = false,
-                    UserIsTransactionRecipient = true
-                };
+                    var block = await _nxtServer.GetBlockAsync(reserveTransaction.IssuanceHeight);
 
-                newTransactions.Add(transaction);
-            }
-        }
+                    var transaction = new MsUndoCrowdfundingTransaction
+                    {
+                        TransactionType = TransactionType.CurrencyUndoCrowdfunding,
+                        NqtAmount = reserveTransaction.NqtAmount,
+                        AccountFrom = "System Generated",
+                        AccountTo = _walletRepository.NxtAccount.AccountRs,
+                        NxtId = null,
+                        Height = reserveTransaction.IssuanceHeight,
+                        Timestamp = block.Timestamp,
+                        Message = "[Currency Crowdfunding Cancellation]",
+                        ReserveIncreaseNxtId = (long)(reserveTransaction.NxtId ?? 0),
+                        IsConfirmed = true,
+                        UserIsTransactionSender = false,
+                        UserIsTransactionRecipient = true
+                    };
 
-        private static void CheckDgsRefundTransactions(List<Transaction> newTransactions)
-        {
-            foreach (var refundTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsRefund))
-            {
-                var attachment = (DigitalGoodsRefundAttachment) refundTransaction.Attachment;
-                refundTransaction.NqtAmount += attachment.Refund.Nqt;
+                    newTransactions.Add(transaction);
+                }
             }
         }
 
@@ -264,6 +280,55 @@ namespace NxtWallet
             if (tradesResult.Any())
             {
                 await _walletRepository.UpdateLastAssetTrade(tradesResult.Max(t => t.Timestamp).AddSeconds(1));
+            }
+        }
+
+        private async Task CheckFinishedShufflingTransactions(List<Transaction> allTransactions, List<Transaction> newTransactions, HashSet<Transaction> updatedTransactions)
+        {
+            var shufflingCreations = allTransactions
+                .Where(t => t.TransactionType == TransactionType.ShufflingCreation)
+                .Cast<ShufflingCreationTransaction>()
+                .Where(t => !t.Done)
+                .ToList();
+
+            var shufflingRegistrations = allTransactions
+                .Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
+                .Cast<ShufflingRegistrationTransaction>()
+                .Where(t => !t.Done)
+                .ToList();
+
+            foreach (var shufflingCreation in shufflingCreations)
+            {
+                var shuffling = await _nxtServer.GetShuffling(shufflingCreation.NxtId.Value);
+                if (shuffling.Stage == ShufflingStage.Done)
+                {
+                    shufflingCreation.Done = true;
+                    updatedTransactions.Add(shufflingCreation);
+                }
+                else if (shuffling.Stage == ShufflingStage.Cancelled && shuffling.ParticipantCount != shuffling.RegistrantCount)
+                {
+                    var block = await _nxtServer.GetBlockAsync(shufflingCreation.Height + shufflingCreation.RegistrationPeriod - 1);
+                    var refundTransaction = new ShufflingRefundTransaction
+                    {
+                        AccountFrom = "[Generated]",
+                        AccountTo = _walletRepository.NxtAccount.AccountRs,
+                        Height = block.Height,
+                        IsConfirmed = true,
+                        Message = "[Shuffling Refund]",
+                        NqtAmount = shufflingCreation.NqtAmount,
+                        NqtFee = 0,
+                        NxtId = null,
+                        ShufflingId = (long)shufflingCreation.NxtId.Value,
+                        Timestamp = block.Timestamp,
+                        TransactionType = TransactionType.ShufflingRefund,
+                        UserIsTransactionRecipient = true,
+                        UserIsTransactionSender = false,
+                    };
+                    newTransactions.Add(refundTransaction);
+
+                    shufflingCreation.Done = true;
+                    updatedTransactions.Add(shufflingCreation);
+                }
             }
         }
 
@@ -353,7 +418,7 @@ namespace NxtWallet
                 {
                     purchaseTransaction = (DgsPurchaseTransaction) newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
                 }
-                purchaseTransaction.DeliveryTransactionNxtId = (long) (deliveryTransaction.NxtId ?? 0);
+                purchaseTransaction.DeliveryTransactionNxtId = (long) deliveryTransaction.NxtId;
 
                 // If I am delivering, update the amount with what the customer is paying
                 if (deliveryTransaction.UserIsTransactionSender)
@@ -363,15 +428,6 @@ namespace NxtWallet
                                  deliveryAttachment.Discount.Nqt;
                     deliveryTransaction.NqtAmount = amount;
                 }
-            }
-        }
-
-        private static void CheckSentDgsPurchaseTransactions(IEnumerable<Transaction> newTransactions)
-        {
-            foreach (var transaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchase && t.UserIsTransactionSender))
-            {
-                var attachment = (DigitalGoodsPurchaseAttachment) transaction.Attachment;
-                transaction.NqtAmount += attachment.Price.Nqt*attachment.Quantity;
             }
         }
 
@@ -446,7 +502,14 @@ namespace NxtWallet
                 .Except(newTransactions)
                 .ToList();
 
-            updatedTransactions.ForEach(t => t.IsConfirmed = true);
+            foreach (var updatedTransaction in updatedTransactions)
+            {
+                var nxtTransaction = nxtTransactions.Single(t => t.Equals(updatedTransaction));
+                updatedTransaction.IsConfirmed = true;
+                updatedTransaction.Height = nxtTransaction.Height;
+            }
+            
+            
             return updatedTransactions;
         }
 

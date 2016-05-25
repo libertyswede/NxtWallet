@@ -7,6 +7,7 @@ using NxtLib;
 using NxtLib.Blocks;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
+using NxtLib.Shuffling;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 
@@ -99,6 +100,11 @@ namespace NxtWallet
         public Task<Currency> GetCurrencyAsync(ulong currencyId)
         {
             return Task.FromResult(new Currency());
+        }
+
+        public Task<ShufflingData> GetShuffling(ulong shufflingId)
+        {
+            return Task.FromResult(new ShufflingData());
         }
     }
 }

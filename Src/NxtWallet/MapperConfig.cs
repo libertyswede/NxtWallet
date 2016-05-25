@@ -5,19 +5,22 @@ using NxtLib;
 using NxtWallet.Model;
 using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
+using System.Numerics;
+using System.Linq;
 
 namespace NxtWallet
 {
     public class MapperConfig
     {
         private static MapperConfiguration _configuration;
+        private static string _accountRs;
 
         public static MapperConfiguration Setup(IWalletRepository repo)
         {
             if (_configuration != null)
                 return _configuration;
 
-            var accountRs = repo.NxtAccount.AccountRs;
+            _accountRs = repo.NxtAccount.AccountRs;
 
             _configuration = new MapperConfiguration(cfg =>
             {
@@ -27,8 +30,8 @@ namespace NxtWallet
                     .ConstructUsing(GetTransactionObject)
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (ulong?)src.NxtId))
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)src.TransactionType))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<Transaction, TransactionDto>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long?)src.NxtId))
@@ -45,22 +48,22 @@ namespace NxtWallet
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null))
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)(int)src.SubType))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<NxtLib.AssetExchange.AssetTradeInfo, AssetTradeTransaction>()
-                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.BuyerRs.Equals(accountRs) ? src.AskOrder : src.BidOrder)) // buyer makes the bidorder
+                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.BuyerRs.Equals(_accountRs) ? src.AskOrder : src.BidOrder)) // buyer makes the bidorder
                     .ForMember(dest => dest.Message, opt => opt.UseValue("[Asset Trade]"))
-                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => (src.BuyerRs.Equals(accountRs) ? -1 : 1) * src.Price.Nqt * src.QuantityQnt))
+                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => (src.BuyerRs.Equals(_accountRs) ? -1 : 1) * src.Price.Nqt * src.QuantityQnt))
                     .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt)) // TODO: Assumption
-                    .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs.Equals(accountRs) ? src.SellerRs : src.BuyerRs))
-                    .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs.Equals(accountRs) ? src.SellerRs : src.BuyerRs))
+                    .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs.Equals(_accountRs) ? src.SellerRs : src.BuyerRs))
+                    .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs.Equals(_accountRs) ? src.SellerRs : src.BuyerRs))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
                     .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.AssetTrade))
                     .ForMember(dest => dest.AssetNxtId, opt => opt.MapFrom(src => src.AssetId))
                     .ForMember(dest => dest.QuantityQnt, opt => opt.MapFrom(src => src.QuantityQnt))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<NxtLib.MonetarySystem.CurrencyExchange, MsCurrencyExchangeTransaction>()
                     .ForMember(dest => dest.Message, opt => opt.UseValue("[Currency Exchange]"))
@@ -73,8 +76,8 @@ namespace NxtWallet
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Units*src.Rate.Nqt))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
                     .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.CurrencyExchange))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = accountRs.Equals(dest.AccountFrom));
+                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
+                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
 
                 cfg.CreateMap<Asset, AssetDto>();
 
@@ -96,17 +99,33 @@ namespace NxtWallet
         {
             switch (transactionDto.TransactionType)
             {
+                case (int) TransactionType.AssetTrade:
+                {
+                    return PopulateObject(new AssetTradeTransaction(), transactionDto);
+                }
                 case (int) TransactionType.DigitalGoodsPurchase:
                 {
                     return PopulateObject(new DgsPurchaseTransaction(), transactionDto);
                 }
-                case (int) TransactionType.DigitalGoodsPurchaseExpired:
-                {
-                    return PopulateObject(new DgsPurchaseExpiredTransaction(), transactionDto);
-                }
                 case (int)TransactionType.ReserveIncrease:
                 {
                     return PopulateObject(new MsReserveIncreaseTransaction(), transactionDto);
+                }
+                case (int)TransactionType.PublishExchangeOffer:
+                {
+                    return PopulateObject(new MsPublishExchangeOfferTransaction(), transactionDto);
+                }
+                case (int)TransactionType.ShufflingCreation:
+                {
+                    return PopulateObject(new ShufflingCreationTransaction(), transactionDto);
+                }
+                case (int)TransactionType.ShufflingRegistration:
+                {
+                    return PopulateObject(new ShufflingRegistrationTransaction(), transactionDto);
+                }
+                case (int)TransactionType.DigitalGoodsPurchaseExpired:
+                {
+                    return PopulateObject(new DgsPurchaseExpiredTransaction(), transactionDto);
                 }
                 case (int)TransactionType.CurrencyUndoCrowdfunding:
                 {
@@ -120,9 +139,9 @@ namespace NxtWallet
                 {
                     return PopulateObject(new MsExchangeOfferExpiredTransaction(), transactionDto);
                 }
-                case (int)TransactionType.PublishExchangeOffer:
+                case (int)TransactionType.ShufflingRefund:
                 {
-                    return PopulateObject(new MsPublishExchangeOfferTransaction(), transactionDto);
+                    return PopulateObject(new ShufflingRefundTransaction(), transactionDto);
                 }
             }
             return new Transaction();
@@ -145,10 +164,21 @@ namespace NxtWallet
                 {
                     var attachment = (DigitalGoodsPurchaseAttachment) nxtTransaction.Attachment;
 
+                    if (nxtTransaction.SenderRs == _accountRs)
+                    {
+                        nxtTransaction.Amount = Amount.CreateAmountFromNqt(nxtTransaction.Amount.Nqt + (attachment.Price.Nqt * attachment.Quantity));
+                    }
+
                     return new DgsPurchaseTransaction
                     {
                         DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp
                     };
+                }
+                case TransactionSubType.DigitalGoodsRefund:
+                {
+                    var attachment = (DigitalGoodsRefundAttachment)nxtTransaction.Attachment;
+                    nxtTransaction.Amount = Amount.CreateAmountFromNqt(nxtTransaction.Amount.Nqt + attachment.Refund.Nqt);
+                    break;
                 }
                 case TransactionSubType.MonetarySystemReserveIncrease:
                 {
@@ -177,6 +207,31 @@ namespace NxtWallet
                         SellRateNqt = attachment.SellRate.Nqt
                     };
                 }
+                case TransactionSubType.ShufflingCreation:
+                {
+                    var attachment = (ShufflingCreationAttachment)nxtTransaction.Attachment;
+                    if (attachment.HoldingType == HoldingType.Nxt)
+                    {
+                        nxtTransaction.Amount = attachment.Amount;
+                    }
+                    
+                    return new ShufflingCreationTransaction
+                    {
+                        RegistrationPeriod = attachment.HoldingType == HoldingType.Nxt ? attachment.RegistrationPeriod : 0
+                    };
+                }
+                case TransactionSubType.ShufflingRegistration:
+                {
+                    var attachment = (ShufflingRegistrationAttachment)nxtTransaction.Attachment;
+                    var idBytes = attachment.ShufflingFullHash.ToBytes().ToArray();
+                    var bigInteger = new BigInteger(idBytes.Take(8).ToArray());
+                    var shufflingId = (long)bigInteger;
+
+                    return new ShufflingRegistrationTransaction
+                    {
+                        ShufflingId = shufflingId
+                    };
+                }
             }
             return new Transaction();
         }
@@ -189,7 +244,10 @@ namespace NxtWallet
                 transaction.TransactionType == TransactionType.CurrencyUndoCrowdfunding ||
                 transaction.TransactionType == TransactionType.CurrencyExchange ||
                 transaction.TransactionType == TransactionType.CurrencyOfferExpired ||
-                transaction.TransactionType == TransactionType.PublishExchangeOffer)
+                transaction.TransactionType == TransactionType.PublishExchangeOffer ||
+                transaction.TransactionType == TransactionType.ShufflingCreation ||
+                transaction.TransactionType == TransactionType.ShufflingRegistration ||
+                transaction.TransactionType == TransactionType.ShufflingRefund)
             {
                 var json = JsonConvert.SerializeObject(transaction, Formatting.None);
                 return json;
