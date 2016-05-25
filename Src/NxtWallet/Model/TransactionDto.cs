@@ -26,12 +26,12 @@ namespace NxtWallet.Model
 
         public override int GetHashCode()
         {
-            return NxtId.GetHashCode();
+            return NxtId.GetHashCode() ^ TransactionType.GetHashCode() ^ Extra.GetHashCode();
         }
 
         public bool Equals(TransactionDto other)
         {
-            return other?.NxtId == NxtId;
+            return other?.NxtId == NxtId && other?.TransactionType == TransactionType && other?.Extra == Extra;
         }
     }
 }
