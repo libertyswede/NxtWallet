@@ -235,7 +235,7 @@ namespace NxtWallet
                     {
                         TransactionType = TransactionType.CurrencyUndoCrowdfunding,
                         NqtAmount = reserveTransaction.NqtAmount,
-                        AccountFrom = "System Generated",
+                        AccountFrom = Transaction.GeneratedFromAddress,
                         AccountTo = _walletRepository.NxtAccount.AccountRs,
                         NxtId = null,
                         Height = reserveTransaction.IssuanceHeight,
@@ -310,7 +310,7 @@ namespace NxtWallet
                     var block = await _nxtServer.GetBlockAsync(shufflingCreation.Height + shufflingCreation.RegistrationPeriod - 1);
                     var refundTransaction = new ShufflingRefundTransaction
                     {
-                        AccountFrom = "[Generated]",
+                        AccountFrom = Transaction.GeneratedFromAddress,
                         AccountTo = _walletRepository.NxtAccount.AccountRs,
                         Height = block.Height,
                         IsConfirmed = true,

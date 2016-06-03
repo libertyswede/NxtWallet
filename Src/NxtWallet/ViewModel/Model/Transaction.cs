@@ -9,6 +9,8 @@ namespace NxtWallet.ViewModel.Model
 {
     public class Transaction : ObservableObject, IEquatable<Transaction>, ILedgerEntry
     {
+        public const string GeneratedFromAddress = "[Generated]";
+
         private bool _isConfirmed;
         private bool _userIsTransactionRecipient;
         private bool _userIsTransactionSender;

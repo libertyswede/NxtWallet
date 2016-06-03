@@ -139,7 +139,7 @@ namespace NxtWallet
             {
                 var expireTransaction = new MsExchangeOfferExpiredTransaction
                 {
-                    AccountFrom = "Generated",
+                    AccountFrom = Transaction.GeneratedFromAddress,
                     AccountTo = _walletRepository.NxtAccount.AccountRs,
                     CurrencyId = exchangeOffer.CurrencyId,
                     OfferId = (long)exchangeOffer.NxtId.Value,
