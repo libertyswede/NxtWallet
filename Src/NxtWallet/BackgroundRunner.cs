@@ -102,23 +102,20 @@ namespace NxtWallet
                 _updatedTransactions = new HashSet<Transaction>();
                 try
                 {
-                    _lastBalanceMatchBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
-                    _knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
-                    _blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
-                    _nxtTransactions = (await _nxtServer.GetTransactionsAsync(_lastBalanceMatchBlock.Timestamp)).ToList();
-                    _unconfirmedBalanceNqt = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+                    await GetKnownTransactions();
+                    await GetDataFromNxtServer();
 
                     _newTransactions = _nxtTransactions.Except(_knownTransactions).ToList();
                     _allTransactions = _newTransactions.Union(_knownTransactions).ToList();
 
                     CheckDgsDeliveryTransactions();
-                    await CheckMsReserveIncreaseTransactions();
-                    await CheckMsReserveClaimTransactions();
-                    await CheckShufflingRegistrationTransactions();
+                    await UpdateNewMsReserveIncreaseTransactions();
+                    await UpdateNewMsReserveClaimTransactions();
+                    await UpdateNewShufflingRegistrationTransactions();
 
                     if (!BalancesMatch())
                     {
-                        await CheckAssetTrades();
+                        await GetNewAssetTrades();
                         await CheckMsExchanges();
                     }
 
@@ -167,7 +164,71 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckShufflingRegistrationTransactions()
+        private async Task GetKnownTransactions()
+        {
+            _knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
+        }
+
+        private async Task GetDataFromNxtServer()
+        {
+            _lastBalanceMatchBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
+            _blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
+            _nxtTransactions = (await _nxtServer.GetTransactionsAsync(_lastBalanceMatchBlock.Timestamp)).ToList();
+            _unconfirmedBalanceNqt = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+        }
+
+        private void CheckDgsDeliveryTransactions()
+        {
+            foreach (var deliveryTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery))
+            {
+                var deliveryAttachment = (DigitalGoodsDeliveryAttachment)deliveryTransaction.Attachment;
+                var purchaseTransaction = (DgsPurchaseTransaction)_knownTransactions.SingleOrDefault(t => t.NxtId == deliveryAttachment.Purchase);
+
+                if (purchaseTransaction != null)
+                {
+                    _updatedTransactions.Add(purchaseTransaction);
+                }
+                else
+                {
+                    purchaseTransaction = (DgsPurchaseTransaction)_newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
+                }
+                purchaseTransaction.DeliveryTransactionNxtId = (long)deliveryTransaction.NxtId;
+
+                // If I am delivering, update the amount with what the customer is paying
+                if (deliveryTransaction.UserIsTransactionSender)
+                {
+                    var purchaseAttachment = (DigitalGoodsPurchaseAttachment)purchaseTransaction.Attachment;
+                    var amount = purchaseAttachment.Price.Nqt * purchaseAttachment.Quantity -
+                                 deliveryAttachment.Discount.Nqt;
+                    deliveryTransaction.NqtAmount = amount;
+                }
+            }
+        }
+
+        private async Task UpdateNewMsReserveClaimTransactions()
+        {
+            foreach (var claimTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
+            {
+                var attachment = (MonetarySystemReserveClaimAttachment)claimTransaction.Attachment;
+                var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
+                claimTransaction.NqtAmount = attachment.Units / (long)Math.Pow(10, currency.Decimals) * 100000000;
+            }
+        }
+
+        private async Task UpdateNewMsReserveIncreaseTransactions()
+        {
+            foreach (var reserveTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+                        .Cast<MsReserveIncreaseTransaction>())
+            {
+                var attachment = (MonetarySystemReserveIncreaseAttachment)reserveTransaction.Attachment;
+                var createCurrencyTransaction = await _nxtServer.GetTransactionAsync(attachment.CurrencyId);
+                var issuanceAttachment = (MonetarySystemCurrencyIssuanceAttachment)createCurrencyTransaction.Attachment;
+                reserveTransaction.IssuanceHeight = issuanceAttachment.IssuanceHeight;
+                reserveTransaction.NqtAmount = issuanceAttachment.ReserveSupply * attachment.AmountPerUnit.Nqt;
+            }
+        }
+
+        private async Task UpdateNewShufflingRegistrationTransactions()
         {
             var newRegistrationTransactions = _newTransactions.Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
                 .Cast<ShufflingRegistrationTransaction>()
@@ -200,39 +261,6 @@ namespace NxtWallet
         private async Task CheckExpiredExchangeOffers()
         {
             await _msCurrencyTracker.ExpireExchangeOffers(_allTransactions, _newTransactions, _updatedTransactions, _blockchainStatus.NumberOfBlocks - 1);
-        }
-
-        private async Task CheckMsReserveClaimTransactions()
-        {
-            foreach (var claimTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
-            {
-                var attachment = (MonetarySystemReserveClaimAttachment) claimTransaction.Attachment;
-                var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
-                claimTransaction.NqtAmount = attachment.Units/(long) Math.Pow(10, currency.Decimals)*100000000;
-            }
-        }
-
-        private async Task CheckMsReserveIncreaseTransactions()
-        {
-            foreach (var reserveTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
-                        .Cast<MsReserveIncreaseTransaction>())
-            {
-                var attachment = (MonetarySystemReserveIncreaseAttachment) reserveTransaction.Attachment;
-                try
-                {
-                    var createCurrencyTransaction = await _nxtServer.GetTransactionAsync(attachment.CurrencyId);
-                    var issuanceAttachment = (MonetarySystemCurrencyIssuanceAttachment)createCurrencyTransaction.Attachment;
-                    reserveTransaction.IssuanceHeight = issuanceAttachment.IssuanceHeight;
-                    reserveTransaction.NqtAmount = issuanceAttachment.ReserveSupply*attachment.AmountPerUnit.Nqt;
-                }
-                catch (NxtException e)
-                {
-                    if (e.Message != "Unknown currency")
-                    {
-                        throw;
-                    }
-                }
-            }
         }
 
         private async Task CheckMsUndoCrowdfundingTransaction()
@@ -299,7 +327,7 @@ namespace NxtWallet
             return balancesMatch;
         }
 
-        private async Task CheckAssetTrades()
+        private async Task GetNewAssetTrades()
         {
             var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
             var newTrades = tradesResult.Except(_knownTransactions).ToList();
@@ -422,36 +450,6 @@ namespace NxtWallet
                         dividendTransaction.NqtAmount = attachment.AmountPerQnt.Nqt*ownership.BalanceQnt;
                         _newTransactions.Add(dividendTransaction);
                     }
-                }
-            }
-        }
-
-        private void CheckDgsDeliveryTransactions()
-        {
-            foreach (var deliveryTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery).ToList())
-            {
-                // Find & update the payment transaction
-                var deliveryAttachment = (DigitalGoodsDeliveryAttachment) deliveryTransaction.Attachment;
-                var purchaseTransaction = (DgsPurchaseTransaction) _knownTransactions
-                    .SingleOrDefault(t => t.NxtId == deliveryAttachment.Purchase);
-
-                if (purchaseTransaction != null)
-                {
-                    _updatedTransactions.Add(purchaseTransaction);
-                }
-                else
-                {
-                    purchaseTransaction = (DgsPurchaseTransaction) _newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
-                }
-                purchaseTransaction.DeliveryTransactionNxtId = (long) deliveryTransaction.NxtId;
-
-                // If I am delivering, update the amount with what the customer is paying
-                if (deliveryTransaction.UserIsTransactionSender)
-                {
-                    var purchaseAttachment = (DigitalGoodsPurchaseAttachment) purchaseTransaction.Attachment;
-                    var amount = purchaseAttachment.Price.Nqt*purchaseAttachment.Quantity -
-                                 deliveryAttachment.Discount.Nqt;
-                    deliveryTransaction.NqtAmount = amount;
                 }
             }
         }

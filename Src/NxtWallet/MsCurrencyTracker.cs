@@ -29,15 +29,15 @@ namespace NxtWallet
         public async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions, List<Transaction> newTransactions,
             HashSet<Transaction> updatedTransactions)
         {
-            var exchangeTransactions = await GetExchangeTransactions();
+            var exchangeTransactions = await GetNewExchangeTransactions();
             var offerTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.PublishExchangeOffer)
                 .Cast<MsPublishExchangeOfferTransaction>()
                 .ToList();
 
             foreach (var exchangeTransaction in exchangeTransactions)
             {
-                exchangeTransaction.NxtId = (ulong)exchangeTransaction.TransactionNxtId;
-                var offerTransaction = offerTransactions.SingleOrDefault(t => t.NxtId == (ulong)exchangeTransaction.OfferNxtId);
+                exchangeTransaction.NxtId = (ulong) exchangeTransaction.TransactionNxtId;
+                var offerTransaction = offerTransactions.SingleOrDefault(t => t.NxtId == (ulong) exchangeTransaction.OfferNxtId);
                 if (offerTransaction != null)
                 {
                     // I am selling currency through ExchangeOffer
@@ -84,7 +84,7 @@ namespace NxtWallet
             }
         }
 
-        private async Task<List<MsCurrencyExchangeTransaction>> GetExchangeTransactions()
+        private async Task<List<MsCurrencyExchangeTransaction>> GetNewExchangeTransactions()
         {
             return (await _nxtServer.GetExchanges(_walletRepository.LastCurrencyExchange))
                 .OrderBy(t => t.Height)
