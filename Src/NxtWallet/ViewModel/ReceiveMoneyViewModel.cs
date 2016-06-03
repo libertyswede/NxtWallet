@@ -56,7 +56,7 @@ namespace NxtWallet.ViewModel
             _backupInfoDialog = backupInfoDialog;
             _transactionRepository = transactionRepository;
             NxtAddress = walletRepository.NxtAccount.AccountRs;
-            PublicKey = walletRepository.NxtAccount.PublicKey.ToHexString();
+            PublicKey = walletRepository.NxtAccountWithPublicKey?.PublicKey.ToHexString();
 
             var writer = new BarcodeWriter
             {

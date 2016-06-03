@@ -116,6 +116,7 @@ namespace NxtWallet
                     if (!BalancesMatch())
                     {
                         await GetNewAssetTrades();
+                        await _assetTracker.UpdateAssetOwnership(_newTransactions);
                         await CheckMsExchanges();
                     }
 
@@ -456,8 +457,7 @@ namespace NxtWallet
 
         private async Task CheckSentDividendTransactions()
         {
-            await _assetTracker.UpdateAssetOwnership(_newTransactions);
-            foreach (var dividendTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment && t.UserIsTransactionSender).ToList())
+            foreach (var dividendTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment && t.UserIsTransactionSender))
             {
                 var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
                 var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);

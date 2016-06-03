@@ -6,7 +6,8 @@ namespace NxtWallet.Model
 {
     public interface IWalletRepository
     {
-        AccountWithPublicKey NxtAccount { get; }
+        Account NxtAccount { get; }
+        AccountWithPublicKey NxtAccountWithPublicKey { get; }
         string NxtServer { get; }
         string SecretPhrase { get; }
         string Balance { get; }

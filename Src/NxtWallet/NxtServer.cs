@@ -451,7 +451,7 @@ namespace NxtWallet
         private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string message,
             IAccountService accountService)
         {
-            var createTransactionByPublicKey = new CreateTransactionByPublicKey(1440, Amount.Zero, _walletRepository.NxtAccount.PublicKey);
+            var createTransactionByPublicKey = new CreateTransactionByPublicKey(1440, Amount.Zero, _walletRepository.NxtAccountWithPublicKey.PublicKey);
             if (!string.IsNullOrEmpty(message))
             {
                 createTransactionByPublicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);

@@ -21,10 +21,13 @@ namespace NxtWallet.Model
         private const string LastAssetTradeKey = "lastAssetTrade";
         private const string LastBalanceMatchBlockIdKey = "lastBalanceMatchBlockId";
         private const string LastCurrencyExchangeKey = "lastCurrencyExchange";
+        private const string ReadOnlyAccountKey = "readOnlyAccountKey";
 
-        public AccountWithPublicKey NxtAccount { get; private set; }
-        public string NxtServer { get; private set; }
+        public Account NxtAccount { get; private set; }
+        public AccountWithPublicKey NxtAccountWithPublicKey { get; private set; }
         public string SecretPhrase { get; private set; }
+        public string ReadOnlyAccount { get; private set; }
+        public string NxtServer { get; private set; }
         public bool BackupCompleted { get; private set; }
         public int SleepTime { get; private set; }
         public bool NotificationsEnabled { get; private set; }
@@ -43,6 +46,7 @@ namespace NxtWallet.Model
 
                 Balance = ReadOrGenerate(dbSettings, context, BalanceKey, () => "0.0");
                 SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
+                ReadOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
                 NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
                 LastBalanceMatchBlockId = ReadOrGenerate(dbSettings, context, LastBalanceMatchBlockIdKey, () => Constants.GenesisBlockId);
@@ -51,10 +55,20 @@ namespace NxtWallet.Model
                 LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
                 LastCurrencyExchange = ReadOrGenerateDateTime(dbSettings, context, LastCurrencyExchangeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
 
-                NxtAccount = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
+                if (string.IsNullOrEmpty(ReadOnlyAccount))
+                {
+                    NxtAccountWithPublicKey = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
+                    NxtAccount = NxtAccountWithPublicKey;
+                }
+                else
+                {
+                    NxtAccount = ReadOnlyAccount;
+                }
                 await context.SaveChangesAsync();
             }
         }
+
+        
 
         public async Task UpdateLastAssetTrade(DateTime newTimestamp)
         {
