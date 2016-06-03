@@ -14,6 +14,9 @@ using NxtLib.Shuffling;
 
 namespace NxtWallet
 {
+    public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
+    public delegate void BalanceHandler(IBackgroundRunner sender, string balance);
+
     public interface IBackgroundRunner
     {
         Task Run(CancellationToken token);
@@ -24,11 +27,13 @@ namespace NxtWallet
         event BalanceHandler BalanceUpdated;
     }
 
-    public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
-    public delegate void BalanceHandler(IBackgroundRunner sender, string balance);
-
     public class BackgroundRunner : IBackgroundRunner
     {
+        public event TransactionHandler TransactionConfirmationUpdated;
+        public event TransactionHandler TransactionBalanceUpdated;
+        public event TransactionHandler TransactionAdded;
+        public event BalanceHandler BalanceUpdated;
+
         private readonly INxtServer _nxtServer;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IBalanceCalculator _balanceCalculator;
@@ -37,10 +42,45 @@ namespace NxtWallet
         private readonly IAssetTracker _assetTracker;
         private readonly IMsCurrencyTracker _msCurrencyTracker;
 
-        public event TransactionHandler TransactionConfirmationUpdated;
-        public event TransactionHandler TransactionBalanceUpdated;
-        public event TransactionHandler TransactionAdded;
-        public event BalanceHandler BalanceUpdated;
+        /// <summary>
+        /// Fetched from nxt server, could be both known and new transactions
+        /// </summary>
+        private List<Transaction> _nxtTransactions;
+
+        /// <summary>
+        /// All previously known transactions, fetched from local db
+        /// </summary>
+        private List<Transaction> _knownTransactions;
+
+        /// <summary>
+        /// Only previously unknown transactions
+        /// </summary>
+        private List<Transaction> _newTransactions;
+
+        /// <summary>
+        /// All transactions, new & Known transactions combined
+        /// </summary>
+        private List<Transaction> _allTransactions;
+
+        /// <summary>
+        /// Transactions that are updated this run
+        /// </summary>
+        private HashSet<Transaction> _updatedTransactions;
+
+        /// <summary>
+        /// Last block where the unconfirmed balance matched with sum of all known transactions
+        /// </summary>
+        private Block<ulong> _lastBalanceMatchBlock;
+
+        /// <summary>
+        /// Current unconfirmed balance from NXT server
+        /// </summary>
+        private long _unconfirmedBalanceNqt;
+
+        /// <summary>
+        /// Status fetched from NXT server
+        /// </summary>
+        private BlockchainStatus _blockchainStatus;
 
         public BackgroundRunner(INxtServer nxtServer, ITransactionRepository transactionRepository,
             IBalanceCalculator balanceCalculator, IWalletRepository walletRepository,
@@ -59,47 +99,45 @@ namespace NxtWallet
         {
             while (!token.IsCancellationRequested)
             {
-                var updatedTransactions = new HashSet<Transaction>();
+                _updatedTransactions = new HashSet<Transaction>();
                 try
                 {
-                    var lastBalanceMatchBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
-                    var knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
-                    var blockchainStatus = await _nxtServer.GetCurrentBlockId();
-                    var nxtTransactions = (await _nxtServer.GetTransactionsAsync(lastBalanceMatchBlock.Timestamp)).ToList();
-                    var balanceResult = await _nxtServer.GetBalanceAsync();
+                    _lastBalanceMatchBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
+                    _knownTransactions = (await _transactionRepository.GetAllTransactionsAsync()).ToList();
+                    _blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
+                    _nxtTransactions = (await _nxtServer.GetTransactionsAsync(_lastBalanceMatchBlock.Timestamp)).ToList();
+                    _unconfirmedBalanceNqt = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
 
-                    var newTransactions = nxtTransactions.Except(knownTransactions).ToList();
-                    var allTransactions = newTransactions.Union(knownTransactions).ToList();
+                    _newTransactions = _nxtTransactions.Except(_knownTransactions).ToList();
+                    _allTransactions = _newTransactions.Union(_knownTransactions).ToList();
 
-                    CheckDgsDeliveryTransactions(newTransactions, knownTransactions, updatedTransactions);
-                    await CheckMsReserveIncreaseTransactions(newTransactions);
-                    await CheckMsReserveClaimTransactions(newTransactions);
-                    await CheckShufflingRegistrationTransactions(newTransactions);
+                    CheckDgsDeliveryTransactions();
+                    await CheckMsReserveIncreaseTransactions();
+                    await CheckMsReserveClaimTransactions();
+                    await CheckShufflingRegistrationTransactions();
 
-                    var balancesMatch = BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult);
-                    if (!balancesMatch)
+                    if (!BalancesMatch())
                     {
-                        await CheckAssetTrades(knownTransactions, newTransactions);
-                        await CheckMsExchanges(allTransactions, newTransactions, updatedTransactions);
+                        await CheckAssetTrades();
+                        await CheckMsExchanges();
                     }
 
-                    await CheckSentDividendTransactions(newTransactions);
-                    await CheckExpiredExchangeOffers(newTransactions, allTransactions, updatedTransactions, blockchainStatus.NumberOfBlocks-1);
+                    await CheckSentDividendTransactions();
+                    await CheckExpiredExchangeOffers();
 
-                    if (!balancesMatch && !BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, balanceResult))
+                    if (!BalancesMatch())
                     {
-                        await CheckReceivedDividendTransactions(knownTransactions, newTransactions, lastBalanceMatchBlock);
-                        var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(lastBalanceMatchBlock.Timestamp);
-                        newTransactions.AddRange(forgeTransactions);
-                        await CheckExpiredDgsPurchases(allTransactions, newTransactions);
-                        await CheckMsUndoCrowdfundingTransaction(allTransactions, blockchainStatus, newTransactions);
-                        await CheckFinishedShufflingTransactions(allTransactions, newTransactions, updatedTransactions);
-                        var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions(knownTransactions, nxtTransactions);
+                        await CheckReceivedDividendTransactions();
+                        var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(_lastBalanceMatchBlock.Timestamp);
+                        _newTransactions.AddRange(forgeTransactions);
+                        await CheckExpiredDgsPurchases();
+                        await CheckMsUndoCrowdfundingTransaction();
+                        await CheckFinishedShufflingTransactions();
+                        var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions();
 
-                        if (BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions, newTransactions, 
-                            deletedTransactions, balanceResult))
+                        if (BalancesMatch(deletedTransactions))
                         {
-                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
+                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
                         }
                         else
                         {
@@ -109,15 +147,15 @@ namespace NxtWallet
                     }
                     else
                     {
-                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(blockchainStatus.LastBlockId);
+                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
                     }
 
-                    GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions)
-                        .Union(await HandleNewTransactions(newTransactions, knownTransactions))
+                    GetTransactionsWithUpdatedConfirmation()
+                        .Union(await HandleNewTransactions())
                         .ToList()
-                        .ForEach(t => updatedTransactions.Add(t));
-                    await HandleUpdatedTransactions(updatedTransactions);
-                    await HandleBalance(balanceResult, newTransactions, knownTransactions);
+                        .ForEach(t => _updatedTransactions.Add(t));
+                    await HandleUpdatedTransactions();
+                    await HandleBalance();
                     await _assetTracker.SaveOwnerships();
 
                     await Task.Delay(_walletRepository.SleepTime, token);
@@ -129,9 +167,9 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckShufflingRegistrationTransactions(List<Transaction> newTransactions)
+        private async Task CheckShufflingRegistrationTransactions()
         {
-            var newRegistrationTransactions = newTransactions.Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
+            var newRegistrationTransactions = _newTransactions.Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
                 .Cast<ShufflingRegistrationTransaction>()
                 .ToList();
 
@@ -142,34 +180,31 @@ namespace NxtWallet
             }
         }
 
-        private async Task<List<Transaction>> RemovePreviouslyUnconfirmedNowRemovedTransactions(List<Transaction> knownTransactions, 
-            List<Transaction> nxtTransactions)
+        private async Task<List<Transaction>> RemovePreviouslyUnconfirmedNowRemovedTransactions()
         {
-            var knownUnconfirmed = knownTransactions.Where(t => !t.IsConfirmed).ToList();
-            var unconfirmedToRemove = knownUnconfirmed.Where(ku => !nxtTransactions.Exists(t => t.Equals(ku))).ToList();
+            var knownUnconfirmed = _knownTransactions.Where(t => !t.IsConfirmed).ToList();
+            var unconfirmedToRemove = knownUnconfirmed.Where(ku => !_nxtTransactions.Exists(t => t.Equals(ku))).ToList();
             foreach (var unconfirmed in unconfirmedToRemove)
             {
-                knownTransactions.Remove(unconfirmed);
+                _knownTransactions.Remove(unconfirmed);
                 await _transactionRepository.RemoveTransactionAsync(unconfirmed);
             }
             return unconfirmedToRemove;
         }
 
-        private async Task CheckMsExchanges(IReadOnlyCollection<Transaction> allTransactions,
-            List<Transaction> newTransactions, HashSet<Transaction> updatedTransactions)
+        private async Task CheckMsExchanges()
         {
-            await _msCurrencyTracker.CheckMsExchanges(allTransactions, newTransactions, updatedTransactions);
+            await _msCurrencyTracker.CheckMsExchanges(_allTransactions, _newTransactions, _updatedTransactions);
         }
 
-        private async Task CheckExpiredExchangeOffers(List<Transaction> newTransactions, List<Transaction> allTransactions, 
-            HashSet<Transaction> updatedTransactions, int currentHeight)
+        private async Task CheckExpiredExchangeOffers()
         {
-            await _msCurrencyTracker.ExpireExchangeOffers(allTransactions, newTransactions, updatedTransactions, currentHeight);
+            await _msCurrencyTracker.ExpireExchangeOffers(_allTransactions, _newTransactions, _updatedTransactions, _blockchainStatus.NumberOfBlocks - 1);
         }
 
-        private async Task CheckMsReserveClaimTransactions(IEnumerable<Transaction> newTransactions)
+        private async Task CheckMsReserveClaimTransactions()
         {
-            foreach (var claimTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
+            foreach (var claimTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveClaim))
             {
                 var attachment = (MonetarySystemReserveClaimAttachment) claimTransaction.Attachment;
                 var currency = await _nxtServer.GetCurrencyAsync(attachment.CurrencyId);
@@ -177,9 +212,9 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckMsReserveIncreaseTransactions(IEnumerable<Transaction> newTransactions)
+        private async Task CheckMsReserveIncreaseTransactions()
         {
-            foreach (var reserveTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+            foreach (var reserveTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
                         .Cast<MsReserveIncreaseTransaction>())
             {
                 var attachment = (MonetarySystemReserveIncreaseAttachment) reserveTransaction.Attachment;
@@ -200,17 +235,16 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckMsUndoCrowdfundingTransaction(IEnumerable<Transaction> allTransactions, 
-            BlockchainStatus blockchainStatus, ICollection<Transaction> newTransactions)
+        private async Task CheckMsUndoCrowdfundingTransaction()
         {
-            var undoTransactions = allTransactions
+            var undoTransactions = _allTransactions
                 .Where(t => t.TransactionType == TransactionType.CurrencyUndoCrowdfunding)
                 .Cast<MsUndoCrowdfundingTransaction>()
                 .ToList();
 
-            var reserveTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
+            var reserveTransactions = _allTransactions.Where(t => t.TransactionType == TransactionType.ReserveIncrease)
                             .Cast<MsReserveIncreaseTransaction>()
-                            .Where(t => t.IssuanceHeight < blockchainStatus.NumberOfBlocks);
+                            .Where(t => t.IssuanceHeight < _blockchainStatus.NumberOfBlocks);
 
             foreach (var reserveTransaction in reserveTransactions)
             {
@@ -247,35 +281,29 @@ namespace NxtWallet
                         UserIsTransactionRecipient = true
                     };
 
-                    newTransactions.Add(transaction);
+                    _newTransactions.Add(transaction);
                 }
             }
         }
 
-        private bool BalancesMatch(HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
-            IReadOnlyList<Transaction> nxtTransactions, IReadOnlyList<Transaction> newTransactions,
-            long balanceResult)
+        private bool BalancesMatch()
         {
-            return BalancesMatch(updatedTransactions, knownTransactions, nxtTransactions,
-                newTransactions, new List<Transaction>(), balanceResult);
+            return BalancesMatch(new List<Transaction>());
         }
 
-        private bool BalancesMatch(HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> knownTransactions,
-            IReadOnlyList<Transaction> nxtTransactions, IReadOnlyList<Transaction> newTransactions,
-            IReadOnlyList<Transaction> removedTransactions, long balanceResult)
+        private bool BalancesMatch(IReadOnlyList<Transaction> removedTransactions)
         {
-            GetTransactionsWithUpdatedConfirmation(knownTransactions, nxtTransactions, newTransactions)
-                .ForEach(t => updatedTransactions.Add(t));
-            var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(newTransactions,
-                knownTransactions, updatedTransactions, removedTransactions, balanceResult);
+            GetTransactionsWithUpdatedConfirmation().ForEach(t => _updatedTransactions.Add(t));
+            var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(_newTransactions,
+                _knownTransactions, _updatedTransactions, removedTransactions, _unconfirmedBalanceNqt);
             return balancesMatch;
         }
 
-        private async Task CheckAssetTrades(IEnumerable<Transaction> knownTransactions, List<Transaction> newTransactions)
+        private async Task CheckAssetTrades()
         {
             var tradesResult = (await _nxtServer.GetAssetTradesAsync(_walletRepository.LastAssetTrade)).ToList();
-            var newTrades = tradesResult.Except(knownTransactions).ToList();
-            newTransactions.AddRange(newTrades);
+            var newTrades = tradesResult.Except(_knownTransactions).ToList();
+            _newTransactions.AddRange(newTrades);
 
             if (tradesResult.Any())
             {
@@ -283,15 +311,15 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckFinishedShufflingTransactions(List<Transaction> allTransactions, List<Transaction> newTransactions, HashSet<Transaction> updatedTransactions)
+        private async Task CheckFinishedShufflingTransactions()
         {
-            var shufflingCreations = allTransactions
+            var shufflingCreations = _allTransactions
                 .Where(t => t.TransactionType == TransactionType.ShufflingCreation)
                 .Cast<ShufflingCreationTransaction>()
                 .Where(t => !t.Done)
                 .ToList();
 
-            var shufflingRegistrations = allTransactions
+            var shufflingRegistrations = _allTransactions
                 .Where(t => t.TransactionType == TransactionType.ShufflingRegistration)
                 .Cast<ShufflingRegistrationTransaction>()
                 .Where(t => !t.Done)
@@ -303,7 +331,7 @@ namespace NxtWallet
                 if (shuffling.Stage == ShufflingStage.Done)
                 {
                     shufflingCreation.Done = true;
-                    updatedTransactions.Add(shufflingCreation);
+                    _updatedTransactions.Add(shufflingCreation);
                 }
                 else if (shuffling.Stage == ShufflingStage.Cancelled && shuffling.ParticipantCount != shuffling.RegistrantCount)
                 {
@@ -324,23 +352,23 @@ namespace NxtWallet
                         UserIsTransactionRecipient = true,
                         UserIsTransactionSender = false,
                     };
-                    newTransactions.Add(refundTransaction);
+                    _newTransactions.Add(refundTransaction);
 
                     shufflingCreation.Done = true;
-                    updatedTransactions.Add(shufflingCreation);
+                    _updatedTransactions.Add(shufflingCreation);
                 }
             }
         }
 
-        private async Task CheckExpiredDgsPurchases(IReadOnlyCollection<Transaction> allTransactions, ICollection<Transaction> newTransactions)
+        private async Task CheckExpiredDgsPurchases()
         {
-            var undeliveredPurchases = allTransactions
+            var undeliveredPurchases = _allTransactions
                 .Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchase && t.UserIsTransactionSender)
                 .Select(t => (DgsPurchaseTransaction) t)
                 .Where(t => !t.DeliveryTransactionNxtId.HasValue)
                 .ToList();
 
-            var expiredTransactions = allTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchaseExpired)
+            var expiredTransactions = _allTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchaseExpired)
                     .Cast<DgsPurchaseExpiredTransaction>()
                     .ToList();
 
@@ -372,51 +400,48 @@ namespace NxtWallet
                     expiredTransaction.UserIsTransactionSender = _walletRepository.NxtAccount.AccountRs.Equals(expiredTransaction.AccountFrom);
                     expiredTransaction.UserIsTransactionRecipient = _walletRepository.NxtAccount.AccountRs.Equals(expiredTransaction.AccountTo);
 
-                    newTransactions.Add(expiredTransaction);
+                    _newTransactions.Add(expiredTransaction);
                 }
             }
         }
 
-        private async Task CheckReceivedDividendTransactions(
-            IReadOnlyCollection<Transaction> knownTransactions, ICollection<Transaction> newTransactions,
-            Block<ulong> block)
+        private async Task CheckReceivedDividendTransactions()
         {
-            var assets = (await _assetTracker.GetOwnedAssetsSince(block.Height))
+            var assets = (await _assetTracker.GetOwnedAssetsSince(_lastBalanceMatchBlock.Height))
                 .Where(a => a.Account != _walletRepository.NxtAccount.AccountRs);
 
             foreach (var asset in assets)
             {
-                var dividendTransactions = await _nxtServer.GetDividendTransactionsAsync(asset.Account, block.Timestamp);
-                foreach (var dividendTransaction in dividendTransactions.Except(knownTransactions))
+                var dividendTransactions = await _nxtServer.GetDividendTransactionsAsync(asset.Account, _lastBalanceMatchBlock.Timestamp);
+                foreach (var dividendTransaction in dividendTransactions.Except(_knownTransactions))
                 {
                     var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
                     var ownership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
                     if (ownership?.BalanceQnt > 0)
                     {
                         dividendTransaction.NqtAmount = attachment.AmountPerQnt.Nqt*ownership.BalanceQnt;
-                        newTransactions.Add(dividendTransaction);
+                        _newTransactions.Add(dividendTransaction);
                     }
                 }
             }
         }
 
-        private static void CheckDgsDeliveryTransactions(List<Transaction> newTransactions, List<Transaction> knownTransactions, 
-            HashSet<Transaction> updatedTransactions)
+        private void CheckDgsDeliveryTransactions()
         {
-            foreach (var deliveryTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery).ToList())
+            foreach (var deliveryTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsDelivery).ToList())
             {
                 // Find & update the payment transaction
                 var deliveryAttachment = (DigitalGoodsDeliveryAttachment) deliveryTransaction.Attachment;
-                var purchaseTransaction = (DgsPurchaseTransaction) knownTransactions
+                var purchaseTransaction = (DgsPurchaseTransaction) _knownTransactions
                     .SingleOrDefault(t => t.NxtId == deliveryAttachment.Purchase);
 
                 if (purchaseTransaction != null)
                 {
-                    updatedTransactions.Add(purchaseTransaction);
+                    _updatedTransactions.Add(purchaseTransaction);
                 }
                 else
                 {
-                    purchaseTransaction = (DgsPurchaseTransaction) newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
+                    purchaseTransaction = (DgsPurchaseTransaction) _newTransactions.Single(t => t.NxtId == deliveryAttachment.Purchase);
                 }
                 purchaseTransaction.DeliveryTransactionNxtId = (long) deliveryTransaction.NxtId;
 
@@ -431,10 +456,10 @@ namespace NxtWallet
             }
         }
 
-        private async Task CheckSentDividendTransactions(List<Transaction> newTransactions)
+        private async Task CheckSentDividendTransactions()
         {
-            await _assetTracker.UpdateAssetOwnership(newTransactions);
-            foreach (var dividendTransaction in newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment && t.UserIsTransactionSender).ToList())
+            await _assetTracker.UpdateAssetOwnership(_newTransactions);
+            foreach (var dividendTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DividendPayment && t.UserIsTransactionSender).ToList())
             {
                 var attachment = (ColoredCoinsDividendPaymentAttachment) dividendTransaction.Attachment;
                 var myOwnership = await _assetTracker.GetOwnership(attachment.AssetId, attachment.Height);
@@ -446,45 +471,45 @@ namespace NxtWallet
             }
         }
 
-        private async Task HandleUpdatedTransactions(HashSet<Transaction> updatedTransactions)
+        private async Task HandleUpdatedTransactions()
         {
-            await _transactionRepository.UpdateTransactionsAsync(updatedTransactions.Distinct());
-            foreach (var updatedTransaction in updatedTransactions)
+            await _transactionRepository.UpdateTransactionsAsync(_updatedTransactions.Distinct());
+            foreach (var updatedTransaction in _updatedTransactions)
             {
                 OnTransactionConfirmationUpdated(updatedTransaction);
             }
         }
 
-        private async Task<IEnumerable<Transaction>> HandleNewTransactions(List<Transaction> newTransactions, IEnumerable<Transaction> knownTransactions)
+        private async Task<IEnumerable<Transaction>> HandleNewTransactions()
         {
             var updated = new List<Transaction>();
-            if (newTransactions.Any())
+            if (_newTransactions.Any())
             {
-                await UpdateTransactionContacts(newTransactions);
-                var allTransactions = knownTransactions.Union(newTransactions).OrderBy(t => t.Timestamp).ToList();
-                updated = _balanceCalculator.Calculate(newTransactions, new List<Transaction>(), allTransactions).ToList();
-                await _transactionRepository.SaveTransactionsAsync(newTransactions);
+                await UpdateTransactionContacts();
+                var allTransactions = _knownTransactions.Union(_newTransactions).OrderBy(t => t.Timestamp).ToList();
+                updated = _balanceCalculator.Calculate(_newTransactions, new List<Transaction>(), allTransactions).ToList();
+                await _transactionRepository.SaveTransactionsAsync(_newTransactions);
 
-                newTransactions.ForEach(OnTransactionAdded);
+                _newTransactions.ForEach(OnTransactionAdded);
             }
             return updated;
         }
 
-        private async Task UpdateTransactionContacts(List<Transaction> newTransactions)
+        private async Task UpdateTransactionContacts()
         {
             var accountsRs =
-                newTransactions.Select(t => t.AccountFrom).Union(newTransactions.Select(t => t.AccountTo)).Distinct();
+                _newTransactions.Select(t => t.AccountFrom).Union(_newTransactions.Select(t => t.AccountTo)).Distinct();
             var contacts = (await _contactRepository.GetContactsAsync(accountsRs)).ToDictionary(contact => contact.NxtAddressRs);
-            newTransactions.ForEach(t => t.UpdateWithContactInfo(contacts));
+            _newTransactions.ForEach(t => t.UpdateWithContactInfo(contacts));
         }
 
-        private async Task HandleBalance(long confirmedBalanceNqt, IEnumerable<Transaction> newTransactions, List<Transaction> knownTransactions)
+        private async Task HandleBalance()
         {
-            var unconfirmedBalanceNqt = newTransactions.Union(knownTransactions)
+            var unconfirmedBalanceNqt = _newTransactions.Union(_knownTransactions)
                 .Where(t => t.UserIsTransactionRecipient && !t.IsConfirmed)
                 .Sum(t => t.NqtAmount);
 
-            var balanceNqt = unconfirmedBalanceNqt + confirmedBalanceNqt;
+            var balanceNqt = unconfirmedBalanceNqt + _unconfirmedBalanceNqt;
             var balance = balanceNqt.NqtToNxt().ToFormattedString();
             if (balance != _walletRepository.Balance)
             {
@@ -493,22 +518,20 @@ namespace NxtWallet
             }
         }
 
-        private static List<Transaction> GetTransactionsWithUpdatedConfirmation(IEnumerable<Transaction> knownTransactions, 
-            IEnumerable<Transaction> nxtTransactions, IEnumerable<Transaction> newTransactions)
+        private List<Transaction> GetTransactionsWithUpdatedConfirmation()
         {
-            var updatedTransactions = knownTransactions
-                .Where(t => t.IsConfirmed == false && nxtTransactions.Contains(t))
-                .Except(nxtTransactions.Where(t => t.IsConfirmed == false))
-                .Except(newTransactions)
+            var updatedTransactions = _knownTransactions
+                .Where(t => t.IsConfirmed == false && _nxtTransactions.Contains(t))
+                .Except(_nxtTransactions.Where(t => t.IsConfirmed == false))
+                .Except(_newTransactions)
                 .ToList();
 
             foreach (var updatedTransaction in updatedTransactions)
             {
-                var nxtTransaction = nxtTransactions.Single(t => t.Equals(updatedTransaction));
+                var nxtTransaction = _nxtTransactions.Single(t => t.Equals(updatedTransaction));
                 updatedTransaction.IsConfirmed = true;
                 updatedTransaction.Height = nxtTransaction.Height;
             }
-            
             
             return updatedTransactions;
         }

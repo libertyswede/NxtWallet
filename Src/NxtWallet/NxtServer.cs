@@ -30,10 +30,10 @@ namespace NxtWallet
 
         bool IsOnline { get; }
 
-        Task<BlockchainStatus> GetCurrentBlockId();
-        Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId);
-        Task<GetBlockReply<ulong>> GetBlockAsync(int height);
-        Task<long> GetBalanceAsync();
+        Task<BlockchainStatus> GetBlockchainStatusAsync();
+        Task<Block<ulong>> GetBlockAsync(ulong blockId);
+        Task<Block<ulong>> GetBlockAsync(int height);
+        Task<long> GetUnconfirmedNqtBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
@@ -71,7 +71,7 @@ namespace NxtWallet
             _serviceFactory = serviceFactory;
         }
 
-        public async Task<BlockchainStatus> GetCurrentBlockId()
+        public async Task<BlockchainStatus> GetBlockchainStatusAsync()
         {
             try
             {
@@ -92,7 +92,7 @@ namespace NxtWallet
             }
         }
 
-        public async Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId)
+        public async Task<Block<ulong>> GetBlockAsync(ulong blockId)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace NxtWallet
             }
         }
 
-        public async Task<GetBlockReply<ulong>> GetBlockAsync(int height)
+        public async Task<Block<ulong>> GetBlockAsync(int height)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace NxtWallet
             }
         }
 
-        public async Task<long> GetBalanceAsync()
+        public async Task<long> GetUnconfirmedNqtBalanceAsync()
         {
             try
             {

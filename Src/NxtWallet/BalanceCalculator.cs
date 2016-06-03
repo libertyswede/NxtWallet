@@ -10,7 +10,7 @@ namespace NxtWallet
             IReadOnlyList<T> allEntries) where T : ILedgerEntry;
 
         bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions, 
-            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long balanceResult);
+            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long uconfirmedBalanceNqt);
     }
 
     public class BalanceCalculator : IBalanceCalculator
@@ -38,7 +38,7 @@ namespace NxtWallet
         }
 
         public bool BalanceEqualsLastTransactionBalance(IReadOnlyList<Transaction> newTransactions, IReadOnlyList<Transaction> knownTransactions,
-            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long balanceResult)
+            HashSet<Transaction> updatedTransactions, IReadOnlyList<Transaction> removedTransactions, long uconfirmedBalanceNqt)
         {
             newTransactions = newTransactions.Except(knownTransactions).ToList();
             var allOrderedTransactions = newTransactions.Union(knownTransactions).OrderBy(t => t.Timestamp).ToList();
@@ -51,7 +51,7 @@ namespace NxtWallet
             var lastTxBalance = allOrderedTransactions.LastOrDefault()?.NqtBalance ?? 0;
             var unconfirmedSum = allOrderedTransactions.Where(t => !t.IsConfirmed)
                 .Sum(t => t.UserIsTransactionRecipient ? t.NqtAmount : -t.NqtAmount);
-            var equals = balanceResult + unconfirmedSum == lastTxBalance;
+            var equals = uconfirmedBalanceNqt + unconfirmedSum == lastTxBalance;
             return equals;
         }
 

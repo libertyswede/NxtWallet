@@ -23,22 +23,22 @@ namespace NxtWallet
             set { Set(ref _isOnline, value); }
         }
 
-        public Task<BlockchainStatus> GetCurrentBlockId()
+        public Task<BlockchainStatus> GetBlockchainStatusAsync()
         {
             return Task.FromResult(new BlockchainStatus());
         }
 
-        public Task<GetBlockReply<ulong>> GetBlockAsync(ulong blockId)
-        {
-            return Task.FromResult(new GetBlockReply<ulong>());
+        public Task<Block<ulong>> GetBlockAsync(ulong blockId)
+        {   
+            return Task.FromResult(new Block<ulong>());
         }
 
-        public Task<GetBlockReply<ulong>> GetBlockAsync(int height)
+        public Task<Block<ulong>> GetBlockAsync(int height)
         {
-            return Task.FromResult(new GetBlockReply<ulong>());
+            return Task.FromResult(new Block<ulong>());
         }
 
-        public Task<long> GetBalanceAsync()
+        public Task<long> GetUnconfirmedNqtBalanceAsync()
         {
             return Task.FromResult(11 * 100000000L);
         }
