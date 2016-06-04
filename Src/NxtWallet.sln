@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxtWallet", "NxtWallet\NxtWallet.csproj", "{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxtWallet.Test", "NxtWallet.Test\NxtWallet.Test.csproj", "{FC68CAE7-08B1-4409-BD04-9B4127B4886F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,24 +33,6 @@ Global
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.ActiveCfg = Release|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.Build.0 = Release|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.Deploy.0 = Release|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|ARM.ActiveCfg = Debug|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|ARM.Build.0 = Debug|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|ARM.Deploy.0 = Debug|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x64.ActiveCfg = Debug|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x64.Build.0 = Debug|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x64.Deploy.0 = Debug|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x86.ActiveCfg = Debug|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x86.Build.0 = Debug|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Debug|x86.Deploy.0 = Debug|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|ARM.ActiveCfg = Release|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|ARM.Build.0 = Release|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|ARM.Deploy.0 = Release|ARM
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x64.ActiveCfg = Release|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x64.Build.0 = Release|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x64.Deploy.0 = Release|x64
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x86.ActiveCfg = Release|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x86.Build.0 = Release|x86
-		{FC68CAE7-08B1-4409-BD04-9B4127B4886F}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
