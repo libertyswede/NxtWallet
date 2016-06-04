@@ -26,7 +26,7 @@ namespace NxtWallet.Model
         public Account NxtAccount { get; private set; }
         public AccountWithPublicKey NxtAccountWithPublicKey { get; private set; }
         public string SecretPhrase { get; private set; }
-        public string ReadOnlyAccount { get; private set; }
+        public bool IsReadOnlyAccount { get; private set; }
         public string NxtServer { get; private set; }
         public bool BackupCompleted { get; private set; }
         public int SleepTime { get; private set; }
@@ -46,7 +46,7 @@ namespace NxtWallet.Model
 
                 Balance = ReadOrGenerate(dbSettings, context, BalanceKey, () => "0.0");
                 SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
-                ReadOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
+                var readOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
                 NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
                 LastBalanceMatchBlockId = ReadOrGenerate(dbSettings, context, LastBalanceMatchBlockIdKey, () => Constants.GenesisBlockId);
@@ -55,20 +55,27 @@ namespace NxtWallet.Model
                 LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
                 LastCurrencyExchange = ReadOrGenerateDateTime(dbSettings, context, LastCurrencyExchangeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
 
-                if (string.IsNullOrEmpty(ReadOnlyAccount))
-                {
-                    NxtAccountWithPublicKey = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
-                    NxtAccount = NxtAccountWithPublicKey;
-                }
-                else
-                {
-                    NxtAccount = ReadOnlyAccount;
-                }
+                SetupAccounts(readOnlyAccount);
+
                 await context.SaveChangesAsync();
             }
         }
 
-        
+        private void SetupAccounts(string readOnlyAccount)
+        {
+            IsReadOnlyAccount = !string.IsNullOrEmpty(readOnlyAccount);
+
+            if (IsReadOnlyAccount)
+            {
+                NxtAccount = readOnlyAccount;
+            }
+            else
+            {
+                NxtAccountWithPublicKey = new LocalAccountService().GetAccount(AccountIdLocator.BySecretPhrase(SecretPhrase));
+                NxtAccount = NxtAccountWithPublicKey;
+            }
+        }
+
 
         public async Task UpdateLastAssetTrade(DateTime newTimestamp)
         {

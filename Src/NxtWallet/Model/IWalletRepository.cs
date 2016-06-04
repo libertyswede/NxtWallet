@@ -8,8 +8,9 @@ namespace NxtWallet.Model
     {
         Account NxtAccount { get; }
         AccountWithPublicKey NxtAccountWithPublicKey { get; }
-        string NxtServer { get; }
         string SecretPhrase { get; }
+        bool IsReadOnlyAccount { get; }
+        string NxtServer { get; }
         string Balance { get; }
         bool BackupCompleted { get; }
         int SleepTime { get; }

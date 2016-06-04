@@ -9,60 +9,27 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using NxtWallet.Controls;
 using NxtWallet.Views;
+using NxtWallet.Model;
 
 namespace NxtWallet
 {
     public sealed partial class AppShell
     {
-        private readonly List<NavMenuItem> _navlist = new List<NavMenuItem>(
-            new[]
-            {
-                new NavMenuItem
-                {
-                    ImageSource = "Assets\\Menu\\home-48x48.png",
-                    Label = "Overview",
-                    DestPage = typeof (OverviewPage)
-                },
-                new NavMenuItem
-                {
-                    ImageSource = "Assets\\Menu\\send-money-48x48.png",
-                    Label = "Send NXT",
-                    Height = 22,
-                    Width = 22,
-                    DestPage = typeof (SendMoneyPage)
-                },
-                new NavMenuItem
-                {
-                    ImageSource = "Assets\\Menu\\receive-money-48x48.png",
-                    Label = "Receive NXT",
-                    Height = 22,
-                    Width = 22,
-                    DestPage = typeof (ReceiveMoneyPage)
-                },
-                new NavMenuItem
-                {
-                    ImageSource = "Assets\\Menu\\contacts-48x48.png",
-                    Label = "Contacts",
-                    DestPage = typeof (ContactsPage)
-                },
-                new NavMenuItem
-                {
-                    ImageSource = "Assets\\Menu\\settings-48x48.png",
-                    Label = "Settings",
-                    DestPage = typeof (SettingsPage)
-                }
-            });
-
         public static AppShell Current;
+        private readonly IWalletRepository _walletRepository;
+        private readonly List<NavMenuItem> _navlist;
 
         /// <summary>
         /// Initializes a new instance of the AppShell, sets the static 'Current' reference,
         /// adds callbacks for Back requests and changes in the SplitView's DisplayMode, and
         /// provide the nav menu list with the data to display.
         /// </summary>
-        public AppShell()
+        public AppShell(IWalletRepository walletRepository)
         {
             InitializeComponent();
+            _walletRepository = walletRepository;
+
+            _navlist = BuildNavigationList();
 
             Loaded += (sender, args) =>
             {
@@ -82,6 +49,51 @@ namespace NxtWallet
             SystemNavigationManager.GetForCurrentView().BackRequested += SystemNavigationManager_BackRequested;
 
             NavMenuList.ItemsSource = _navlist;
+        }
+
+        private List<NavMenuItem> BuildNavigationList()
+        {
+            var navigationList = new List<NavMenuItem>(new[] {
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\home-48x48.png",
+                    Label = "Overview",
+                    DestPage = typeof(OverviewPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\send-money-48x48.png",
+                    Label = "Send NXT",
+                    Height = 22,
+                    Width = 22,
+                    DestPage = typeof(SendMoneyPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\receive-money-48x48.png",
+                    Label = "Receive NXT",
+                    Height = 22,
+                    Width = 22,
+                    DestPage = typeof(ReceiveMoneyPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\contacts-48x48.png",
+                    Label = "Contacts",
+                    DestPage = typeof(ContactsPage)
+                },
+                new NavMenuItem
+                {
+                    ImageSource = "Assets\\Menu\\settings-48x48.png",
+                    Label = "Settings",
+                    DestPage = typeof(SettingsPage)
+                }
+            });
+            if (_walletRepository.IsReadOnlyAccount)
+            {
+                navigationList.RemoveAt(1);
+            }
+            return navigationList;
         }
 
         public void Navigate(NavigationPage navigationPage, object parameter)

@@ -14,15 +14,16 @@ namespace NxtWallet
     sealed partial class App
     {
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly IWalletRepository _walletRepository;
 
         public App()
         {
             Ioc.Register();
-            var walletRepository = ServiceLocator.Current.GetInstance<IWalletRepository>();
+            _walletRepository = ServiceLocator.Current.GetInstance<IWalletRepository>();
 
             InitializeComponent();
             Suspending += OnSuspending;
-            walletRepository.LoadAsync().Wait();
+            _walletRepository.LoadAsync().Wait();
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace NxtWallet
             // just ensure that the window is active
             if (shell == null)
             {
-                shell = new AppShell {Language = Windows.Globalization.ApplicationLanguages.Languages[0]};
+                shell = new AppShell(_walletRepository) { Language = Windows.Globalization.ApplicationLanguages.Languages[0]};
                 shell.AppFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
