@@ -4,7 +4,7 @@
     {
         public static string ToFormattedString(this decimal amount)
         {
-            var formatted = amount.ToString("#0.00#######");
+            var formatted = amount.ToString("#,##0.00#######;;");
             return formatted;
         }
 

@@ -420,7 +420,7 @@ namespace NxtWallet
                     .Where(b => b.TotalFee.Nqt > 0)
                     .Select(block => new Transaction
                 {
-                    AccountFrom = _walletRepository.NxtAccount.AccountRs,
+                    AccountFrom = Transaction.GeneratedFromAddress,
                     AccountTo = _walletRepository.NxtAccount.AccountRs,
                     Height = block.Height,
                     IsConfirmed = true,
@@ -430,7 +430,8 @@ namespace NxtWallet
                     Timestamp = block.Timestamp,
                     TransactionType = TransactionType.ForgeIncome,
                     Message = "[Forge Income]",
-                    UserIsTransactionRecipient = true
+                    UserIsTransactionRecipient = true,
+                    UserIsTransactionSender = false
                 });
 
                 IsOnline = true;

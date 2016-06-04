@@ -52,9 +52,9 @@
                 <ColumnDefinition Width="*" x:Name="MessageColumn" />
                 <ColumnDefinition Width="0" x:Name="AltMessageColumn" />
                 <ColumnDefinition Width="100" x:Name="DateColumn" />
-                <ColumnDefinition Width="100" x:Name="AmountColumn" />
+                <ColumnDefinition Width="120" x:Name="AmountColumn" />
                 <ColumnDefinition Width="70" x:Name="FeeColumn" />
-                <ColumnDefinition Width="100" x:Name="BalanceColumn" />
+                <ColumnDefinition Width="120" x:Name="BalanceColumn" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Message" x:Name="MessageHeader" FontSize="16" FontWeight="Bold" Visibility="Visible" />
             <TextBlock Grid.Column="1" Text="Message" x:Name="AltMessageHeader" FontSize="12" FontWeight="Bold" Visibility="Visible" />
