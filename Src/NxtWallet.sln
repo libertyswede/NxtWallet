@@ -5,16 +5,21 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxtWallet", "NxtWallet\NxtWallet.csproj", "{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxtWallet.Core", "NxtWallet.Core\NxtWallet.Core.csproj", "{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|ARM.ActiveCfg = Debug|ARM
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|ARM.Build.0 = Debug|ARM
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -24,6 +29,7 @@ Global
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|x86.ActiveCfg = Debug|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|x86.Build.0 = Debug|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Debug|x86.Deploy.0 = Debug|x86
+		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|Any CPU.ActiveCfg = Release|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|ARM.ActiveCfg = Release|ARM
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|ARM.Build.0 = Release|ARM
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|ARM.Deploy.0 = Release|ARM
@@ -33,6 +39,22 @@ Global
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.ActiveCfg = Release|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.Build.0 = Release|x86
 		{B9330B55-8BCD-4BD8-819B-B48F2473AA8B}.Release|x86.Deploy.0 = Release|x86
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|ARM.Build.0 = Debug|ARM
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|x64.ActiveCfg = Debug|x64
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|x64.Build.0 = Debug|x64
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|x86.ActiveCfg = Debug|x86
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Debug|x86.Build.0 = Debug|x86
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|ARM.ActiveCfg = Release|ARM
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|ARM.Build.0 = Release|ARM
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|x64.ActiveCfg = Release|x64
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|x64.Build.0 = Release|x64
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|x86.ActiveCfg = Release|x86
+		{F79EEDD3-BF91-4CF6-8AAA-06363E21359E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

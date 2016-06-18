@@ -106,75 +106,34 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AssetTracker.cs" />
-    <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BoolToVisiblityConverter.cs" />
     <Compile Include="Controls\SelectableTextBlock.cs" />
     <Compile Include="Controls\TransactionListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
-    <Compile Include="Migrations\20160419123036_Initial.cs" />
-    <Compile Include="Migrations\20160419123036_Initial.designer.cs">
-      <DependentUpon>20160419123036_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
-    <Compile Include="MsCurrencyTracker.cs" />
-    <Compile Include="ViewModel\Model\DgsPurchaseExpiredTransaction.cs" />
-    <Compile Include="ViewModel\Model\DgsPurchaseTransaction.cs" />
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FakeBackgroundRunner.cs" />
-    <Compile Include="FakeNxtServer.cs" />
-    <Compile Include="BalanceCalculator.cs" />
     <Compile Include="FakeToastManager.cs" />
-    <Compile Include="ViewModel\Model\ILedgerEntry.cs" />
-    <Compile Include="Model\AssetDto.cs" />
-    <Compile Include="Model\AssetOwnershipDto.cs" />
-    <Compile Include="Model\AssetRepository.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="MapperConfig.cs" />
-    <Compile Include="Model\ContactDto.cs" />
-    <Compile Include="Model\ContactRepository.cs" />
-    <Compile Include="Model\FakeContactRepository.cs" />
-    <Compile Include="Model\FakeTransactionRepository.cs" />
-    <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Ioc.cs" />
-    <Compile Include="Model\IContactRepository.cs" />
-    <Compile Include="Model\ITransactionRepository.cs" />
-    <Compile Include="Model\IWalletRepository.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />
-    <Compile Include="Model\TransactionRepository.cs" />
-    <Compile Include="Model\WalletRepository.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="NoopConverter.cs" />
-    <Compile Include="Result.cs" />
     <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ToastManager.cs" />
+    <Compile Include="IDialog.cs" />
+    <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
+      <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel\BackupConfirmViewModel.cs" />
     <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
-    <Compile Include="ViewModel\Model\Asset.cs" />
-    <Compile Include="ViewModel\Model\AssetOwnership.cs" />
-    <Compile Include="ViewModel\Model\AssetTradeTransaction.cs" />
-    <Compile Include="ViewModel\Model\Contact.cs" />
-    <Compile Include="ViewModel\Model\MsExchangeOfferExpiredTransaction.cs" />
-    <Compile Include="ViewModel\Model\MsCurrencyExchangeTransaction.cs" />
-    <Compile Include="ViewModel\Model\MsPublishExchangeOfferTransaction.cs" />
-    <Compile Include="ViewModel\Model\MsReserveIncreaseTransaction.cs" />
-    <Compile Include="ViewModel\Model\MsUndoCrowdfundingTransaction.cs" />
-    <Compile Include="ViewModel\Model\ShufflingCreationTransaction.cs" />
-    <Compile Include="ViewModel\Model\ShufflingDistributionTransaction.cs" />
-    <Compile Include="ViewModel\Model\ShufflingRefundTransaction.cs" />
-    <Compile Include="ViewModel\Model\ShufflingRegistrationTransaction.cs" />
+    <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModel\TransactionListViewModel.cs" />
-    <Compile Include="ViewModel\Model\Transaction.cs" />
-    <Compile Include="IDialog.cs" />
-    <Compile Include="Controls\NetworkIndicatorControl.xaml.cs">
-      <DependentUpon>NetworkIndicatorControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\BackupConfirmPage.xaml.cs">
       <DependentUpon>BackupConfirmPage.xaml</DependentUpon>
     </Compile>
@@ -193,12 +152,7 @@
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\SettingDto.cs" />
-    <Compile Include="Model\TransactionDto.cs" />
-    <Compile Include="Model\WalletContext.cs" />
-    <Compile Include="NxtServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="Controls\SendMoneyDialog.xaml.cs">
       <DependentUpon>SendMoneyDialog.xaml</DependentUpon>
     </Compile>
@@ -322,7 +276,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\NxtWallet.Core\NxtWallet.Core.csproj">
+      <Project>{f79eedd3-bf91-4cf6-8aaa-06363e21359e}</Project>
+      <Name>NxtWallet.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
