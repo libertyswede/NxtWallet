@@ -264,6 +264,7 @@ namespace NxtWallet.ViewModel.Model
         CurrencyExchange = 1005,
         CurrencyOfferExpired = 1006,
         ShufflingRefund = 1007,
+        ShufflingDistribution = 1008
     }
 
     // NRS Account Ledger Events
@@ -335,5 +336,5 @@ namespace NxtWallet.ViewModel.Model
     //    SHUFFLING_REGISTRATION(51, true), ------------------------  Supported
     //    SHUFFLING_PROCESSING(52, true), --------------------------  Supported
     //    SHUFFLING_CANCELLATION(53, true), ------------------------  
-    //    SHUFFLING_DISTRIBUTION(54, true); ------------------------
+    //    SHUFFLING_DISTRIBUTION(54, true); ------------------------  Supported
 }

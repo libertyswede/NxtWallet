@@ -11,6 +11,8 @@ using NxtWallet.ViewModel.Model;
 using Transaction = NxtWallet.ViewModel.Model.Transaction;
 using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
 using NxtLib.Shuffling;
+using NxtLib.Local;
+using NxtLib.Accounts;
 
 namespace NxtWallet
 {
@@ -131,6 +133,7 @@ namespace NxtWallet
                         await CheckExpiredDgsPurchases();
                         await CheckMsUndoCrowdfundingTransaction();
                         await CheckFinishedShufflingTransactions();
+                        await CheckShufflingDistributionTransactions();
                         var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions();
 
                         if (BalancesMatch(deletedTransactions))
@@ -385,6 +388,58 @@ namespace NxtWallet
 
                     shufflingCreation.Done = true;
                     _updatedTransactions.Add(shufflingCreation);
+                }
+            }
+        }
+
+        private async Task CheckShufflingDistributionTransactions()
+        {
+            if (!_knownTransactions.Any())
+            {
+                var shufflings = (await _nxtServer.GetShufflingsStageDone()).ToList();
+                var localAccountService = new LocalAccountService();
+                var found = false;
+                var shufflingIndex = 0;
+
+                while (!found && shufflings.Count() > shufflingIndex)
+                {
+                    var shuffling = shufflings[shufflingIndex];
+                    foreach (var recipientPublicKey in shuffling.RecipientPublicKeys)
+                    {
+                        var account = localAccountService.GetAccount(AccountIdLocator.ByPublicKey(recipientPublicKey));
+                        if (_walletRepository.NxtAccount.AccountId == account.AccountId)
+                        {
+                            var participants = await _nxtServer.GetShufflingParticipants(shuffling.ShufflingId);
+                            var lastParticipant = participants.Participants.Single(p => p.NextAccountId == 0);
+                            var lastParticipantToVerify = participants.Participants.Single(p => p.NextAccountId == lastParticipant.AccountId);
+
+                            var verifyShufflingTransactions = await _nxtServer.GetTransactionsAsync(lastParticipantToVerify.AccountRs, TransactionSubType.ShufflingVerification);
+                            var verifyShufflingTransaction = verifyShufflingTransactions.Single(t => ((ShufflingVerificationAttachment)t.Attachment).ShufflingId == shuffling.ShufflingId);
+                            var block = await _nxtServer.GetBlockAsync(verifyShufflingTransaction.Height);
+
+                            var transaction = new ShufflingDistributionTransaction
+                            {
+                                AccountFrom = Transaction.GeneratedFromAddress,
+                                AccountTo = _walletRepository.NxtAccount.AccountRs,
+                                Height = verifyShufflingTransaction.Height,
+                                IsConfirmed = true,
+                                NqtAmount = shuffling.Amount.Nqt,
+                                Message = "[Shuffling Distribution]",
+                                NqtFee = 0,
+                                RecipientPublicKey = recipientPublicKey.ToHexString(),
+                                ShufflingId = (long)shuffling.ShufflingId,
+                                Timestamp = block.Timestamp,
+                                TransactionType = TransactionType.ShufflingDistribution,
+                                UserIsTransactionSender = false,
+                                UserIsTransactionRecipient = true
+                            };
+                            _newTransactions.Add(transaction);
+
+                            found = true;
+                            break;
+                        }
+                    }
+                    shufflingIndex++;
                 }
             }
         }

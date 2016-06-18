@@ -143,6 +143,10 @@ namespace NxtWallet
                 {
                     return PopulateObject(new ShufflingRefundTransaction(), transactionDto);
                 }
+                case (int)TransactionType.ShufflingDistribution:
+                {
+                    return PopulateObject(new ShufflingDistributionTransaction(), transactionDto);
+                }
             }
             return new Transaction();
         }
@@ -247,7 +251,8 @@ namespace NxtWallet
                 transaction.TransactionType == TransactionType.PublishExchangeOffer ||
                 transaction.TransactionType == TransactionType.ShufflingCreation ||
                 transaction.TransactionType == TransactionType.ShufflingRegistration ||
-                transaction.TransactionType == TransactionType.ShufflingRefund)
+                transaction.TransactionType == TransactionType.ShufflingRefund ||
+                transaction.TransactionType == TransactionType.ShufflingDistribution)
             {
                 var json = JsonConvert.SerializeObject(transaction, Formatting.None);
                 return json;

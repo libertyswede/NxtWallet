@@ -35,6 +35,7 @@ namespace NxtWallet
         Task<Block<ulong>> GetBlockAsync(int height);
         Task<long> GetUnconfirmedNqtBalanceAsync();
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
         Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
@@ -47,6 +48,8 @@ namespace NxtWallet
         Task<bool> GetIsPurchaseExpired(ulong purchaseId);
         Task<Currency> GetCurrencyAsync(ulong currencyId);
         Task<ShufflingData> GetShuffling(ulong shufflingId);
+        Task<IEnumerable<ShufflingData>> GetShufflingsStageDone();
+        Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -259,6 +262,29 @@ namespace NxtWallet
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
+        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
+        {
+            var transactionList = new List<Transaction>();
+            try
+            {
+                var transactionService = _serviceFactory.CreateTransactionService();
+                var transactions = await transactionService.GetBlockchainTransactions(account, transactionType: transactionSubType);
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
+                IsOnline = true;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+            return transactionList.OrderByDescending(t => t.Timestamp);
+        }
+
         public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
@@ -391,6 +417,60 @@ namespace NxtWallet
                 var shuffling = await shufflingService.GetShuffling(shufflingId, false, requireBlock);
                 IsOnline = true;
                 return shuffling;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<IEnumerable<ShufflingData>> GetShufflingsStageDone()
+        {
+            try
+            {
+                var shufflingService = _serviceFactory.CreateShufflingService();
+                bool hasMore = true;
+                int firstIndex = 0;
+                const int count = 100;
+                var shufflings = new List<ShufflingData>();
+
+                while (hasMore)
+                {
+                    var shufflingsReply = await shufflingService.GetHoldingShufflings(0, ShufflingStage.Done, true, firstIndex, count - 1);
+                    shufflings.AddRange(shufflingsReply.Shufflings);
+                    firstIndex += count;
+                    hasMore = shufflingsReply.Shufflings.Count() == count;
+                }
+
+                IsOnline = true;
+                return shufflings;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
+        public async Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId)
+        {
+            try
+            {
+                var shufflingService = _serviceFactory.CreateShufflingService();
+                var shufflingsReply = await shufflingService.GetShufflingParticipants(shufflingId);
+                IsOnline = true;
+                return shufflingsReply;
             }
             catch (HttpRequestException e)
             {

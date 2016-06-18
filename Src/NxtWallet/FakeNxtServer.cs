@@ -53,6 +53,11 @@ namespace NxtWallet
             return GetTransactionsAsync(DateTime.UtcNow);
         }
 
+        public Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
+        {
+            return Task.FromResult(new List<Transaction>().AsEnumerable());
+        }
+
         public Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)
         {
             return Task.FromResult(new List<Transaction>().AsEnumerable());
@@ -105,6 +110,16 @@ namespace NxtWallet
         public Task<ShufflingData> GetShuffling(ulong shufflingId)
         {
             return Task.FromResult(new ShufflingData());
+        }
+
+        public Task<IEnumerable<ShufflingData>> GetShufflingsStageDone()
+        {
+            return Task.FromResult(new List<ShufflingData>().AsEnumerable());
+        }
+
+        public Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId)
+        {
+            return Task.FromResult(new ShufflingParticipantsReply());
         }
     }
 }
