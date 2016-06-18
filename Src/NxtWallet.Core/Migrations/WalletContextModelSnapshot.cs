@@ -15,7 +15,7 @@ namespace NxtWallet.Core.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348");
 
-            modelBuilder.Entity("NxtWallet.Model.AssetDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.AssetDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -33,9 +33,11 @@ namespace NxtWallet.Core.Migrations
                     b.Property<long>("NxtId");
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "Asset");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.AssetOwnershipDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.AssetOwnershipDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -53,9 +55,11 @@ namespace NxtWallet.Core.Migrations
                     b.Property<int>("TransactionId");
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "AssetOwnership");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.ContactDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.ContactDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -73,7 +77,7 @@ namespace NxtWallet.Core.Migrations
                     b.HasAnnotation("Relational:TableName", "Contact");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.SettingDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.SettingDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -90,7 +94,7 @@ namespace NxtWallet.Core.Migrations
                     b.HasAnnotation("Relational:TableName", "Setting");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.TransactionDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.TransactionDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -126,17 +130,19 @@ namespace NxtWallet.Core.Migrations
                     b.Property<int>("TransactionType");
 
                     b.HasKey("Id");
+
+                    b.HasAnnotation("Relational:TableName", "Transaction");
                 });
 
-            modelBuilder.Entity("NxtWallet.Model.AssetOwnershipDto", b =>
+            modelBuilder.Entity("NxtWallet.Migrations.Model.AssetOwnershipDto", b =>
                 {
-                    b.HasOne("NxtWallet.Model.AssetDto")
+                    b.HasOne("NxtWallet.Migrations.Model.AssetDto")
                         .WithMany()
                         .HasForeignKey("AssetId");
 
-                    b.HasOne("NxtWallet.Model.TransactionDto")
+                    b.HasOne("NxtWallet.Migrations.Model.TransactionDto")
                         .WithOne()
-                        .HasForeignKey("NxtWallet.Model.AssetOwnershipDto", "TransactionId");
+                        .HasForeignKey("NxtWallet.Migrations.Model.AssetOwnershipDto", "TransactionId");
                 });
         }
     }

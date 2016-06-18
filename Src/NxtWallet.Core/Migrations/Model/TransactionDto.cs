@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NxtWallet.Migrations.Model
 {
-    [Table("Setting")]
+    [Table("Transaction")]
     public class TransactionDto : IEquatable<TransactionDto>
     {
         public int Id { get; set; }

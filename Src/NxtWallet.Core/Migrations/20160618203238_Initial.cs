@@ -9,7 +9,7 @@ namespace NxtWallet.Core.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AssetDto",
+                name: "Asset",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -50,7 +50,7 @@ namespace NxtWallet.Core.Migrations
                     table.PrimaryKey("PK_SettingDto", x => x.Id);
                 });
             migrationBuilder.CreateTable(
-                name: "TransactionDto",
+                name: "Transaction",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -73,7 +73,7 @@ namespace NxtWallet.Core.Migrations
                     table.PrimaryKey("PK_TransactionDto", x => x.Id);
                 });
             migrationBuilder.CreateTable(
-                name: "AssetOwnershipDto",
+                name: "AssetOwnership",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -91,13 +91,13 @@ namespace NxtWallet.Core.Migrations
                     table.ForeignKey(
                         name: "FK_AssetOwnershipDto_AssetDto_AssetId",
                         column: x => x.AssetId,
-                        principalTable: "AssetDto",
+                        principalTable: "Asset",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AssetOwnershipDto_TransactionDto_TransactionId",
                         column: x => x.TransactionId,
-                        principalTable: "TransactionDto",
+                        principalTable: "Transaction",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -105,11 +105,11 @@ namespace NxtWallet.Core.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("AssetOwnershipDto");
+            migrationBuilder.DropTable("AssetOwnership");
             migrationBuilder.DropTable("Contact");
             migrationBuilder.DropTable("Setting");
-            migrationBuilder.DropTable("AssetDto");
-            migrationBuilder.DropTable("TransactionDto");
+            migrationBuilder.DropTable("Asset");
+            migrationBuilder.DropTable("Transaction");
         }
     }
 }
