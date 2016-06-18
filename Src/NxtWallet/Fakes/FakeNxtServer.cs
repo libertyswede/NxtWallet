@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
-using NxtLib.Blocks;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Shuffling;
 using NxtWallet.Core.ViewModel.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using NxtWallet.Core;
 
-namespace NxtWallet.Core
+namespace NxtWallet.Fakes
 {
     public class FakeNxtServer : ObservableObject, INxtServer
     {

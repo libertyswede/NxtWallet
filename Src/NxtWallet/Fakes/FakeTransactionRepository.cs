@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Fakes
 {
     public class FakeTransactionRepository : ITransactionRepository
     {

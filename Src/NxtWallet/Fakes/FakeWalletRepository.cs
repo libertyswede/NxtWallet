@@ -1,8 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using NxtLib;
+using NxtWallet.Core.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Fakes
 {
     public class FakeWalletRepository : IWalletRepository
     {

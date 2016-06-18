@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Fakes
 {
     public class FakeContactRepository : IContactRepository
     {

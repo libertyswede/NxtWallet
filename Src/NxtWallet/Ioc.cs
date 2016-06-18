@@ -4,6 +4,7 @@ using NxtLib;
 using NxtWallet.Controls;
 using NxtWallet.Core;
 using NxtWallet.Core.Model;
+using NxtWallet.Fakes;
 using NxtWallet.ViewModel;
 using NxtWallet.Views;
 

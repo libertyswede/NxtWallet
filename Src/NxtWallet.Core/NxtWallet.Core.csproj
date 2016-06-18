@@ -111,7 +111,6 @@
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="FakeNxtServer.cs" />
     <Compile Include="Migrations\20160419123036_Initial.cs" />
     <Compile Include="Migrations\20160419123036_Initial.Designer.cs">
       <DependentUpon>20160419123036_Initial.cs</DependentUpon>
@@ -122,9 +121,6 @@
     <Compile Include="Model\AssetRepository.cs" />
     <Compile Include="Model\ContactDto.cs" />
     <Compile Include="Model\ContactRepository.cs" />
-    <Compile Include="Model\FakeContactRepository.cs" />
-    <Compile Include="Model\FakeTransactionRepository.cs" />
-    <Compile Include="Model\FakeWalletRepository.cs" />
     <Compile Include="Model\IContactRepository.cs" />
     <Compile Include="Model\ITransactionRepository.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
