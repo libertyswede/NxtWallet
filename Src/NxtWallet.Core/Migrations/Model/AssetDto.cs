@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NxtWallet.Migrations.Model
+namespace NxtWallet.Core.Migrations.Model
 {
     [Table("Asset")]
     public class AssetDto

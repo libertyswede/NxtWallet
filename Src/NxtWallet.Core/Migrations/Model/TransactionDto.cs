@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NxtWallet.Migrations.Model
+namespace NxtWallet.Core.Migrations.Model
 {
     [Table("Transaction")]
     public class TransactionDto : IEquatable<TransactionDto>

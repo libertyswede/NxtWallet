@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 using NxtLib;
 using NxtWallet.Core.Model;
 using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Migrations.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using System.Numerics;
 using System.Linq;
-using NxtWallet.Migrations.Model;
 
 namespace NxtWallet
 {
