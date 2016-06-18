@@ -5,7 +5,7 @@ using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using NxtLib;
 
-namespace NxtWallet.ViewModel.Model
+namespace NxtWallet.Core.ViewModel.Model
 {
     public class Transaction : ObservableObject, IEquatable<Transaction>, ILedgerEntry
     {

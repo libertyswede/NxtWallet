@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public class AssetDto
     {

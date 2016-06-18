@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Data.Entity;
-using NxtWallet.ViewModel.Model;
+using NxtWallet.Core.ViewModel.Model;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public class ContactRepository : IContactRepository
     {

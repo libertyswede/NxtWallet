@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml.Navigation;
 using NxtWallet.ViewModel;
-using NxtWallet.ViewModel.Model;
+using NxtWallet.Core.ViewModel.Model;
 
 namespace NxtWallet.Views
 {

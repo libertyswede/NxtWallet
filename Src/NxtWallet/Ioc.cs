@@ -2,7 +2,8 @@
 using Microsoft.Practices.ServiceLocation;
 using NxtLib;
 using NxtWallet.Controls;
-using NxtWallet.Model;
+using NxtWallet.Core;
+using NxtWallet.Core.Model;
 using NxtWallet.ViewModel;
 using NxtWallet.Views;
 

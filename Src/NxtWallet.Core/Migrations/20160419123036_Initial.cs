@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Data.Entity.Migrations;
 
-namespace NxtWallet.Migrations
+namespace NxtWallet.Core.Migrations
 {
     public partial class Initial : Migration
     {

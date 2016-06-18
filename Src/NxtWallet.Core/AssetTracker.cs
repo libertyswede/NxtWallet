@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using NxtLib;
 using NxtLib.AssetExchange;
-using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
-using Asset = NxtWallet.ViewModel.Model.Asset;
-using Transaction = NxtWallet.ViewModel.Model.Transaction;
+using NxtWallet.Core.Model;
+using NxtWallet.Core.ViewModel.Model;
+using Asset = NxtWallet.Core.ViewModel.Model.Asset;
+using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using System.Linq;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public interface IAssetTracker
     {

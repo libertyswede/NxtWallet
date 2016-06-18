@@ -1,6 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using GalaSoft.MvvmLight.Threading;
 using Microsoft.Practices.ServiceLocation;
+using NxtWallet.Core;
 
 namespace NxtWallet
 {

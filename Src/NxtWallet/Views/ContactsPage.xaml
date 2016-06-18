@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:nxtWallet="using:NxtWallet"
-    xmlns:model="using:NxtWallet.ViewModel.Model"
+    xmlns:model="using:NxtWallet.Core.ViewModel.Model"
     mc:Ignorable="d"
     DataContext="{Binding ContactsViewModel, Source={StaticResource Ioc}}"
     Loaded="ContactsPage_OnLoaded">

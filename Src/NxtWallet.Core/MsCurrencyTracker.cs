@@ -1,11 +1,11 @@
-﻿using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
+﻿using NxtWallet.Core.Model;
+using NxtWallet.Core.ViewModel.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public interface IMsCurrencyTracker
     {

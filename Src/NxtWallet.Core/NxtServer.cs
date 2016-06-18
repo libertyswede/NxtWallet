@@ -15,14 +15,14 @@ using NxtLib.Local;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Transactions;
-using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
-using Asset = NxtWallet.ViewModel.Model.Asset;
-using Transaction = NxtWallet.ViewModel.Model.Transaction;
-using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
+using NxtWallet.Core.Model;
+using NxtWallet.Core.ViewModel.Model;
+using Asset = NxtWallet.Core.ViewModel.Model.Asset;
+using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using TransactionType = NxtWallet.Core.ViewModel.Model.TransactionType;
 using NxtLib.Shuffling;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public interface INxtServer
     {

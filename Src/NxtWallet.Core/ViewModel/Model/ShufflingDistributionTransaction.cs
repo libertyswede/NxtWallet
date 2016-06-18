@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NxtWallet.ViewModel.Model
+namespace NxtWallet.Core.ViewModel.Model
 {
     public class ShufflingDistributionTransaction : Transaction, IEquatable<Transaction>, IEquatable<ShufflingDistributionTransaction>
     {

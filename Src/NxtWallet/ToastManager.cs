@@ -1,7 +1,8 @@
 ﻿using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
-using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
+using NxtWallet.Core.Model;
+using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core;
 
 namespace NxtWallet
 {

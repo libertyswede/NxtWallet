@@ -1,6 +1,6 @@
 using System;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public class TransactionDto : IEquatable<TransactionDto>
     {

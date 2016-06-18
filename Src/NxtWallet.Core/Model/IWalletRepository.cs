@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using NxtLib;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public interface IWalletRepository
     {

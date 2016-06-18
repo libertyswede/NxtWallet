@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     [Table("Contact")]
     public class ContactDto

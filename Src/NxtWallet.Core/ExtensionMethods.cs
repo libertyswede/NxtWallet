@@ -1,4 +1,4 @@
-﻿namespace NxtWallet
+﻿namespace NxtWallet.Core
 {
     public static class ExtensionMethods
     {

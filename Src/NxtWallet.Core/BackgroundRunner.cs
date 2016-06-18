@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Threading;
 using NxtLib;
 using NxtLib.ServerInfo;
-using NxtWallet.Model;
-using NxtWallet.ViewModel.Model;
-using Transaction = NxtWallet.ViewModel.Model.Transaction;
-using TransactionType = NxtWallet.ViewModel.Model.TransactionType;
+using NxtWallet.Core.Model;
+using NxtWallet.Core.ViewModel.Model;
+using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using TransactionType = NxtWallet.Core.ViewModel.Model.TransactionType;
 using NxtLib.Shuffling;
 using NxtLib.Local;
 using NxtLib.Accounts;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
     public delegate void BalanceHandler(IBackgroundRunner sender, string balance);

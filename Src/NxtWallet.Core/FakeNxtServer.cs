@@ -8,10 +8,10 @@ using NxtLib.Blocks;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Shuffling;
-using NxtWallet.ViewModel.Model;
-using Transaction = NxtWallet.ViewModel.Model.Transaction;
+using NxtWallet.Core.ViewModel.Model;
+using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public class FakeNxtServer : ObservableObject, INxtServer
     {

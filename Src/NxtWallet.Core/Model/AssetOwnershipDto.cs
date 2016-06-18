@@ -1,4 +1,4 @@
-﻿namespace NxtWallet.Model
+﻿namespace NxtWallet.Core.Model
 {
     public class AssetOwnershipDto
     {

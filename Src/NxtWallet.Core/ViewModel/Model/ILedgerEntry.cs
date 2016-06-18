@@ -1,4 +1,4 @@
-namespace NxtWallet.ViewModel.Model
+namespace NxtWallet.Core.ViewModel.Model
 {
     public interface ILedgerEntry
     {

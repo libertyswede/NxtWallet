@@ -8,7 +8,7 @@ using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public class WalletRepository : IWalletRepository
     {

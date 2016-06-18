@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Entity;
 
-namespace NxtWallet.Model
+namespace NxtWallet.Core.Model
 {
     public class WalletContext : DbContext
     {

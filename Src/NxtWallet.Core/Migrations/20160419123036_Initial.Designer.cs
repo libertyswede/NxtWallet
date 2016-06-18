@@ -3,9 +3,9 @@ using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations;
-using NxtWallet.Model;
+using NxtWallet.Core.Model;
 
-namespace NxtWallet.Migrations
+namespace NxtWallet.Core.Migrations
 {
     [DbContext(typeof(WalletContext))]
     [Migration("20160419123036_Initial")]
