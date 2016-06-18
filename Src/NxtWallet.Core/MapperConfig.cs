@@ -9,7 +9,7 @@ using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using System.Numerics;
 using System.Linq;
 
-namespace NxtWallet
+namespace NxtWallet.Core
 {
     public class MapperConfig
     {
