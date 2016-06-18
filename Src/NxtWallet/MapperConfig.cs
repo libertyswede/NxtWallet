@@ -7,6 +7,7 @@ using NxtWallet.Core.ViewModel.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using System.Numerics;
 using System.Linq;
+using NxtWallet.Migrations.Model;
 
 namespace NxtWallet
 {

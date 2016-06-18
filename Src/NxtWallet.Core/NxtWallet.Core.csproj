@@ -116,16 +116,16 @@
       <DependentUpon>20160419123036_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
-    <Compile Include="Model\AssetDto.cs" />
-    <Compile Include="Model\AssetOwnershipDto.cs" />
+    <Compile Include="Migrations\Model\AssetDto.cs" />
+    <Compile Include="Migrations\Model\AssetOwnershipDto.cs" />
     <Compile Include="Model\AssetRepository.cs" />
-    <Compile Include="Model\ContactDto.cs" />
+    <Compile Include="Migrations\Model\ContactDto.cs" />
     <Compile Include="Model\ContactRepository.cs" />
     <Compile Include="Model\IContactRepository.cs" />
     <Compile Include="Model\ITransactionRepository.cs" />
     <Compile Include="Model\IWalletRepository.cs" />
-    <Compile Include="Model\SettingDto.cs" />
-    <Compile Include="Model\TransactionDto.cs" />
+    <Compile Include="Migrations\Model\SettingDto.cs" />
+    <Compile Include="Migrations\Model\TransactionDto.cs" />
     <Compile Include="Model\TransactionRepository.cs" />
     <Compile Include="Model\WalletContext.cs" />
     <Compile Include="Model\WalletRepository.cs" />

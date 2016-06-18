@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Entity;
+using NxtWallet.Migrations.Model;
 
 namespace NxtWallet.Core.Model
 {

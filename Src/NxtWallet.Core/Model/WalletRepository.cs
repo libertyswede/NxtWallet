@@ -7,6 +7,7 @@ using Microsoft.Data.Entity;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
+using NxtWallet.Migrations.Model;
 
 namespace NxtWallet.Core.Model
 {

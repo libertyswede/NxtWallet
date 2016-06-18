@@ -1,5 +1,8 @@
-﻿namespace NxtWallet.Core.Model
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace NxtWallet.Migrations.Model
 {
+    [Table("AssetOwnership")]
     public class AssetOwnershipDto
     {
         public int Id { get; set; }
