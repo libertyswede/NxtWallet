@@ -1,12 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using NxtWallet.Core;
-using NxtWallet.Repositories.Model;
-using NxtWallet.Core.Models;
 using System.Threading;
 using System.Threading.Tasks;
 using NxtWallet.Core.Fakes;
 using System;
-using System.Collections.Generic;
 
 namespace NxtWallet.Test
 {
@@ -17,7 +14,7 @@ namespace NxtWallet.Test
         public void TestMethod1()
         {
             var walletRepository = new FakeWalletRepository();
-            walletRepository.NxtAccount = "NXT-XA5U-Y394-TKWQ-9SG8H";
+            walletRepository.NxtAccount = "NXT-G885-AKDX-5G2B-BLUCG";
             walletRepository.IsReadOnlyAccount = true;
             walletRepository.Balance = "0";
             walletRepository.SecretPhrase = "abc123";
@@ -32,10 +29,10 @@ namespace NxtWallet.Test
             var mapper = MapperConfig.Setup(walletRepository).CreateMapper();
             var serviceFactory = new NxtLib.ServiceFactory(walletRepository.NxtServer);
             var nxtServer = new NxtServer(walletRepository, mapper, serviceFactory);
-            var transactionRepository = new FakeTransactionRepository();
+            var transactionRepository = new FakeTransactionRepository(walletRepository);
             var balanceCalculator = new BalanceCalculator();
             var contactRepository = new FakeContactRepository();
-            var assetRepository = new AssetRepository(mapper);
+            var assetRepository = new FakeAssetRepository();
             var assetTracker = new AssetTracker(assetRepository, serviceFactory, mapper, balanceCalculator);
             var msCurrencyTracker = new MsCurrencyTracker(nxtServer, walletRepository);
 
