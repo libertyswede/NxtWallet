@@ -46,12 +46,8 @@ namespace NxtWallet.Repositories.Model
             var transactionDto = _mapper.Map<TransactionDto>(transaction);
             using (var context = new WalletContext())
             {
-                var existingTransaction = await context.Transactions.SingleOrDefaultAsync(t => t.NxtId == transactionDto.NxtId);
-                if (existingTransaction == null)
-                {
-                    context.Transactions.Add(transactionDto);
-                    await context.SaveChangesAsync();
-                }
+                context.Transactions.Add(transactionDto);
+                await context.SaveChangesAsync();
             }
         }
 
