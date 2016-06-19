@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using NxtWallet.Controls;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core;
 

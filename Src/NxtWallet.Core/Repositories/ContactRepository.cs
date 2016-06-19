@@ -6,8 +6,17 @@ using Microsoft.Data.Entity;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core.Migrations.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Repositories.Model
 {
+    public interface IContactRepository
+    {
+        Task<IList<Contact>> GetAllContactsAsync();
+        Task UpdateContactAsync(Contact contact);
+        Task<Contact> AddContactAsync(Contact contact);
+        Task DeleteContactAsync(Contact contact);
+        Task<IList<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
+    }
+
     public class ContactRepository : IContactRepository
     {
         private readonly IMapper _mapper;

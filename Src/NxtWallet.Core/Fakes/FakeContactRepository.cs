@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.ViewModel.Model;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 
 namespace NxtWallet.Core.Fakes
 {

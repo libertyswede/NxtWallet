@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core;
 

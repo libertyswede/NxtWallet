@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using NxtLib;
 using NxtLib.AssetExchange;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using Asset = NxtWallet.Core.ViewModel.Model.Asset;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;

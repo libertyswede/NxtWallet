@@ -1,6 +1,6 @@
 ﻿using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core;
 

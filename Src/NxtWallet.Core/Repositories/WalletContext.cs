@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Entity;
 using NxtWallet.Core.Migrations.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Repositories.Model
 {
     public class WalletContext : DbContext
     {

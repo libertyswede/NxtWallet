@@ -2,7 +2,7 @@
 using AutoMapper;
 using Newtonsoft.Json;
 using NxtLib;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core.Migrations.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;

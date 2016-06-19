@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Threading;
 using NxtLib;
 using NxtLib.ServerInfo;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using TransactionType = NxtWallet.Core.ViewModel.Model.TransactionType;

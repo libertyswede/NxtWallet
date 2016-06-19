@@ -6,8 +6,18 @@ using Microsoft.Data.Entity;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core.Migrations.Model;
 
-namespace NxtWallet.Core.Model
+namespace NxtWallet.Repositories.Model
 {
+    public interface ITransactionRepository
+    {
+        Task<IEnumerable<Transaction>> GetAllTransactionsAsync();
+        Task SaveTransactionAsync(Transaction transaction);
+        Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels);
+        Task SaveTransactionsAsync(IEnumerable<Transaction> transactions);
+        Task<bool> HasOutgoingTransactionAsync();
+        Task RemoveTransactionAsync(Transaction transaction);
+    }
+
     public class TransactionRepository : ITransactionRepository
     {
         private readonly IMapper _mapper;

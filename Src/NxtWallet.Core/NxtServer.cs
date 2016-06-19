@@ -15,7 +15,7 @@ using NxtLib.Local;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Transactions;
-using NxtWallet.Core.Model;
+using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using Asset = NxtWallet.Core.ViewModel.Model.Asset;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;

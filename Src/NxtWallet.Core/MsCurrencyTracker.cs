@@ -1,4 +1,4 @@
-﻿using NxtWallet.Core.Model;
+﻿using NxtWallet.Repositories.Model;
 using NxtWallet.Core.ViewModel.Model;
 using System.Collections.Generic;
 using System.Linq;
