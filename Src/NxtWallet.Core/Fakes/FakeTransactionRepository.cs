@@ -9,20 +9,14 @@ namespace NxtWallet.Core.Fakes
 {
     public class FakeTransactionRepository : ITransactionRepository
     {
-        public List<Transaction> GetAllTransactions { get; set; }
-        public List<Transaction> SaveTransaction { get; set; }
-        public List<Transaction> UpdateTransactions { get; set; }
-        public List<Transaction> RemoveTransaction { get; set; }
-        public List<Transaction> SaveTransactions { get; set; }
-        public bool HasOutgoingTransaction { get; set; }
+        public List<Transaction> Transactions { get; set; }
 
-        public FakeTransactionRepository()
+        private IWalletRepository _walletRepository;
+
+        public FakeTransactionRepository(IWalletRepository walletRepository)
         {
-            GetAllTransactions = new List<Transaction>();
-            SaveTransaction = new List<Transaction>();
-            UpdateTransactions = new List<Transaction>();
-            RemoveTransaction = new List<Transaction>();
-            SaveTransactions = new List<Transaction>();
+            _walletRepository = walletRepository;
+            Transactions = new List<Transaction>();
 
             if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
             {
@@ -30,43 +24,62 @@ namespace NxtWallet.Core.Fakes
             }
         }
 
+        public FakeTransactionRepository() : this(null)
+        {
+        }
+
         public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
         {
-            return Task.FromResult(GetAllTransactions.AsEnumerable());
+            return Task.FromResult(Transactions.OrderByDescending(t => t.Timestamp).AsEnumerable());
         }
 
         public Task SaveTransactionAsync(Transaction transaction)
         {
-            SaveTransaction.Add(transaction);
+            if (transaction.Id == 0)
+                transaction.Id = Transactions.Any() ? Transactions.Max(t => t.Id) + 1 : 1;
+            Transactions.Add(transaction);
             return Task.CompletedTask;
         }
 
         public Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
-            UpdateTransactions.AddRange(transactionModels);
+            foreach (var updatedTransaction in transactionModels)
+            {
+                var storedTransaction = Transactions.Single(t => t.Id == updatedTransaction.Id);
+                Transactions.Remove(storedTransaction);
+                Transactions.Add(updatedTransaction);
+            }
             return Task.CompletedTask;
         }
 
         public Task RemoveTransactionAsync(Transaction transaction)
         {
-            RemoveTransaction.Add(transaction);
+            var storedTransaction = Transactions.Single(t => t.Id == transaction.Id);
+            Transactions.Remove(storedTransaction);
             return Task.CompletedTask;
         }
 
-        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        public async Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
-            SaveTransactions.AddRange(transactions);
-            return Task.CompletedTask;
+            foreach (var transaction in transactions)
+            {
+                await SaveTransactionAsync(transaction);
+            }
         }
 
         public Task<bool> HasOutgoingTransactionAsync()
         {
-            return Task.FromResult(HasOutgoingTransaction);
+            if (_walletRepository != null)
+            {
+                var hasOutgoingTransaction = Transactions.Any(t => t.AccountFrom == _walletRepository.NxtAccount.AccountRs);
+                return Task.FromResult(hasOutgoingTransaction);
+            }
+            return Task.FromResult(false);
         }
 
         private void UseDesignTimeData()
         {
-            GetAllTransactions = new List<Transaction>
+            Transactions = new List<Transaction>
             {
                 new Transaction
                 {

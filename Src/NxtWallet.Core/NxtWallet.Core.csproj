@@ -111,6 +111,7 @@
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Fakes\FakeAssetRepository.cs" />
     <Compile Include="Fakes\FakeContactRepository.cs" />
     <Compile Include="Fakes\FakeNxtServer.cs" />
     <Compile Include="Fakes\FakeTransactionRepository.cs" />

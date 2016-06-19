@@ -129,7 +129,7 @@ namespace NxtWallet.Core
 
         public async Task<IEnumerable<Asset>> GetOwnedAssetsSince(int height)
         {
-            var dbOwnershipsOwnedAtHeight = (await _assetRepository.GetOwnershipsOwnedAtHeight(height)).ToList();
+            var dbOwnershipsOwnedAtHeight = (await _assetRepository.GetOwnershipsOwnedAtHeightAsync(height)).ToList();
             var dbOwnershipsSinceHeight = (await _assetRepository.GetOwnershipsOwnedSinceHeightAsync(height)).ToList();
 
             var newOwnershipsOwnedAtHeight = GetNewownershipsOwnedAtHeight(height);
