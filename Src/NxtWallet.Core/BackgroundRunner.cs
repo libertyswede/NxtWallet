@@ -76,7 +76,7 @@ namespace NxtWallet.Core
         /// <summary>
         /// Current unconfirmed balance from NXT server
         /// </summary>
-        private long _unconfirmedBalanceNqt;
+        public long UnconfirmedBalanceNqt { get; private set; }
 
         /// <summary>
         /// Status fetched from NXT server
@@ -114,6 +114,7 @@ namespace NxtWallet.Core
             _newTransactions = _nxtTransactions.Except(_knownTransactions).ToList();
             _allTransactions = _newTransactions.Union(_knownTransactions).ToList();
 
+            CheckDgsPurchaseTransactions();
             CheckDgsDeliveryTransactions();
             await UpdateNewMsReserveIncreaseTransactions();
             await UpdateNewMsReserveClaimTransactions();
@@ -144,10 +145,6 @@ namespace NxtWallet.Core
                 {
                     await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
                 }
-                else
-                {
-                    throw new Exception("Balances don't match!");
-                }
             }
             else
             {
@@ -173,7 +170,22 @@ namespace NxtWallet.Core
             _lastBalanceMatchBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastBalanceMatchBlockId);
             _blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
             _nxtTransactions = (await _nxtServer.GetTransactionsAsync(_lastBalanceMatchBlock.Timestamp)).ToList();
-            _unconfirmedBalanceNqt = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+            UnconfirmedBalanceNqt = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+        }
+
+        private void CheckDgsPurchaseTransactions()
+        {
+            foreach (var purchaseTransaction in _newTransactions.Where(t => t.TransactionType == TransactionType.DigitalGoodsPurchase)
+                .Cast<DgsPurchaseTransaction>())
+            {
+                var attachment = (DigitalGoodsPurchaseAttachment) purchaseTransaction.Attachment;
+                purchaseTransaction.DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp;
+
+                if (purchaseTransaction.UserIsTransactionSender)
+                {
+                    purchaseTransaction.NqtAmount += attachment.Price.Nqt * attachment.Quantity;
+                }
+            }
         }
 
         private void CheckDgsDeliveryTransactions()
@@ -322,7 +334,7 @@ namespace NxtWallet.Core
         {
             GetTransactionsWithUpdatedConfirmation().ForEach(t => _updatedTransactions.Add(t));
             var balancesMatch = _balanceCalculator.BalanceEqualsLastTransactionBalance(_newTransactions,
-                _knownTransactions, _updatedTransactions, removedTransactions, _unconfirmedBalanceNqt);
+                _knownTransactions, _updatedTransactions, removedTransactions, UnconfirmedBalanceNqt);
             return balancesMatch;
         }
 
@@ -557,7 +569,7 @@ namespace NxtWallet.Core
                 .Where(t => t.UserIsTransactionRecipient && !t.IsConfirmed)
                 .Sum(t => t.NqtAmount);
 
-            var balanceNqt = unconfirmedBalanceNqt + _unconfirmedBalanceNqt;
+            var balanceNqt = unconfirmedBalanceNqt + UnconfirmedBalanceNqt;
             var balance = balanceNqt.NqtToNxt().ToFormattedString();
             if (balance != _walletRepository.Balance)
             {

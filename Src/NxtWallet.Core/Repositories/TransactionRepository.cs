@@ -33,11 +33,13 @@ namespace NxtWallet.Repositories.Model
         {
             using (var context = new WalletContext())
             {
-                var transactions = await context.Transactions
+                var transactionDtos = await context.Transactions
                     .OrderByDescending(t => t.Timestamp)
                     .ToListAsync();
 
-                return _mapper.Map<IEnumerable<Transaction>>(transactions);
+                var transactions = _mapper.Map<List<Transaction>>(transactionDtos);
+                UpdateIsMyAddress(transactions);
+                return transactions.AsEnumerable();
             }
         }
 
@@ -88,6 +90,7 @@ namespace NxtWallet.Repositories.Model
                 }
                 await context.SaveChangesAsync();
                 var savedTransactions = _mapper.Map<IEnumerable<Transaction>>(transactionDtos).ToList();
+                UpdateIsMyAddress(savedTransactions);
 
                 savedTransactions.ForEach(saved => transactionList.Find(t => t.Equals(saved)).Id = saved.Id);
             }
@@ -101,6 +104,12 @@ namespace NxtWallet.Repositories.Model
                     .AnyAsync(t => t.AccountFrom == _walletRepository.NxtAccount.AccountRs);
                 return outgouingTransaction;
             }
+        }
+
+        private void UpdateIsMyAddress(List<Transaction> transactions)
+        {
+            transactions.ForEach(t => t.UserIsTransactionRecipient = _walletRepository.NxtAccount.AccountRs == t.AccountTo);
+            transactions.ForEach(t => t.UserIsTransactionSender = _walletRepository.NxtAccount.AccountRs == t.AccountFrom);
         }
     }
 }

@@ -2,7 +2,6 @@
 using AutoMapper;
 using Newtonsoft.Json;
 using NxtLib;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
 using Transaction = NxtWallet.Core.Models.Transaction;
@@ -14,14 +13,11 @@ namespace NxtWallet.Core
     public class MapperConfig
     {
         private static MapperConfiguration _configuration;
-        private static string _accountRs;
 
-        public static MapperConfiguration Setup(IWalletRepository repo)
+        public static MapperConfiguration Setup()
         {
             if (_configuration != null)
                 return _configuration;
-
-            _accountRs = repo.NxtAccount.AccountRs;
 
             _configuration = new MapperConfiguration(cfg =>
             {
@@ -30,9 +26,7 @@ namespace NxtWallet.Core
                 cfg.CreateMap<TransactionDto, Transaction>()
                     .ConstructUsing(GetTransactionObject)
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (ulong?)src.NxtId))
-                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)src.TransactionType))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
+                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)src.TransactionType));
 
                 cfg.CreateMap<Transaction, TransactionDto>()
                     .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => (long?)src.NxtId))
@@ -48,23 +42,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.SenderRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null))
-                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)(int)src.SubType))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
-
-                cfg.CreateMap<NxtLib.AssetExchange.AssetTradeInfo, AssetTradeTransaction>()
-                    .ForMember(dest => dest.NxtId, opt => opt.MapFrom(src => src.BuyerRs.Equals(_accountRs) ? src.AskOrder : src.BidOrder)) // buyer makes the bidorder
-                    .ForMember(dest => dest.Message, opt => opt.UseValue("[Asset Trade]"))
-                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => (src.BuyerRs.Equals(_accountRs) ? -1 : 1) * src.Price.Nqt * src.QuantityQnt))
-                    .ForMember(dest => dest.NqtFee, opt => opt.UseValue(Amount.OneNxt.Nqt)) // TODO: Assumption
-                    .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.BuyerRs.Equals(_accountRs) ? src.SellerRs : src.BuyerRs))
-                    .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs.Equals(_accountRs) ? src.SellerRs : src.BuyerRs))
-                    .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
-                    .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.AssetTrade))
-                    .ForMember(dest => dest.AssetNxtId, opt => opt.MapFrom(src => src.AssetId))
-                    .ForMember(dest => dest.QuantityQnt, opt => opt.MapFrom(src => src.QuantityQnt))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
+                    .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (TransactionType)(int)src.SubType));
 
                 cfg.CreateMap<NxtLib.MonetarySystem.CurrencyExchange, MsCurrencyExchangeTransaction>()
                     .ForMember(dest => dest.Message, opt => opt.UseValue("[Currency Exchange]"))
@@ -76,9 +54,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.SellerRs))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Units*src.Rate.Nqt))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
-                    .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.CurrencyExchange))
-                    .AfterMap((src, dest) => dest.UserIsTransactionRecipient = _accountRs.Equals(dest.AccountTo))
-                    .AfterMap((src, dest) => dest.UserIsTransactionSender = _accountRs.Equals(dest.AccountFrom));
+                    .ForMember(dest => dest.TransactionType, opt => opt.UseValue(TransactionType.CurrencyExchange));
 
                 cfg.CreateMap<Asset, AssetDto>();
 
@@ -167,17 +143,7 @@ namespace NxtWallet.Core
             {
                 case TransactionSubType.DigitalGoodsPurchase:
                 {
-                    var attachment = (DigitalGoodsPurchaseAttachment) nxtTransaction.Attachment;
-
-                    if (nxtTransaction.SenderRs == _accountRs)
-                    {
-                        nxtTransaction.Amount = Amount.CreateAmountFromNqt(nxtTransaction.Amount.Nqt + (attachment.Price.Nqt * attachment.Quantity));
-                    }
-
-                    return new DgsPurchaseTransaction
-                    {
-                        DeliveryDeadlineTimestamp = attachment.DeliveryDeadlineTimestamp
-                    };
+                    return new DgsPurchaseTransaction();
                 }
                 case TransactionSubType.DigitalGoodsRefund:
                 {

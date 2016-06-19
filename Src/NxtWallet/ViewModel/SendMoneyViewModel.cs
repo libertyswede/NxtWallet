@@ -64,8 +64,7 @@ namespace NxtWallet.ViewModel
             await Task.Run(async () =>
             {
                 var amount = decimal.Parse(Amount);
-                var transactionResult = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
-                var transaction = transactionResult.Value;
+                var transaction = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
                 SetBalance(transaction);
                 await _transactionRepository.SaveTransactionAsync(transaction);
                 await _walletRepository.UpdateBalanceAsync((transaction.NqtBalance/100000000M).ToFormattedString());

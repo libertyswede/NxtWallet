@@ -63,9 +63,9 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(new List<Transaction>().AsEnumerable());
         }
 
-        public Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            return Task.FromResult(new Result<Transaction>());
+            return Task.FromResult(new Transaction());
         }
 
         public Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)

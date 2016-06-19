@@ -38,7 +38,7 @@ namespace NxtWallet.Core
         Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
         Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
-        Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message);
+        Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
         Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp);
         Task<Asset> GetAssetAsync(ulong assetId);
@@ -59,6 +59,7 @@ namespace NxtWallet.Core
         private bool _isOnline;
         private IServiceFactory _serviceFactory;
         private ulong requireBlock => _walletRepository.LastBalanceMatchBlockId;
+        private string accountRs => _walletRepository.NxtAccount.AccountRs;
 
         public bool IsOnline
         {
@@ -176,7 +177,9 @@ namespace NxtWallet.Core
                 var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId),
                     requireBlock: requireBlock);
                 IsOnline = true;
-                return _mapper.Map<Transaction>(transactionReply);
+                var transaction = _mapper.Map<Transaction>(transactionReply);
+                UpdateIsMyAddress(transaction);
+                return transaction;
             }
             catch (HttpRequestException e)
             {
@@ -238,15 +241,14 @@ namespace NxtWallet.Core
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionsTask = transactionService.GetBlockchainTransactions(_walletRepository.NxtAccount, 
+                var transactions = await transactionService.GetBlockchainTransactions(_walletRepository.NxtAccount, 
                     lastTimestamp, requireBlock: requireBlock);
-                var unconfirmedTask = transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount},
+                var unconfirmed = await transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount},
                     requireBlock);
 
-                await Task.WhenAll(transactionsTask, unconfirmedTask);
-
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactionsTask.Result.Transactions));
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmedTask.Result.UnconfirmedTransactions));
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmed.UnconfirmedTransactions));
+                UpdateIsMyAddress(transactionList);
                 IsOnline = true;
             }
             catch (HttpRequestException e)
@@ -270,6 +272,7 @@ namespace NxtWallet.Core
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactions = await transactionService.GetBlockchainTransactions(account, transactionType: transactionSubType);
                 transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
+                UpdateIsMyAddress(transactionList);
                 IsOnline = true;
             }
             catch (HttpRequestException e)
@@ -298,7 +301,9 @@ namespace NxtWallet.Core
                 var transactions = await transactionService.GetBlockchainTransactions(
                     account, timestamp, TransactionSubType.ColoredCoinsDividendPayment, requireBlock: requireBlock);
                 IsOnline = true;
-                return _mapper.Map<IEnumerable<Transaction>>(transactions.Transactions);
+                var transactionList = _mapper.Map<List<Transaction>>(transactions.Transactions);
+                UpdateIsMyAddress(transactionList);
+                return transactionList;
             }
             catch (HttpRequestException e)
             {
@@ -313,7 +318,7 @@ namespace NxtWallet.Core
         }
 
         //TODO: Use one known exception instead of Result<>
-        public async Task<Result<Transaction>> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public async Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             try
             {
@@ -328,8 +333,9 @@ namespace NxtWallet.Core
                 IsOnline = true;
 
                 var transaction = _mapper.Map<Transaction>(sendMoneyReply.Transaction);
+                UpdateIsMyAddress(transaction);
                 transaction.NxtId = broadcastReply.TransactionId;
-                return new Result<Transaction>(transaction);
+                return transaction;
             }
             catch (HttpRequestException e)
             {
@@ -372,7 +378,28 @@ namespace NxtWallet.Core
                 var trades = await assetService.GetTrades(
                     AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp, requireBlock: requireBlock);
                 IsOnline = true;
-                return _mapper.Map<IEnumerable<AssetTradeTransaction>>(trades.Trades);
+                var transactionList = new List<AssetTradeTransaction>();
+                foreach (var trade in trades.Trades)
+                {
+                    var transaction = new AssetTradeTransaction
+                    {
+                        NxtId = trade.BuyerRs == accountRs ? trade.AskOrder : trade.BidOrder,  // buyer makes the bidorder
+                        Message = "[Asset Trade]",
+                        NqtAmount = (trade.BuyerRs == accountRs ? -1 : 1) * trade.Price.Nqt * trade.QuantityQnt,
+                        NqtFee = Amount.OneNxt.Nqt, // TODO: Assumption
+                        AccountFrom = trade.BuyerRs == accountRs ? trade.SellerRs : trade.BuyerRs,
+                        AccountTo = trade.SellerRs == accountRs ? trade.SellerRs : trade.BuyerRs,
+                        IsConfirmed = true,
+                        TransactionType = TransactionType.AssetTrade,
+                        AssetNxtId = trade.AssetId,
+                        QuantityQnt = trade.QuantityQnt,
+                        Height = trade.Height,
+                        Timestamp = trade.Timestamp
+                    };
+                    UpdateIsMyAddress(transaction);
+                    transactionList.Add(transaction);
+                }
+                return transactionList;
             }
             catch (HttpRequestException e)
             {
@@ -395,7 +422,9 @@ namespace NxtWallet.Core
                     CurrencyOrAccountLocator.ByAccountId(_walletRepository.NxtAccount.AccountRs), 
                     timestamp: timestamp, includeCurrencyInfo: true, requireBlock: requireBlock);
                 IsOnline = true;
-                return _mapper.Map<IEnumerable<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
+                var transactionList = _mapper.Map<List<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
+                UpdateIsMyAddress(transactionList);
+                return transactionList;
             }
             catch (HttpRequestException e)
             {
@@ -539,6 +568,18 @@ namespace NxtWallet.Core
             }
             var sendMoneyReply = await accountService.SendMoney(createTransactionByPublicKey, recipient, amount);
             return sendMoneyReply;
+        }
+
+        private void UpdateIsMyAddress<T>(List<T> transactions) where T : Transaction
+        {
+            transactions.ForEach(t => t.UserIsTransactionRecipient = accountRs == t.AccountTo);
+            transactions.ForEach(t => t.UserIsTransactionSender = accountRs == t.AccountFrom);
+        }
+
+        private void UpdateIsMyAddress(Transaction transaction)
+        {
+            transaction.UserIsTransactionRecipient = accountRs == transaction.AccountTo;
+            transaction.UserIsTransactionSender = accountRs == transaction.AccountFrom;
         }
     }
 }
