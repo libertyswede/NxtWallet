@@ -591,22 +591,22 @@ namespace NxtWallet.Core
 
         protected virtual void OnTransactionConfirmationUpdated(Transaction transaction)
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionConfirmationUpdated?.Invoke(this, transaction));
+            TransactionConfirmationUpdated?.Invoke(this, transaction);
         }
 
         protected virtual void OnTransactionBalanceUpdated(Transaction transaction)
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionBalanceUpdated?.Invoke(this, transaction));
+            TransactionBalanceUpdated?.Invoke(this, transaction);
         }
 
         protected virtual void OnTransactionAdded(Transaction transaction)
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => TransactionAdded?.Invoke(this, transaction));
+            TransactionAdded?.Invoke(this, transaction);
         }
 
         protected virtual void OnBalanceUpdated(string balance)
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => BalanceUpdated?.Invoke(this, balance));
+            BalanceUpdated?.Invoke(this, balance);
         }
     }
 }

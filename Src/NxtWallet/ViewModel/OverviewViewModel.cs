@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Threading;
 using NxtWallet.Core;
 using NxtWallet.Repositories.Model;
 
@@ -37,7 +38,7 @@ namespace NxtWallet.ViewModel
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
 
-            backgroundRunner.BalanceUpdated += (sender, balance) => Balance = balance;
+            backgroundRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => Balance = balance);
         }
 
         public void LoadFromRepository()

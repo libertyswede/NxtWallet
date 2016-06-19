@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight;
 using NxtWallet.Repositories.Model;
 using NxtWallet.Core.Models;
 using NxtWallet.Core;
+using GalaSoft.MvvmLight.Threading;
 
 namespace NxtWallet.ViewModel
 {
@@ -26,17 +27,23 @@ namespace NxtWallet.ViewModel
         {
             backgroundRunner.TransactionAdded += (sender, transaction) =>
             {
-                InsertTransaction(transaction);
+                DispatcherHelper.CheckBeginInvokeOnUI(() => InsertTransaction(transaction));
             };
             backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.Equals(transaction));
-                existingTransaction.NqtBalance = transaction.NqtBalance;
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    var existingTransaction = Transactions.Single(t => t.Equals(transaction));
+                    existingTransaction.NqtBalance = transaction.NqtBalance;
+                });
             };
             backgroundRunner.TransactionConfirmationUpdated += (sender, transaction) =>
             {
-                var existingTransaction = Transactions.Single(t => t.Equals(transaction));
-                existingTransaction.IsConfirmed = transaction.IsConfirmed;
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    var existingTransaction = Transactions.Single(t => t.Equals(transaction));
+                    existingTransaction.IsConfirmed = transaction.IsConfirmed;
+                });
             };
 
             _transactionRepository = transactionRepository;
