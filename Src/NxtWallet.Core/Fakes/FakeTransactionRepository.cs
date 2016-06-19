@@ -18,6 +18,54 @@ namespace NxtWallet.Core.Fakes
 
         public FakeTransactionRepository()
         {
+            GetAllTransactions = new List<Transaction>();
+            SaveTransaction = new List<Transaction>();
+            UpdateTransactions = new List<Transaction>();
+            RemoveTransaction = new List<Transaction>();
+            SaveTransactions = new List<Transaction>();
+
+            if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
+            {
+                UseDesignTimeData();
+            }
+        }
+
+        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        {
+            return Task.FromResult(GetAllTransactions.AsEnumerable());
+        }
+
+        public Task SaveTransactionAsync(Transaction transaction)
+        {
+            SaveTransaction.Add(transaction);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
+        {
+            UpdateTransactions.AddRange(transactionModels);
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveTransactionAsync(Transaction transaction)
+        {
+            RemoveTransaction.Add(transaction);
+            return Task.CompletedTask;
+        }
+
+        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
+        {
+            SaveTransactions.AddRange(transactions);
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> HasOutgoingTransactionAsync()
+        {
+            return Task.FromResult(HasOutgoingTransaction);
+        }
+
+        private void UseDesignTimeData()
+        {
             GetAllTransactions = new List<Transaction>
             {
                 new Transaction
@@ -54,45 +102,6 @@ namespace NxtWallet.Core.Fakes
                     Timestamp = DateTime.Now.AddDays(-1).AddHours(1)
                 }
             };
-
-            SaveTransaction = new List<Transaction>();
-            UpdateTransactions = new List<Transaction>();
-            RemoveTransaction = new List<Transaction>();
-            SaveTransactions = new List<Transaction>();
-        }
-
-        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
-        {
-            return Task.FromResult(GetAllTransactions.AsEnumerable());
-        }
-
-        public Task SaveTransactionAsync(Transaction transaction)
-        {
-            SaveTransaction.Add(transaction);
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
-        {
-            UpdateTransactions.AddRange(transactionModels);
-            return Task.CompletedTask;
-        }
-
-        public Task RemoveTransactionAsync(Transaction transaction)
-        {
-            RemoveTransaction.Add(transaction);
-            return Task.CompletedTask;
-        }
-
-        public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
-        {
-            SaveTransactions.AddRange(transactions);
-            return Task.CompletedTask;
-        }
-
-        public Task<bool> HasOutgoingTransactionAsync()
-        {
-            return Task.FromResult(HasOutgoingTransaction);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace NxtWallet.Repositories.Model
 {
     public interface IContactRepository
     {
-        Task<IList<Contact>> GetAllContactsAsync();
+        Task<List<Contact>> GetAllContactsAsync();
         Task UpdateContactAsync(Contact contact);
         Task<Contact> AddContactAsync(Contact contact);
         Task DeleteContactAsync(Contact contact);
-        Task<IList<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
+        Task<List<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
     }
 
     public class ContactRepository : IContactRepository
@@ -26,12 +26,12 @@ namespace NxtWallet.Repositories.Model
             _mapper = mapper;
         }
 
-        public async Task<IList<Contact>> GetAllContactsAsync()
+        public async Task<List<Contact>> GetAllContactsAsync()
         {
             using (var context = new WalletContext())
             {
                 var contactsDto = await context.Contacts.ToListAsync();
-                return _mapper.Map<IList<Contact>>(contactsDto);
+                return _mapper.Map<List<Contact>>(contactsDto);
             }
         }
 
@@ -56,12 +56,12 @@ namespace NxtWallet.Repositories.Model
             await UpdateEntityStateAsync(contact, EntityState.Deleted);
         }
 
-        public async Task<IList<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses)
+        public async Task<List<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses)
         {
             using (var context = new WalletContext())
             {
                 var list = await context.Contacts.Where(c => nxtRsAddresses.Contains(c.NxtAddressRs)).ToListAsync();
-                return _mapper.Map<IList<Contact>>(list);
+                return _mapper.Map<List<Contact>>(list);
             }
         }
 
