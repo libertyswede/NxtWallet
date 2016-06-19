@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NxtLib;
 using NxtWallet.Core.Model;
 
-namespace NxtWallet.Fakes
+namespace NxtWallet.Core.Fakes
 {
     public class FakeWalletRepository : IWalletRepository
     {

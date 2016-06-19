@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using NxtWallet.Core.ViewModel.Model;
 using NxtWallet.Core.Model;
 
-namespace NxtWallet.Fakes
+namespace NxtWallet.Core.Fakes
 {
     public class FakeTransactionRepository : ITransactionRepository
     {

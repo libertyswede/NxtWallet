@@ -1,4 +1,4 @@
-﻿namespace NxtWallet.Fakes
+﻿namespace NxtWallet
 {
     public class FakeToastManager : IToastManager
     {

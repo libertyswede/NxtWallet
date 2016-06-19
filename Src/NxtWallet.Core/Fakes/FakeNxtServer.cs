@@ -11,7 +11,7 @@ using NxtWallet.Core.ViewModel.Model;
 using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
 using NxtWallet.Core;
 
-namespace NxtWallet.Fakes
+namespace NxtWallet.Core.Fakes
 {
     public class FakeNxtServer : ObservableObject, INxtServer
     {

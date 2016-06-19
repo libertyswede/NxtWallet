@@ -111,11 +111,7 @@
     <Compile Include="Controls\TransactionListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
-    <Compile Include="Fakes\FakeContactRepository.cs" />
-    <Compile Include="Fakes\FakeNxtServer.cs" />
-    <Compile Include="Fakes\FakeToastManager.cs" />
-    <Compile Include="Fakes\FakeTransactionRepository.cs" />
-    <Compile Include="Fakes\FakeWalletRepository.cs" />
+    <Compile Include="FakeToastManager.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="Ioc.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />

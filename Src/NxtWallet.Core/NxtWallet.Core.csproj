@@ -111,6 +111,10 @@
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BalanceCalculator.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Fakes\FakeContactRepository.cs" />
+    <Compile Include="Fakes\FakeNxtServer.cs" />
+    <Compile Include="Fakes\FakeTransactionRepository.cs" />
+    <Compile Include="Fakes\FakeWalletRepository.cs" />
     <Compile Include="MapperConfig.cs" />
     <Compile Include="Migrations\20160618203238_Initial.cs" />
     <Compile Include="Migrations\20160618203238_Initial.designer.cs">
