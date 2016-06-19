@@ -13,12 +13,12 @@ namespace NxtWallet.Core.Fakes
         public string SecretPhrase { get; set; }
         public bool IsReadOnlyAccount { get; set; }
         public string Balance { get; set; } = "1100000000";
-        public bool BackupCompleted { get; } = false;
-        public int SleepTime { get; } = 10000;
-        public bool NotificationsEnabled { get; } = true;
-        public ulong LastBalanceMatchBlockId { get; } = 600000;
-        public DateTime LastAssetTrade { get; } = DateTime.UtcNow;
-        public DateTime LastCurrencyExchange { get; } = DateTime.Now;
+        public bool BackupCompleted { get; set; } = false;
+        public int SleepTime { get; set; } = 10000;
+        public bool NotificationsEnabled { get; set; } = true;
+        public ulong LastBalanceMatchBlockId { get; set; } = 600000;
+        public DateTime LastAssetTrade { get; set; } = DateTime.UtcNow;
+        public DateTime LastCurrencyExchange { get; set; } = DateTime.Now;
 
         public Task LoadAsync()
         {
@@ -27,36 +27,43 @@ namespace NxtWallet.Core.Fakes
 
         public Task UpdateBalanceAsync(string balance)
         {
+            Balance = balance;
             return Task.CompletedTask;
         }
 
         public Task UpdateNxtServerAsync(string newServerAddress)
         {
+            NxtServer = newServerAddress;
             return Task.CompletedTask;
         }
 
         public Task UpdateBackupCompleted(bool completed)
         {
+            BackupCompleted = completed;
             return Task.CompletedTask;
         }
 
         public Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled)
         {
+            NotificationsEnabled = newNotificationsEnabled;
             return Task.CompletedTask;
         }
 
         public Task UpdateLastAssetTrade(DateTime newTimestamp)
         {
+            LastAssetTrade = newTimestamp;
             return Task.CompletedTask;
         }
 
         public Task UpdateLastCurrencyExchange(DateTime newTimestamp)
         {
+            LastCurrencyExchange = newTimestamp;
             return Task.CompletedTask;
         }
 
         public Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId)
         {
+            LastBalanceMatchBlockId = blockId;
             return Task.CompletedTask;
         }
     }
