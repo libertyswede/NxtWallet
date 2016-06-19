@@ -19,7 +19,7 @@ namespace NxtWallet.Repositories.Model
         Task SaveAssetOwnershipAsync(AssetOwnership assetOwnership);
         Task SaveAssetOwnershipsAsync(List<AssetOwnership> newOwnerships);
         Task UpdatesAssetOwnershipBalancesAsync(IEnumerable<AssetOwnership> updatedOwnerships);
-        Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeight(int height);
+        Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeightAsync(int height);
         Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedSinceHeightAsync(int height);
     }
 
@@ -76,7 +76,7 @@ namespace NxtWallet.Repositories.Model
             }
         }
 
-        public async Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeight(int height)
+        public async Task<IEnumerable<AssetOwnership>> GetOwnershipsOwnedAtHeightAsync(int height)
         {
             using (var context = new WalletContext())
             {
