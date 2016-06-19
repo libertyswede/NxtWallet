@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GalaSoft.MvvmLight.Threading;
 using NxtLib;
 using NxtLib.ServerInfo;
 using NxtWallet.Repositories.Model;
@@ -101,71 +100,67 @@ namespace NxtWallet.Core
         {
             while (!token.IsCancellationRequested)
             {
-                _updatedTransactions = new HashSet<Transaction>();
-                try
+                await TryCheckAllTransactions();
+                await Task.Delay(_walletRepository.SleepTime, token);
+            }
+        }
+
+        public async Task TryCheckAllTransactions()
+        {
+            _updatedTransactions = new HashSet<Transaction>();
+            await GetKnownTransactions();
+            await GetDataFromNxtServer();
+
+            _newTransactions = _nxtTransactions.Except(_knownTransactions).ToList();
+            _allTransactions = _newTransactions.Union(_knownTransactions).ToList();
+
+            CheckDgsDeliveryTransactions();
+            await UpdateNewMsReserveIncreaseTransactions();
+            await UpdateNewMsReserveClaimTransactions();
+            await UpdateNewShufflingRegistrationTransactions();
+
+            if (!BalancesMatch())
+            {
+                await GetNewAssetTrades();
+                await _assetTracker.UpdateAssetOwnership(_newTransactions);
+                await CheckMsExchanges();
+            }
+
+            await CheckSentDividendTransactions();
+            await CheckExpiredExchangeOffers();
+
+            if (!BalancesMatch())
+            {
+                await CheckReceivedDividendTransactions();
+                var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(_lastBalanceMatchBlock.Timestamp);
+                _newTransactions.AddRange(forgeTransactions);
+                await CheckExpiredDgsPurchases();
+                await CheckMsUndoCrowdfundingTransaction();
+                await CheckFinishedShufflingTransactions();
+                await CheckShufflingDistributionTransactions();
+                var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions();
+
+                if (BalancesMatch(deletedTransactions))
                 {
-                    await GetKnownTransactions();
-                    await GetDataFromNxtServer();
-
-                    _newTransactions = _nxtTransactions.Except(_knownTransactions).ToList();
-                    _allTransactions = _newTransactions.Union(_knownTransactions).ToList();
-
-                    CheckDgsDeliveryTransactions();
-                    await UpdateNewMsReserveIncreaseTransactions();
-                    await UpdateNewMsReserveClaimTransactions();
-                    await UpdateNewShufflingRegistrationTransactions();
-
-                    if (!BalancesMatch())
-                    {
-                        await GetNewAssetTrades();
-                        await _assetTracker.UpdateAssetOwnership(_newTransactions);
-                        await CheckMsExchanges();
-                    }
-
-                    await CheckSentDividendTransactions();
-                    await CheckExpiredExchangeOffers();
-
-                    if (!BalancesMatch())
-                    {
-                        await CheckReceivedDividendTransactions();
-                        var forgeTransactions = await _nxtServer.GetForgingIncomeAsync(_lastBalanceMatchBlock.Timestamp);
-                        _newTransactions.AddRange(forgeTransactions);
-                        await CheckExpiredDgsPurchases();
-                        await CheckMsUndoCrowdfundingTransaction();
-                        await CheckFinishedShufflingTransactions();
-                        await CheckShufflingDistributionTransactions();
-                        var deletedTransactions = await RemovePreviouslyUnconfirmedNowRemovedTransactions();
-
-                        if (BalancesMatch(deletedTransactions))
-                        {
-                            await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
-                        }
-                        else
-                        {
-                            // WTF?! Balances still don't match!!
-                            throw new Exception("Fatal Fucking Error Baby!");
-                        }
-                    }
-                    else
-                    {
-                        await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
-                    }
-
-                    GetTransactionsWithUpdatedConfirmation()
-                        .Union(await HandleNewTransactions())
-                        .ToList()
-                        .ForEach(t => _updatedTransactions.Add(t));
-                    await HandleUpdatedTransactions();
-                    await HandleBalance();
-                    await _assetTracker.SaveOwnerships();
-
-                    await Task.Delay(_walletRepository.SleepTime, token);
+                    await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
                 }
-                catch (Exception)
+                else
                 {
-                    // ignore
+                    throw new Exception("Balances don't match!");
                 }
             }
+            else
+            {
+                await _walletRepository.UpdateLastBalanceMatchBlockIdAsync(_blockchainStatus.LastBlockId);
+            }
+
+            GetTransactionsWithUpdatedConfirmation()
+                .Union(await HandleNewTransactions())
+                .ToList()
+                .ForEach(t => _updatedTransactions.Add(t));
+            await HandleUpdatedTransactions();
+            await HandleBalance();
+            await _assetTracker.SaveOwnerships();
         }
 
         private async Task GetKnownTransactions()
