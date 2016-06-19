@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NxtWallet.Core.ViewModel.Model
+namespace NxtWallet.Core.Models
 {
     public class MsExchangeOfferExpiredTransaction : Transaction, IEquatable<MsExchangeOfferExpiredTransaction>, IEquatable<Transaction>
     {

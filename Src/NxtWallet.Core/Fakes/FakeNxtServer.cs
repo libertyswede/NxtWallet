@@ -7,8 +7,8 @@ using NxtLib;
 using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Shuffling;
-using NxtWallet.Core.ViewModel.Model;
-using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using NxtWallet.Core.Models;
+using Transaction = NxtWallet.Core.Models.Transaction;
 using NxtWallet.Core;
 
 namespace NxtWallet.Core.Fakes

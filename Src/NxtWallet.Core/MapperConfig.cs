@@ -3,9 +3,9 @@ using AutoMapper;
 using Newtonsoft.Json;
 using NxtLib;
 using NxtWallet.Repositories.Model;
-using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
-using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using Transaction = NxtWallet.Core.Models.Transaction;
 using System.Numerics;
 using System.Linq;
 

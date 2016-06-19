@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Models;
 
 namespace NxtWallet.Core
 {

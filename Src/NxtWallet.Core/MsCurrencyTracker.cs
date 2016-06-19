@@ -1,5 +1,5 @@
 ﻿using NxtWallet.Repositories.Model;
-using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

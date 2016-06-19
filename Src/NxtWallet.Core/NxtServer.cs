@@ -16,10 +16,10 @@ using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Transactions;
 using NxtWallet.Repositories.Model;
-using NxtWallet.Core.ViewModel.Model;
-using Asset = NxtWallet.Core.ViewModel.Model.Asset;
-using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
-using TransactionType = NxtWallet.Core.ViewModel.Model.TransactionType;
+using NxtWallet.Core.Models;
+using Asset = NxtWallet.Core.Models.Asset;
+using Transaction = NxtWallet.Core.Models.Transaction;
+using TransactionType = NxtWallet.Core.Models.TransactionType;
 using NxtLib.Shuffling;
 
 namespace NxtWallet.Core

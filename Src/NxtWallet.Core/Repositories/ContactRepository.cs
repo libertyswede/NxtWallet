@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Data.Entity;
-using NxtWallet.Core.ViewModel.Model;
+using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
 
 namespace NxtWallet.Repositories.Model

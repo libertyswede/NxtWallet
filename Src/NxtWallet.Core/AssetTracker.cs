@@ -6,9 +6,9 @@ using AutoMapper;
 using NxtLib;
 using NxtLib.AssetExchange;
 using NxtWallet.Repositories.Model;
-using NxtWallet.Core.ViewModel.Model;
-using Asset = NxtWallet.Core.ViewModel.Model.Asset;
-using Transaction = NxtWallet.Core.ViewModel.Model.Transaction;
+using NxtWallet.Core.Models;
+using Asset = NxtWallet.Core.Models.Asset;
+using Transaction = NxtWallet.Core.Models.Transaction;
 using System.Linq;
 
 namespace NxtWallet.Core

@@ -1,6 +1,6 @@
 using System;
 
-namespace NxtWallet.Core.ViewModel.Model
+namespace NxtWallet.Core.Models
 {
     public class MsUndoCrowdfundingTransaction : Transaction, IEquatable<MsUndoCrowdfundingTransaction>
     {
