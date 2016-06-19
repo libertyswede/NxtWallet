@@ -9,9 +9,16 @@ namespace NxtWallet.Core.Fakes
 {
     public class FakeTransactionRepository : ITransactionRepository
     {
-        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        public List<Transaction> GetAllTransactions { get; set; }
+        public List<Transaction> SaveTransaction { get; set; }
+        public List<Transaction> UpdateTransactions { get; set; }
+        public List<Transaction> RemoveTransaction { get; set; }
+        public List<Transaction> SaveTransactions { get; set; }
+        public bool HasOutgoingTransaction { get; set; }
+
+        public FakeTransactionRepository()
         {
-            var transactions = new List<Transaction>
+            GetAllTransactions = new List<Transaction>
             {
                 new Transaction
                 {
@@ -48,32 +55,44 @@ namespace NxtWallet.Core.Fakes
                 }
             };
 
-            return Task.FromResult(transactions.AsEnumerable());
+            SaveTransaction = new List<Transaction>();
+            UpdateTransactions = new List<Transaction>();
+            RemoveTransaction = new List<Transaction>();
+            SaveTransactions = new List<Transaction>();
+        }
+
+        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        {
+            return Task.FromResult(GetAllTransactions.AsEnumerable());
         }
 
         public Task SaveTransactionAsync(Transaction transaction)
         {
+            SaveTransaction.Add(transaction);
             return Task.CompletedTask;
         }
 
         public Task UpdateTransactionsAsync(IEnumerable<Transaction> transactionModels)
         {
+            UpdateTransactions.AddRange(transactionModels);
             return Task.CompletedTask;
         }
 
         public Task RemoveTransactionAsync(Transaction transaction)
         {
+            RemoveTransaction.Add(transaction);
             return Task.CompletedTask;
         }
 
         public Task SaveTransactionsAsync(IEnumerable<Transaction> transactions)
         {
+            SaveTransactions.AddRange(transactions);
             return Task.CompletedTask;
         }
 
         public Task<bool> HasOutgoingTransactionAsync()
         {
-            return Task.FromResult(true);
+            return Task.FromResult(HasOutgoingTransaction);
         }
     }
 }
