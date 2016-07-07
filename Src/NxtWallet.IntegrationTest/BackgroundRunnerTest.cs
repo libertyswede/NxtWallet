@@ -22,8 +22,7 @@ namespace NxtWallet.IntegrationTest
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountsTest()
         {
-            await TryCheckAllTransactionsTest("NXT-7A48-47JL-T7LD-D5FS3");
-            //await TryCheckAllTransactionsTest("NXT-G885-AKDX-5G2B-BLUCG");
+            await TryCheckAllTransactionsTest("NXT-G885-AKDX-5G2B-BLUCG");
             //await TryCheckAllTransactionsTest("NXT-7A48-47JL-T7LD-D5FS3");
         }
 
@@ -85,10 +84,22 @@ namespace NxtWallet.IntegrationTest
             using (var outputStream = stream.GetOutputStreamAt(0))
             using (var dataWriter = new DataWriter(outputStream))
             {
+                var header = "Balance".PadLeft(15) + " - " +
+                    "Amount".PadLeft(15) + " - " +
+                    "Fee".PadLeft(15) + " - " +
+                    "TransactionId".PadLeft(20) + " - " +
+                    "Transaction Type".PadLeft(30) + " - " +
+                    "Timestamp".PadLeft(19) + " - " +
+                    "Height".PadLeft(10) + "\r\n";
+
+                Debug.Write(header);
+                dataWriter.WriteString(header);
+
                 foreach (var transaction in orderedTransactions)
                 {
                     var formattedTransaction = transaction.FormattedBalance.PadLeft(15) + " - " +
                         transaction.FormattedAmount.PadLeft(15) + " - " +
+                        transaction.FormattedFee.PadLeft(15) + " - " +
                         transaction.NxtId.ToString().PadLeft(20) + " - " +
                         transaction.TransactionType.ToString().PadLeft(30) + " - " +
                         transaction.Timestamp.ToString("yyyy-MM-dd HH:mm:ss") + " - " +
