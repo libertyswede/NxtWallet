@@ -1,8 +1,8 @@
 ﻿{
   "dependencies": {
-    "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "AutoMapper": "4.2.1",
-    "NxtLib": "1.1.12"
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "NxtLib": "1.1.16"
   },
   "frameworks": {
     "uap10.0": {}
