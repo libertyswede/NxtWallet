@@ -34,7 +34,7 @@ namespace NxtWallet.ViewModel
         {
             if (string.Equals(_walletRepository.SecretPhrase, SecretPhraseConfirmation))
             {
-                await Task.Run(async () => await _walletRepository.UpdateBackupCompleted(true));
+                await Task.Run(async () => await _walletRepository.UpdateBackupCompletedAsync(true));
                 await _backupDoneDialog.ShowAsync();
             }
         }

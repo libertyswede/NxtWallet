@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NxtWallet.Core
 {
-    public delegate void AccountLedgerHandler(IAccountLedgerRunner sender, Transaction transaction);
+    public delegate void AccountLedgerHandler(IAccountLedgerRunner sender, LedgerEntry ledgerEntry);
     public delegate void BalanceHandler(IAccountLedgerRunner sender, string balance);
 
     public interface IAccountLedgerRunner
@@ -31,7 +31,7 @@ namespace NxtWallet.Core
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
 
-        private HashSet<Transaction> _updatedTransactions;
+        private HashSet<LedgerEntry> _updatedLedgerEntries;
 
         public AccountLedgerRunner(IWalletRepository walletRepository, INxtServer nxtServer)
         {
@@ -50,23 +50,23 @@ namespace NxtWallet.Core
 
         public async Task TryCheckAllTransactions()
         {
-            var accountLedger = _nxtServer.getAccountLedger();
+            var accountLedger = _nxtServer.GetAccountLedgerEntriesAsync();
 
         }
 
-        protected virtual void OnTransactionConfirmationUpdated(Transaction transaction)
+        protected virtual void OnTransactionConfirmationUpdated(LedgerEntry ledgerEntry)
         {
-            TransactionConfirmationUpdated?.Invoke(this, transaction);
+            TransactionConfirmationUpdated?.Invoke(this, ledgerEntry);
         }
 
-        protected virtual void OnTransactionBalanceUpdated(Transaction transaction)
+        protected virtual void OnTransactionBalanceUpdated(LedgerEntry ledgerEntry)
         {
-            TransactionBalanceUpdated?.Invoke(this, transaction);
+            TransactionBalanceUpdated?.Invoke(this, ledgerEntry);
         }
 
-        protected virtual void OnTransactionAdded(Transaction transaction)
+        protected virtual void OnTransactionAdded(LedgerEntry ledgerEntry)
         {
-            TransactionAdded?.Invoke(this, transaction);
+            TransactionAdded?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnBalanceUpdated(string balance)

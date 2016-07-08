@@ -16,9 +16,7 @@ namespace NxtWallet.Core.Fakes
         public bool BackupCompleted { get; set; }
         public int SleepTime { get; set; }
         public bool NotificationsEnabled { get; set; }
-        public ulong LastBalanceMatchBlockId { get; set; }
-        public DateTime LastAssetTrade { get; set; }
-        public DateTime LastCurrencyExchange { get; set; }
+        public ulong LastLedgerEntryBlockId { get; set; }
 
         public FakeWalletRepository()
         {
@@ -36,9 +34,7 @@ namespace NxtWallet.Core.Fakes
             BackupCompleted = false;
             SleepTime = 10000;
             NotificationsEnabled = true;
-            LastBalanceMatchBlockId = 600000;
-            LastAssetTrade = DateTime.UtcNow;
-            LastCurrencyExchange = DateTime.Now;
+            LastLedgerEntryBlockId = 600000;
         }
 
         public Task LoadAsync()
@@ -58,7 +54,7 @@ namespace NxtWallet.Core.Fakes
             return Task.CompletedTask;
         }
 
-        public Task UpdateBackupCompleted(bool completed)
+        public Task UpdateBackupCompletedAsync(bool completed)
         {
             BackupCompleted = completed;
             return Task.CompletedTask;
@@ -70,21 +66,9 @@ namespace NxtWallet.Core.Fakes
             return Task.CompletedTask;
         }
 
-        public Task UpdateLastAssetTrade(DateTime newTimestamp)
+        public Task UpdateLastLedgerEntryBlockIdAsync(ulong blockId)
         {
-            LastAssetTrade = newTimestamp;
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateLastCurrencyExchange(DateTime newTimestamp)
-        {
-            LastCurrencyExchange = newTimestamp;
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId)
-        {
-            LastBalanceMatchBlockId = blockId;
+            LastLedgerEntryBlockId = blockId;
             return Task.CompletedTask;
         }
     }
