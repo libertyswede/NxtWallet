@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountLedgerRunner.cs" />
     <Compile Include="AssetTracker.cs" />
     <Compile Include="BackgroundRunner.cs" />
     <Compile Include="BalanceCalculator.cs" />

@@ -75,7 +75,7 @@ namespace NxtWallet
 
             _cancellationTokenSource = new CancellationTokenSource();
             var token = _cancellationTokenSource.Token;
-            var runner = ServiceLocator.Current.GetInstance<IBackgroundRunner>();
+            var runner = ServiceLocator.Current.GetInstance<IAccountLedgerRunner>();
             Task.Factory.StartNew(() => runner.Run(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 

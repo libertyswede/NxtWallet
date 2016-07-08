@@ -16,7 +16,7 @@ using NxtLib.Accounts;
 namespace NxtWallet.Core
 {
     public delegate void TransactionHandler(IBackgroundRunner sender, Transaction transaction);
-    public delegate void BalanceHandler(IBackgroundRunner sender, string balance);
+    //public delegate void BalanceHandler(IBackgroundRunner sender, string balance);
 
     public interface IBackgroundRunner
     {
@@ -613,7 +613,7 @@ namespace NxtWallet.Core
 
         protected virtual void OnBalanceUpdated(string balance)
         {
-            BalanceUpdated?.Invoke(this, balance);
+            //BalanceUpdated?.Invoke(this, balance);
         }
     }
 }

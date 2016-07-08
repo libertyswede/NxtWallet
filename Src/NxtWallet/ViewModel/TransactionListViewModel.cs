@@ -22,14 +22,14 @@ namespace NxtWallet.ViewModel
             set { Set(ref _transactions, value); }
         }
 
-        public TransactionListViewModel(ITransactionRepository transactionRepository, IBackgroundRunner backgroundRunner,
+        public TransactionListViewModel(ITransactionRepository transactionRepository, IAccountLedgerRunner accountLedgerRunner,
             IContactRepository contactRepository)
         {
-            backgroundRunner.TransactionAdded += (sender, transaction) =>
+            accountLedgerRunner.TransactionAdded += (sender, transaction) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() => InsertTransaction(transaction));
             };
-            backgroundRunner.TransactionBalanceUpdated += (sender, transaction) =>
+            accountLedgerRunner.TransactionBalanceUpdated += (sender, transaction) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
@@ -37,7 +37,7 @@ namespace NxtWallet.ViewModel
                     existingTransaction.NqtBalance = transaction.NqtBalance;
                 });
             };
-            backgroundRunner.TransactionConfirmationUpdated += (sender, transaction) =>
+            accountLedgerRunner.TransactionConfirmationUpdated += (sender, transaction) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {

@@ -37,6 +37,7 @@ namespace NxtWallet.Core
         Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
         Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType);
         Task<IEnumerable<Transaction>> GetTransactionsAsync();
+        Task<IEnumerable<Transaction>> GetAccountLedgerTransactions();
         Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
         Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
         Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
@@ -291,6 +292,30 @@ namespace NxtWallet.Core
         public Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
+        }
+
+        public async Task<IEnumerable<Transaction>> GetAccountLedgerTransactions()
+        {
+            var transactionList = new List<Transaction>();
+            try
+            {
+                var accountService = _serviceFactory.CreateAccountService();
+                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount, 0, 10, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
+                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
+                UpdateIsMyAddress(transactionList);
+                IsOnline = true;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+            return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
         public async Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)

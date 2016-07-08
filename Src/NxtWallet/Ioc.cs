@@ -45,7 +45,7 @@ namespace NxtWallet
             var repo = ServiceLocator.Current.GetInstance<IWalletRepository>();
 
             SimpleIoc.Default.Register(() => MapperConfig.Setup().CreateMapper());
-            SimpleIoc.Default.Register<IBackgroundRunner, BackgroundRunner>();
+            SimpleIoc.Default.Register<IAccountLedgerRunner, AccountLedgerRunner>();
             SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
             SimpleIoc.Default.Register<INavigationService, NavigationService>();
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();

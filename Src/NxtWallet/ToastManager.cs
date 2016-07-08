@@ -14,17 +14,17 @@ namespace NxtWallet
     public class ToastManager : IToastManager
     {
         private readonly IWalletRepository _walletRepository;
-        private readonly IBackgroundRunner _backgroundRunner;
+        private readonly IAccountLedgerRunner _accountLedgerRunner;
 
-        public ToastManager(IWalletRepository walletRepository, IBackgroundRunner backgroundRunner)
+        public ToastManager(IWalletRepository walletRepository, IAccountLedgerRunner accountLedgerRunner)
         {
             _walletRepository = walletRepository;
-            _backgroundRunner = backgroundRunner;
+            _accountLedgerRunner = accountLedgerRunner;
         }
 
         public void Register()
         {
-            _backgroundRunner.TransactionAdded += (sender, transaction) =>
+            _accountLedgerRunner.TransactionAdded += (sender, transaction) =>
             {
                 if (transaction.UserIsTransactionRecipient && _walletRepository.NotificationsEnabled)
                     PopNewTransactionToast(transaction);

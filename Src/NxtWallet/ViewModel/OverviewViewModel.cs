@@ -31,14 +31,14 @@ namespace NxtWallet.ViewModel
             set { Set(ref _showAddress, value); }
         }
 
-        public OverviewViewModel(IWalletRepository walletRepository, IBackgroundRunner backgroundRunner)
+        public OverviewViewModel(IWalletRepository walletRepository, IAccountLedgerRunner accountLedgerRunner)
         {
             _walletRepository = walletRepository;
 
             Balance = "0.0";
             NxtAddress = walletRepository.NxtAccount.AccountRs;
 
-            backgroundRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => Balance = balance);
+            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => Balance = balance);
         }
 
         public void LoadFromRepository()
