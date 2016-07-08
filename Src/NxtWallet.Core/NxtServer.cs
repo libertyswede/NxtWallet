@@ -16,11 +16,9 @@ using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
 using NxtLib.Transactions;
 using NxtWallet.Repositories.Model;
-using NxtWallet.Core.Models;
-using Asset = NxtWallet.Core.Models.Asset;
-using Transaction = NxtWallet.Core.Models.Transaction;
-using TransactionType = NxtWallet.Core.Models.TransactionType;
+using LedgerEntryType = NxtWallet.Core.Models.LedgerEntryType;
 using NxtLib.Shuffling;
+using NxtWallet.Core.Models;
 
 namespace NxtWallet.Core
 {
@@ -34,22 +32,12 @@ namespace NxtWallet.Core
         Task<Block<ulong>> GetBlockAsync(ulong blockId);
         Task<Block<ulong>> GetBlockAsync(int height);
         Task<long> GetUnconfirmedNqtBalanceAsync();
-        Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp);
-        Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType);
-        Task<IEnumerable<Transaction>> GetTransactionsAsync();
-        Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp);
-        Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message);
-        Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp);
-        Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp);
-        Task<Asset> GetAssetAsync(ulong assetId);
+        Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(DateTime lastTimestamp);
+        Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(string account, TransactionSubType transactionSubType);
+        Task<IEnumerable<LedgerEntry>> GetTransactionsAsync();
+        Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
-        Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp);
-        Task<Transaction> GetTransactionAsync(ulong transactionId);
-        Task<bool> GetIsPurchaseExpired(ulong purchaseId);
-        Task<Currency> GetCurrencyAsync(ulong currencyId);
-        Task<ShufflingData> GetShuffling(ulong shufflingId);
-        Task<IEnumerable<ShufflingData>> GetShufflingsStageDone();
-        Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId);
+        Task<LedgerEntry> GetTransactionAsync(ulong transactionId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -58,7 +46,7 @@ namespace NxtWallet.Core
         private readonly IMapper _mapper;
         private bool _isOnline;
         private IServiceFactory _serviceFactory;
-        private ulong requireBlock => _walletRepository.LastBalanceMatchBlockId;
+        private ulong requireBlock => _walletRepository.LastLedgerEntryBlockId;
         private string accountRs => _walletRepository.NxtAccount.AccountRs;
 
         public bool IsOnline
@@ -169,7 +157,7 @@ namespace NxtWallet.Core
             return 0;
         }
 
-        public async Task<Transaction> GetTransactionAsync(ulong transactionId)
+        public async Task<LedgerEntry> GetTransactionAsync(ulong transactionId)
         {
             try
             {
@@ -177,7 +165,7 @@ namespace NxtWallet.Core
                 var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId),
                     requireBlock: requireBlock);
                 IsOnline = true;
-                var transaction = _mapper.Map<Transaction>(transactionReply);
+                var transaction = _mapper.Map<LedgerEntry>(transactionReply);
                 UpdateIsMyAddress(transaction);
                 return transaction;
             }
@@ -193,51 +181,9 @@ namespace NxtWallet.Core
             }
         }
 
-        public async Task<bool> GetIsPurchaseExpired(ulong purchaseId)
+        public async Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            try
-            {
-                var dgsService = _serviceFactory.CreateDigitalGoodsStoreService();
-                var purchaseReply = await dgsService.GetPurchase(purchaseId, requireBlock: requireBlock);
-                IsOnline = true;
-                return purchaseReply.Pending == false && purchaseReply.GoodsData == null;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<Currency> GetCurrencyAsync(ulong currencyId)
-        {
-            try
-            {
-                var msService = _serviceFactory.CreateMonetarySystemService();
-                var currency = await msService.GetCurrency(CurrencyLocator.ByCurrencyId(currencyId), requireBlock: requireBlock);
-                IsOnline = true;
-                return currency;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
-        {
-            var transactionList = new List<Transaction>();
+            var transactionList = new List<LedgerEntry>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
@@ -246,8 +192,8 @@ namespace NxtWallet.Core
                 var unconfirmed = await transactionService.GetUnconfirmedTransactions(new[] {_walletRepository.NxtAccount},
                     requireBlock);
 
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(unconfirmed.UnconfirmedTransactions));
+                transactionList.AddRange(_mapper.Map<List<LedgerEntry>>(transactions.Transactions));
+                transactionList.AddRange(_mapper.Map<List<LedgerEntry>>(unconfirmed.UnconfirmedTransactions));
                 UpdateIsMyAddress(transactionList);
                 IsOnline = true;
             }
@@ -264,14 +210,14 @@ namespace NxtWallet.Core
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
+        public async Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
         {
-            var transactionList = new List<Transaction>();
+            var transactionList = new List<LedgerEntry>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactions = await transactionService.GetBlockchainTransactions(account, transactionType: transactionSubType);
-                transactionList.AddRange(_mapper.Map<List<Transaction>>(transactions.Transactions));
+                transactionList.AddRange(_mapper.Map<List<LedgerEntry>>(transactions.Transactions));
                 UpdateIsMyAddress(transactionList);
                 IsOnline = true;
             }
@@ -288,37 +234,12 @@ namespace NxtWallet.Core
             return transactionList.OrderByDescending(t => t.Timestamp);
         }
 
-        public Task<IEnumerable<Transaction>> GetTransactionsAsync()
+        public Task<IEnumerable<LedgerEntry>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
-
-        public async Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)
-        {
-            try
-            {
-                var transactionService = _serviceFactory.CreateTransactionService();
-                var transactions = await transactionService.GetBlockchainTransactions(
-                    account, timestamp, TransactionSubType.ColoredCoinsDividendPayment, requireBlock: requireBlock);
-                IsOnline = true;
-                var transactionList = _mapper.Map<List<Transaction>>(transactions.Transactions);
-                UpdateIsMyAddress(transactionList);
-                return transactionList;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        //TODO: Use one known exception instead of Result<>
-        public async Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        
+        public async Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             try
             {
@@ -332,174 +253,10 @@ namespace NxtWallet.Core
 
                 IsOnline = true;
 
-                var transaction = _mapper.Map<Transaction>(sendMoneyReply.Transaction);
-                UpdateIsMyAddress(transaction);
-                transaction.NxtId = broadcastReply.TransactionId;
-                return transaction;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<Asset> GetAssetAsync(ulong assetId)
-        {
-            try
-            {
-                var assetService = _serviceFactory.CreateAssetExchangeService();
-                var asset = await assetService.GetAsset(assetId, requireBlock: requireBlock);
-                IsOnline = true;
-                return _mapper.Map<Asset>(asset);
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
-        {
-            try
-            {
-                var assetService = _serviceFactory.CreateAssetExchangeService();
-                var trades = await assetService.GetTrades(
-                    AssetIdOrAccountId.ByAccountId(_walletRepository.NxtAccount), timestamp: timestamp, requireBlock: requireBlock);
-                IsOnline = true;
-                var transactionList = new List<AssetTradeTransaction>();
-                foreach (var trade in trades.Trades)
-                {
-                    var transaction = new AssetTradeTransaction
-                    {
-                        NxtId = trade.BuyerRs == accountRs ? trade.AskOrder : trade.BidOrder,  // buyer makes the bidorder
-                        Message = "[Asset Trade]",
-                        NqtAmount = (trade.BuyerRs == accountRs ? -1 : 1) * trade.Price.Nqt * trade.QuantityQnt,
-                        NqtFee = Amount.OneNxt.Nqt, // TODO: Assumption
-                        AccountFrom = trade.BuyerRs == accountRs ? trade.SellerRs : trade.BuyerRs,
-                        AccountTo = trade.SellerRs == accountRs ? trade.SellerRs : trade.BuyerRs,
-                        IsConfirmed = true,
-                        TransactionType = TransactionType.AssetTrade,
-                        AssetNxtId = trade.AssetId,
-                        QuantityQnt = trade.QuantityQnt,
-                        Height = trade.Height,
-                        Timestamp = trade.Timestamp
-                    };
-                    UpdateIsMyAddress(transaction);
-                    transactionList.Add(transaction);
-                }
-                return transactionList;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp)
-        {
-            try
-            {
-                var msService = _serviceFactory.CreateMonetarySystemService();
-                var exchanges = await msService.GetExchanges(
-                    CurrencyOrAccountLocator.ByAccountId(_walletRepository.NxtAccount.AccountRs), 
-                    timestamp: timestamp, includeCurrencyInfo: true, requireBlock: requireBlock);
-                IsOnline = true;
-                var transactionList = _mapper.Map<List<MsCurrencyExchangeTransaction>>(exchanges.Exchanges);
-                UpdateIsMyAddress(transactionList);
-                return transactionList;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<ShufflingData> GetShuffling(ulong shufflingId)
-        {
-            try
-            {
-                var shufflingService = _serviceFactory.CreateShufflingService();
-                var shuffling = await shufflingService.GetShuffling(shufflingId, false, requireBlock);
-                IsOnline = true;
-                return shuffling;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<IEnumerable<ShufflingData>> GetShufflingsStageDone()
-        {
-            try
-            {
-                var shufflingService = _serviceFactory.CreateShufflingService();
-                bool hasMore = true;
-                int firstIndex = 0;
-                const int count = 100;
-                var shufflings = new List<ShufflingData>();
-
-                while (hasMore)
-                {
-                    var shufflingsReply = await shufflingService.GetHoldingShufflings(0, ShufflingStage.Done, true, firstIndex, count - 1);
-                    shufflings.AddRange(shufflingsReply.Shufflings);
-                    firstIndex += count;
-                    hasMore = shufflingsReply.Shufflings.Count() == count;
-                }
-
-                IsOnline = true;
-                return shufflings;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
-        public async Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId)
-        {
-            try
-            {
-                var shufflingService = _serviceFactory.CreateShufflingService();
-                var shufflingsReply = await shufflingService.GetShufflingParticipants(shufflingId);
-                IsOnline = true;
-                return shufflingsReply;
+                var ledgerEntry = _mapper.Map<LedgerEntry>(sendMoneyReply.Transaction);
+                UpdateIsMyAddress(ledgerEntry);
+                ledgerEntry.NxtId = broadcastReply.TransactionId;
+                return ledgerEntry;
             }
             catch (HttpRequestException e)
             {
@@ -518,46 +275,6 @@ namespace NxtWallet.Core
             _serviceFactory = new ServiceFactory(newServerAddress);
         }
 
-        public async Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp)
-        {
-            try
-            {
-                var assetService = _serviceFactory.CreateAccountService();
-                var accountBlocks = await assetService.GetAccountBlocks(_walletRepository.NxtAccount.AccountRs, timestamp, requireBlock: requireBlock);
-
-                var transactions = accountBlocks.Blocks
-                    .Where(b => b.TotalFee.Nqt > 0)
-                    .Select(block => new Transaction
-                {
-                    AccountFrom = Transaction.GeneratedFromAddress,
-                    AccountTo = _walletRepository.NxtAccount.AccountRs,
-                    Height = block.Height,
-                    IsConfirmed = true,
-                    NqtAmount = block.TotalFee.Nqt,
-                    NqtFee = 0,
-                    NxtId = block.BlockId,
-                    Timestamp = block.Timestamp,
-                    TransactionType = TransactionType.ForgeIncome,
-                    Message = "[Forge Income]",
-                    UserIsTransactionRecipient = true,
-                    UserIsTransactionSender = false
-                });
-
-                IsOnline = true;
-                return transactions;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
         private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string message,
             IAccountService accountService)
         {
@@ -570,13 +287,13 @@ namespace NxtWallet.Core
             return sendMoneyReply;
         }
 
-        private void UpdateIsMyAddress<T>(List<T> transactions) where T : Transaction
+        private void UpdateIsMyAddress<T>(List<T> transactions) where T : LedgerEntry
         {
             transactions.ForEach(t => t.UserIsTransactionRecipient = accountRs == t.AccountTo);
             transactions.ForEach(t => t.UserIsTransactionSender = accountRs == t.AccountFrom);
         }
 
-        private void UpdateIsMyAddress(Transaction transaction)
+        private void UpdateIsMyAddress(LedgerEntry transaction)
         {
             transaction.UserIsTransactionRecipient = accountRs == transaction.AccountTo;
             transaction.UserIsTransactionSender = accountRs == transaction.AccountFrom;

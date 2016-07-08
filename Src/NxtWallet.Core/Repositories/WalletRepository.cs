@@ -22,18 +22,14 @@ namespace NxtWallet.Repositories.Model
         bool BackupCompleted { get; }
         int SleepTime { get; }
         bool NotificationsEnabled { get; }
-        ulong LastBalanceMatchBlockId { get; }
-        DateTime LastAssetTrade { get; }
-        DateTime LastCurrencyExchange { get; }
+        ulong LastLedgerEntryBlockId { get; }
 
         Task LoadAsync();
         Task UpdateBalanceAsync(string balance);
         Task UpdateNxtServerAsync(string newServerAddress);
-        Task UpdateBackupCompleted(bool completed);
+        Task UpdateBackupCompletedAsync(bool completed);
         Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
-        Task UpdateLastAssetTrade(DateTime newTimestamp);
-        Task UpdateLastCurrencyExchange(DateTime newTimestamp);
-        Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId);
+        Task UpdateLastLedgerEntryBlockIdAsync(ulong blockId);
     }
 
     public class WalletRepository : IWalletRepository
@@ -44,9 +40,7 @@ namespace NxtWallet.Repositories.Model
         private const string SleepTimeKey = "sleepTime";
         private const string BalanceKey = "balance";
         private const string NotificationsEnabledKey = "notificationsEnabled";
-        private const string LastAssetTradeKey = "lastAssetTrade";
-        private const string LastBalanceMatchBlockIdKey = "lastBalanceMatchBlockId";
-        private const string LastCurrencyExchangeKey = "lastCurrencyExchange";
+        private const string LastLedgerEntryBlockIdKey = "lastLedgerEntryBlockId";
         private const string ReadOnlyAccountKey = "readOnlyAccountKey";
 
         public Account NxtAccount { get; private set; }
@@ -57,10 +51,8 @@ namespace NxtWallet.Repositories.Model
         public bool BackupCompleted { get; private set; }
         public int SleepTime { get; private set; }
         public bool NotificationsEnabled { get; private set; }
-        public ulong LastBalanceMatchBlockId { get; private set; }
+        public ulong LastLedgerEntryBlockId { get; private set; }
         public string Balance { get; private set; }
-        public DateTime LastAssetTrade { get; private set; }
-        public DateTime LastCurrencyExchange { get; private set; }
 
         public async Task LoadAsync()
         {
@@ -75,11 +67,9 @@ namespace NxtWallet.Repositories.Model
                 var readOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
                 NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
-                LastBalanceMatchBlockId = ReadOrGenerate(dbSettings, context, LastBalanceMatchBlockIdKey, () => Constants.GenesisBlockId);
+                LastLedgerEntryBlockId = ReadOrGenerate(dbSettings, context, LastLedgerEntryBlockIdKey, () => Constants.GenesisBlockId);
                 BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
                 NotificationsEnabled = ReadOrGenerate(dbSettings, context, NotificationsEnabledKey, () => true);
-                LastAssetTrade = ReadOrGenerateDateTime(dbSettings, context, LastAssetTradeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
-                LastCurrencyExchange = ReadOrGenerateDateTime(dbSettings, context, LastCurrencyExchangeKey, () => new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
 
                 SetupAccounts(readOnlyAccount);
 
@@ -102,19 +92,6 @@ namespace NxtWallet.Repositories.Model
             }
         }
 
-
-        public async Task UpdateLastAssetTrade(DateTime newTimestamp)
-        {
-            await Update(LastAssetTradeKey, newTimestamp.ToString("O"));
-            LastAssetTrade = newTimestamp;
-        }
-
-        public async Task UpdateLastCurrencyExchange(DateTime newTimestamp)
-        {
-            await Update(LastCurrencyExchangeKey, newTimestamp.ToString("O"));
-            LastCurrencyExchange = newTimestamp;
-        }
-
         public async Task UpdateBalanceAsync(string balance)
         {
             await Update(BalanceKey, balance);
@@ -133,16 +110,16 @@ namespace NxtWallet.Repositories.Model
             NotificationsEnabled = newNotificationsEnabled;
         }
 
-        public async Task UpdateBackupCompleted(bool completed)
+        public async Task UpdateBackupCompletedAsync(bool completed)
         {
             await Update(BackupCompletedKey, completed);
             BackupCompleted = completed;
         }
 
-        public async Task UpdateLastBalanceMatchBlockIdAsync(ulong blockId)
+        public async Task UpdateLastLedgerEntryBlockIdAsync(ulong blockId)
         {
-            await Update(LastBalanceMatchBlockIdKey, blockId.ToString());
-            LastBalanceMatchBlockId = blockId;
+            await Update(LastLedgerEntryBlockIdKey, blockId.ToString());
+            LastLedgerEntryBlockId = blockId;
         }
 
         private static async Task Update<T>(string key, T value)
@@ -165,13 +142,6 @@ namespace NxtWallet.Repositories.Model
             var defaultValue = defaultValueAction.Invoke();
             context.Settings.Add(new SettingDto {Key = key, Value = defaultValue.ToString(CultureInfo.InvariantCulture)});
             return defaultValue;
-        }
-
-        private static DateTime ReadOrGenerateDateTime(IEnumerable<SettingDto> dbSettings, WalletContext context,
-            string key, Func<DateTime> defaultValueAction)
-        {
-            var value = ReadOrGenerate(dbSettings, context, key, () => defaultValueAction.Invoke().ToString("O"));
-            return DateTime.ParseExact(value, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         private static void CreateAndMigrateDb(DbContext context)

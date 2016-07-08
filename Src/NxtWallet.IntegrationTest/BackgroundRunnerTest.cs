@@ -40,7 +40,7 @@ namespace NxtWallet.IntegrationTest
             walletRepository.IsReadOnlyAccount = true;
             walletRepository.Balance = "0";
             walletRepository.SecretPhrase = string.Empty;
-            walletRepository.LastBalanceMatchBlockId = 2680262203532249785UL;
+            walletRepository.LastLedgerEntryBlockId = 2680262203532249785UL;
             walletRepository.NxtServer = "http://localhost:6876/nxt";
             walletRepository.SleepTime = 10000;
             walletRepository.BackupCompleted = true;

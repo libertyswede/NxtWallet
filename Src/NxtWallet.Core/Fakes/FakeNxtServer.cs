@@ -4,12 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
-using NxtLib.MonetarySystem;
 using NxtLib.ServerInfo;
-using NxtLib.Shuffling;
 using NxtWallet.Core.Models;
-using Transaction = NxtWallet.Core.Models.Transaction;
-using NxtWallet.Core;
 
 namespace NxtWallet.Core.Fakes
 {
@@ -43,83 +39,37 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(11 * 100000000L);
         }
 
-        public Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime lastTimestamp)
+        public Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(DateTime lastTimestamp)
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
         }
 
-        public Task<IEnumerable<Transaction>> GetTransactionsAsync()
+        public Task<IEnumerable<LedgerEntry>> GetTransactionsAsync()
         {
             return GetTransactionsAsync(DateTime.UtcNow);
         }
 
-        public Task<IEnumerable<Transaction>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
+        public Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(string account, TransactionSubType transactionSubType)
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
         }
 
-        public Task<IEnumerable<Transaction>> GetDividendTransactionsAsync(string account, DateTime timestamp)
+        public Task<IEnumerable<LedgerEntry>> GetDividendTransactionsAsync(string account, DateTime timestamp)
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
         }
 
-        public Task<Transaction> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
-            return Task.FromResult(new Transaction());
+            return Task.FromResult(new LedgerEntry());
         }
-
-        public Task<IEnumerable<Transaction>> GetAssetTradesAsync(DateTime timestamp)
-        {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
-        }
-
-        public Task<IEnumerable<MsCurrencyExchangeTransaction>> GetExchanges(DateTime timestamp)
-        {
-            return Task.FromResult(new List<MsCurrencyExchangeTransaction>().AsEnumerable());
-        }
-
-        public Task<Asset> GetAssetAsync(ulong assetId)
-        {
-            return Task.FromResult(new Asset());
-        }
-
         public void UpdateNxtServer(string newServerAddress)
         {
         }
 
-        public Task<IEnumerable<Transaction>> GetForgingIncomeAsync(DateTime timestamp)
+        public Task<LedgerEntry> GetTransactionAsync(ulong transactionId)
         {
-            return Task.FromResult(new List<Transaction>().AsEnumerable());
-        }
-
-        public Task<Transaction> GetTransactionAsync(ulong transactionId)
-        {
-            return Task.FromResult(new Transaction());
-        }
-
-        public Task<bool> GetIsPurchaseExpired(ulong purchaseId)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<Currency> GetCurrencyAsync(ulong currencyId)
-        {
-            return Task.FromResult(new Currency());
-        }
-
-        public Task<ShufflingData> GetShuffling(ulong shufflingId)
-        {
-            return Task.FromResult(new ShufflingData());
-        }
-
-        public Task<IEnumerable<ShufflingData>> GetShufflingsStageDone()
-        {
-            return Task.FromResult(new List<ShufflingData>().AsEnumerable());
-        }
-
-        public Task<ShufflingParticipantsReply> GetShufflingParticipants(ulong shufflingId)
-        {
-            return Task.FromResult(new ShufflingParticipantsReply());
+            return Task.FromResult(new LedgerEntry());
         }
     }
 }
