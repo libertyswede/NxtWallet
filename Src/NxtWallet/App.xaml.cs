@@ -7,8 +7,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using GalaSoft.MvvmLight.Threading;
 using Microsoft.Practices.ServiceLocation;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Core;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet
 {

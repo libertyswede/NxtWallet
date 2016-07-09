@@ -3,22 +3,22 @@ using NxtWallet.Core.Models;
 
 namespace NxtWallet.ViewModel
 {
-    public class TransactionDetailViewModel : ViewModelBase
+    public class LedgerEntryDetailViewModel : ViewModelBase
     {
-        private Transaction _transaction;
+        private LedgerEntry _ledgerEntry;
         private string _transactionLink;
 
-        public Transaction Transaction
+        public LedgerEntry LedgerEntry
         {
-            get { return _transaction; }
+            get { return _ledgerEntry; }
             set
             {
-                Set(ref _transaction, value);
+                Set(ref _ledgerEntry, value);
                 UpdateTransactionLink();
             }
         }
 
-        public string TransactionLink
+        public string LedgerEntryLink
         {
             get { return _transactionLink; }
             set { Set(ref _transactionLink, value); }
@@ -26,7 +26,7 @@ namespace NxtWallet.ViewModel
 
         private void UpdateTransactionLink()
         {
-            TransactionLink = $"https://nxtportal.org/transactions/{Transaction.NxtId}";
+            LedgerEntryLink = $"https://nxtportal.org/transactions/{LedgerEntry.NxtId}";
         }
     }
 }

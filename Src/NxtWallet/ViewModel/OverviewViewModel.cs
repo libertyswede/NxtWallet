@@ -1,7 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using NxtWallet.Core;
-using NxtWallet.Repositories.Model;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
 {

@@ -5,8 +5,9 @@ using AutoMapper;
 using Microsoft.Data.Entity;
 using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
+using NxtWallet.Repositories.Model;
 
-namespace NxtWallet.Repositories.Model
+namespace NxtWallet.Core.Repositories
 {
     public interface IContactRepository
     {

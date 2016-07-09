@@ -3,10 +3,10 @@ using Microsoft.Practices.ServiceLocation;
 using NxtLib;
 using NxtWallet.Controls;
 using NxtWallet.Core;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Core.Fakes;
 using NxtWallet.ViewModel;
 using NxtWallet.Views;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet
 {
@@ -14,8 +14,8 @@ namespace NxtWallet
     {
         public OverviewViewModel OverviewViewModel => ServiceLocator.Current.GetInstance<OverviewViewModel>();
         public SendMoneyViewModel SendMoneyViewModel => ServiceLocator.Current.GetInstance<SendMoneyViewModel>();
-        public TransactionDetailViewModel TransactionDetailViewModel => ServiceLocator.Current.GetInstance<TransactionDetailViewModel>();
-        public TransactionListViewModel TransactionListViewModel => ServiceLocator.Current.GetInstance<TransactionListViewModel>();
+        public LedgerEntryDetailViewModel TransactionDetailViewModel => ServiceLocator.Current.GetInstance<LedgerEntryDetailViewModel>();
+        public LedgerEntryListViewModel LedgerEntryListViewModel => ServiceLocator.Current.GetInstance<LedgerEntryListViewModel>();
         public SettingsViewModel SettingsViewModel => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public ReceiveMoneyViewModel ReceiveMoneyViewModel => ServiceLocator.Current.GetInstance<ReceiveMoneyViewModel>();
         public ContactsViewModel ContactsViewModel => ServiceLocator.Current.GetInstance<ContactsViewModel>();
@@ -30,7 +30,6 @@ namespace NxtWallet
             {
                 SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
-                SimpleIoc.Default.Register<ITransactionRepository, FakeTransactionRepository>();
                 SimpleIoc.Default.Register<IContactRepository, FakeContactRepository>();
                 SimpleIoc.Default.Register<IToastManager, FakeToastManager>();
             }
@@ -38,7 +37,7 @@ namespace NxtWallet
             {
                 SimpleIoc.Default.Register<INxtServer, NxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, WalletRepository>();
-                SimpleIoc.Default.Register<ITransactionRepository, TransactionRepository>();
+                SimpleIoc.Default.Register<IAccountLedgerRepository, AccountLedgerRepository>();
                 SimpleIoc.Default.Register<IContactRepository, ContactRepository>();
                 SimpleIoc.Default.Register<IToastManager, ToastManager>();
             }
@@ -46,19 +45,15 @@ namespace NxtWallet
 
             SimpleIoc.Default.Register(() => MapperConfig.Setup().CreateMapper());
             SimpleIoc.Default.Register<IAccountLedgerRunner, AccountLedgerRunner>();
-            SimpleIoc.Default.Register<IBalanceCalculator, BalanceCalculator>();
             SimpleIoc.Default.Register<INavigationService, NavigationService>();
             SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
             SimpleIoc.Default.Register<IBackupInfoDialog, BackupInfoDialog>();
             SimpleIoc.Default.Register<IBackupDoneDialog, BackupDoneDialog>();
-            SimpleIoc.Default.Register<IAssetRepository, AssetRepository>();
-            SimpleIoc.Default.Register<IAssetTracker, AssetTracker>();
-            SimpleIoc.Default.Register<IMsCurrencyTracker, MsCurrencyTracker>();
             SimpleIoc.Default.Register<IServiceFactory>(() => new ServiceFactory(repo.NxtServer));
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
-            SimpleIoc.Default.Register<TransactionListViewModel>();
-            SimpleIoc.Default.Register<TransactionDetailViewModel>();
+            SimpleIoc.Default.Register<LedgerEntryListViewModel>();
+            SimpleIoc.Default.Register<LedgerEntryDetailViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<ReceiveMoneyViewModel>();
             SimpleIoc.Default.Register<ContactsViewModel>();

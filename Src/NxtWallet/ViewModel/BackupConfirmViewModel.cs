@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Views;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
 {

@@ -12,7 +12,7 @@ namespace NxtWallet.Views
         public OverviewPage()
         {
             InitializeComponent();
-            TransactionList.SelectedTransactionChanged += OnSelectedTransactionChanged;
+            TransactionList.SelectedLedgerEntryChanged += OnSelectedTransactionChanged;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

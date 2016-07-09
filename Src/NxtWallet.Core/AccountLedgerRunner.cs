@@ -1,7 +1,5 @@
 ﻿using NxtWallet.Core.Models;
-using NxtWallet.Repositories.Model;
-using System;
-using System.Collections.Generic;
+using NxtWallet.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,9 +12,9 @@ namespace NxtWallet.Core
     {
         Task Run(CancellationToken token);
 
-        event AccountLedgerHandler TransactionConfirmationUpdated;
-        event AccountLedgerHandler TransactionBalanceUpdated;
-        event AccountLedgerHandler TransactionAdded;
+        event AccountLedgerHandler AccountLedgerConfirmationUpdated;
+        event AccountLedgerHandler AccountLedgerBalanceUpdated;
+        event AccountLedgerHandler AccountLedgerAdded;
         event BalanceHandler BalanceUpdated;
     }
 
@@ -24,14 +22,12 @@ namespace NxtWallet.Core
     {
 
         public event BalanceHandler BalanceUpdated;
-        public event AccountLedgerHandler TransactionAdded;
-        public event AccountLedgerHandler TransactionBalanceUpdated;
-        public event AccountLedgerHandler TransactionConfirmationUpdated;
+        public event AccountLedgerHandler AccountLedgerAdded;
+        public event AccountLedgerHandler AccountLedgerBalanceUpdated;
+        public event AccountLedgerHandler AccountLedgerConfirmationUpdated;
         
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
-
-        private HashSet<LedgerEntry> _updatedLedgerEntries;
 
         public AccountLedgerRunner(IWalletRepository walletRepository, INxtServer nxtServer)
         {
@@ -50,23 +46,23 @@ namespace NxtWallet.Core
 
         public async Task TryCheckAllTransactions()
         {
-            var accountLedger = _nxtServer.GetAccountLedgerEntriesAsync();
+            var accountLedger = await _nxtServer.GetAccountLedgerEntriesAsync();
 
         }
 
         protected virtual void OnTransactionConfirmationUpdated(LedgerEntry ledgerEntry)
         {
-            TransactionConfirmationUpdated?.Invoke(this, ledgerEntry);
+            AccountLedgerConfirmationUpdated?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnTransactionBalanceUpdated(LedgerEntry ledgerEntry)
         {
-            TransactionBalanceUpdated?.Invoke(this, ledgerEntry);
+            AccountLedgerBalanceUpdated?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnTransactionAdded(LedgerEntry ledgerEntry)
         {
-            TransactionAdded?.Invoke(this, ledgerEntry);
+            AccountLedgerAdded?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnBalanceUpdated(string balance)

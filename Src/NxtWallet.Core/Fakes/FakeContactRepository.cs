@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.Models;
-using NxtWallet.Repositories.Model;
 using System.Linq;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.Core.Fakes
 {

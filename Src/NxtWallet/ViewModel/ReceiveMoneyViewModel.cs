@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight;
 using NxtWallet.Repositories.Model;
 using NxtWallet.Views;
 using ZXing;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
 {
@@ -11,7 +12,7 @@ namespace NxtWallet.ViewModel
     {
         private readonly IWalletRepository _walletRepository;
         private readonly IBackupInfoDialog _backupInfoDialog;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IAccountLedgerRepository _accountLedgerRepository;
 
         private string _nxtAddress;
         private string _publicKey;
@@ -50,11 +51,11 @@ namespace NxtWallet.ViewModel
         }
 
         public ReceiveMoneyViewModel(IWalletRepository walletRepository, IBackupInfoDialog backupInfoDialog,
-            ITransactionRepository transactionRepository)
+            IAccountLedgerRepository accountLedgerRepository)
         {
             _walletRepository = walletRepository;
             _backupInfoDialog = backupInfoDialog;
-            _transactionRepository = transactionRepository;
+            _accountLedgerRepository = accountLedgerRepository;
             NxtAddress = walletRepository.NxtAccount.AccountRs;
             PublicKey = walletRepository.NxtAccountWithPublicKey?.PublicKey.ToHexString();
 
@@ -74,7 +75,7 @@ namespace NxtWallet.ViewModel
         public async void OnNavigatedTo()
         {
             ShowNxtAddress = _walletRepository.BackupCompleted;
-            ShowPublicKey = ShowNxtAddress && !(await _transactionRepository.HasOutgoingTransactionAsync());
+            ShowPublicKey = ShowNxtAddress;// && !(await _accountLedgerRepository.HasOutgoingTransactionAsync());
 
             if (!ShowNxtAddress)
             {

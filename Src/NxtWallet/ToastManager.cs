@@ -1,8 +1,8 @@
 ﻿using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
-using NxtWallet.Repositories.Model;
-using NxtWallet.Core.Models;
 using NxtWallet.Core;
+using NxtWallet.Core.Repositories;
+using NxtWallet.Core.Models;
 
 namespace NxtWallet
 {
@@ -24,25 +24,25 @@ namespace NxtWallet
 
         public void Register()
         {
-            _accountLedgerRunner.TransactionAdded += (sender, transaction) =>
+            _accountLedgerRunner.AccountLedgerAdded += (sender, ledgerEntry) =>
             {
-                if (transaction.UserIsTransactionRecipient && _walletRepository.NotificationsEnabled)
-                    PopNewTransactionToast(transaction);
+                if (ledgerEntry.UserIsTransactionRecipient && _walletRepository.NotificationsEnabled)
+                    PopNewLedgerEntryToast(ledgerEntry);
             };
         }
 
-        private static void PopNewTransactionToast(Transaction transaction)
+        private static void PopNewLedgerEntryToast(LedgerEntry ledgerEntry)
         {
-            var message = string.IsNullOrEmpty(transaction.Message) ? string.Empty : $"\nMessage: {transaction.Message}";
-            var from = transaction.ContactListAccountFrom ?? transaction.AccountFrom;
+            var message = string.IsNullOrEmpty(ledgerEntry.Message) ? string.Empty : $"\nMessage: {ledgerEntry.Message}";
+            var from = ledgerEntry.ContactListAccountFrom ?? ledgerEntry.AccountFrom;
 
             var xmlToast =  "<toast launch=\"app-defined-string\">" +
                                 "<visual>" +
                                 "<binding template =\"ToastGeneric\">" +
                                     "<text>New NXT transaction</text>" +
                                     "<text>" +
-                                    $"You received {transaction.FormattedAmount} NXT from {from}.\n" + 
-                                    $"Your new balance is {transaction.FormattedBalance} NXT." +
+                                    $"You received {ledgerEntry.FormattedAmount} NXT from {from}.\n" + 
+                                    $"Your new balance is {ledgerEntry.FormattedBalance} NXT." +
                                     $"{message}" + 
                                     "</text>" +
                                 "</binding>" +

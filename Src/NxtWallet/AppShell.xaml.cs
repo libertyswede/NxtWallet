@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using NxtWallet.Controls;
 using NxtWallet.Views;
-using NxtWallet.Repositories.Model;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet
 {

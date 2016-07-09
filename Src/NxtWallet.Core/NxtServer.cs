@@ -13,8 +13,8 @@ using NxtLib.Blocks;
 using NxtLib.Local;
 using NxtLib.ServerInfo;
 using NxtLib.Transactions;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Core.Models;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.Core
 {

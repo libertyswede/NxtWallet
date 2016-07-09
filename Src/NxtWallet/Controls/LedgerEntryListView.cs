@@ -6,15 +6,14 @@ using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using NxtWallet.ViewModel;
 using NxtWallet.Core.Models;
 
 namespace NxtWallet.Controls
 {
-    public class TransactionListView : ListView
+    public class LedgerEntryListView : ListView
     {
         public static readonly DependencyProperty OddRowBackgroundProperty =
-            DependencyProperty.Register("OddRowBackground", typeof(Brush), typeof(TransactionListView), null);
+            DependencyProperty.Register("OddRowBackground", typeof(Brush), typeof(LedgerEntryListView), null);
         public Brush OddRowBackground
         {
             get { return (Brush)GetValue(OddRowBackgroundProperty); }
@@ -22,7 +21,7 @@ namespace NxtWallet.Controls
         }
 
         public static readonly DependencyProperty EvenRowBackgroundProperty =
-            DependencyProperty.Register("EvenRowBackground", typeof(Brush), typeof(TransactionListView), null);
+            DependencyProperty.Register("EvenRowBackground", typeof(Brush), typeof(LedgerEntryListView), null);
         public Brush EvenRowBackground
         {
             get { return (Brush)GetValue(EvenRowBackgroundProperty); }
@@ -30,14 +29,14 @@ namespace NxtWallet.Controls
         }
 
         public static readonly DependencyProperty UnconfirmedForegroundProperty =
-            DependencyProperty.Register("UnconfirmedForeground", typeof(Brush), typeof(TransactionListView), null);
+            DependencyProperty.Register("UnconfirmedForeground", typeof(Brush), typeof(LedgerEntryListView), null);
         public Brush UnconfirmedForeground
         {
             get { return (Brush)GetValue(UnconfirmedForegroundProperty); }
             set { SetValue(UnconfirmedForegroundProperty, value); }
         }
 
-        public TransactionListView()
+        public LedgerEntryListView()
         {
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
@@ -45,23 +44,23 @@ namespace NxtWallet.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<Transaction>)ItemsSource;
+            var source = (ObservableCollection<LedgerEntry>)ItemsSource;
             source.CollectionChanged += Source_CollectionChanged;
 
-            foreach (var viewModelTransaction in source)
+            foreach (var viewModelLedgerEntry in source)
             {
-                viewModelTransaction.PropertyChanged += TransactionOnPropertyChanged;
+                viewModelLedgerEntry.PropertyChanged += LedgerEntryOnPropertyChanged;
             }
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            var source = (ObservableCollection<Transaction>)ItemsSource;
+            var source = (ObservableCollection<LedgerEntry>)ItemsSource;
             source.CollectionChanged -= Source_CollectionChanged;
 
-            foreach (var viewModelTransaction in source)
+            foreach (var viewModelLedgerEntry in source)
             {
-                viewModelTransaction.PropertyChanged -= TransactionOnPropertyChanged;
+                viewModelLedgerEntry.PropertyChanged -= LedgerEntryOnPropertyChanged;
             }
         }
 
@@ -69,23 +68,23 @@ namespace NxtWallet.Controls
         {
             if (e.NewItems != null)
             {
-                foreach (var newTransaction in e.NewItems?.Cast<Transaction>())
+                foreach (var newLedgerEntry in e.NewItems?.Cast<LedgerEntry>())
                 {
-                    newTransaction.PropertyChanged += TransactionOnPropertyChanged;
+                    newLedgerEntry.PropertyChanged += LedgerEntryOnPropertyChanged;
                 }
             }
             if (e.OldItems != null)
             {
-                foreach (var oldTransaction in e.OldItems.Cast<Transaction>())
+                foreach (var oldLedgerEntry in e.OldItems.Cast<LedgerEntry>())
                 {
-                    oldTransaction.PropertyChanged -= TransactionOnPropertyChanged;
+                    oldLedgerEntry.PropertyChanged -= LedgerEntryOnPropertyChanged;
                 }
             }
         }
 
-        private void TransactionOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        private void LedgerEntryOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-            if (propertyChangedEventArgs.PropertyName.Equals(nameof(Transaction.IsConfirmed)))
+            if (propertyChangedEventArgs.PropertyName.Equals(nameof(LedgerEntry.IsConfirmed)))
             {
                 var listViewItem = (ListViewItem)ContainerFromItem(sender);
                 var index = IndexFromContainer(listViewItem);
@@ -113,9 +112,9 @@ namespace NxtWallet.Controls
 
         private void SetColors(ListViewItem listViewItem, int index)
         {
-            var transaction = Items[index] as Transaction;
+            var ledgerEntry = Items[index] as LedgerEntry;
             SetBackgroundColor(listViewItem, index);
-            SetForegroundColor(listViewItem, transaction);
+            SetForegroundColor(listViewItem, ledgerEntry);
         }
 
         private void SetBackgroundColor(ListViewItem listViewItem, int index)
@@ -123,9 +122,9 @@ namespace NxtWallet.Controls
             listViewItem.Background = (index + 1) % 2 == 1 ? OddRowBackground : EvenRowBackground;
         }
 
-        private void SetForegroundColor(ListViewItem listViewItem, Transaction transaction)
+        private void SetForegroundColor(ListViewItem listViewItem, LedgerEntry ledgerEntry)
         {
-            if (transaction != null && transaction.IsConfirmed)
+            if (ledgerEntry != null && ledgerEntry.IsConfirmed)
             {
                 listViewItem.Foreground = new SolidColorBrush(Colors.Black);
             }

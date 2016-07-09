@@ -121,6 +121,7 @@
     <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Migrations\Model\ContactDto.cs" />
     <Compile Include="Models\LedgerEntryType.cs" />
+    <Compile Include="Repositories\AccountLedgerRepository.cs" />
     <Compile Include="Repositories\ContactRepository.cs" />
     <Compile Include="Migrations\Model\SettingDto.cs" />
     <Compile Include="Repositories\WalletContext.cs" />

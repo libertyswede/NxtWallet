@@ -1,7 +1,6 @@
-using System;
 using System.Threading.Tasks;
 using NxtLib;
-using NxtWallet.Repositories.Model;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.Core.Fakes
 {

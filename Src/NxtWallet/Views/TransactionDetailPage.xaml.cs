@@ -6,7 +6,7 @@ namespace NxtWallet.Views
 {
     public sealed partial class TransactionDetailPage
     {
-        private TransactionDetailViewModel ViewModel => (TransactionDetailViewModel) DataContext;
+        private LedgerEntryDetailViewModel ViewModel => (LedgerEntryDetailViewModel) DataContext;
 
         public TransactionDetailPage()
         {
@@ -15,7 +15,7 @@ namespace NxtWallet.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ViewModel.Transaction = (Transaction) e.Parameter;
+            ViewModel.LedgerEntry = (LedgerEntry) e.Parameter;
         }
     }
 }

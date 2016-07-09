@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Command;
-using NxtWallet.Repositories.Model;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
 {

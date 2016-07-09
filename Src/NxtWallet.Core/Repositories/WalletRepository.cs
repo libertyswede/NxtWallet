@@ -8,8 +8,9 @@ using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtWallet.Core.Migrations.Model;
+using NxtWallet.Repositories.Model;
 
-namespace NxtWallet.Repositories.Model
+namespace NxtWallet.Core.Repositories
 {
     public interface IWalletRepository
     {

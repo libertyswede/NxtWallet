@@ -65,7 +65,7 @@
                 </TextBlock>
             </Border>
             <TextBlock x:Name="TransactionsTextBlock" Grid.Row="2" Text="Transactions" FontSize="21.333" Margin="0,20,0,0" />
-            <controls:TransactionListControl Grid.Row="3" x:Name="TransactionList" Margin="0,10,0,0" />
+            <controls:LedgerEntryListControl Grid.Row="3" x:Name="TransactionList" Margin="0,10,0,0" />
         </Grid>
         <controls:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
     </Grid>

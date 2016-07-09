@@ -108,7 +108,7 @@
     </Compile>
     <Compile Include="BoolToVisiblityConverter.cs" />
     <Compile Include="Controls\SelectableTextBlock.cs" />
-    <Compile Include="Controls\TransactionListView.cs" />
+    <Compile Include="Controls\LedgerEntryListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="FakeToastManager.cs" />
@@ -130,8 +130,8 @@
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
-    <Compile Include="ViewModel\TransactionDetailViewModel.cs" />
-    <Compile Include="ViewModel\TransactionListViewModel.cs" />
+    <Compile Include="ViewModel\LedgerEntryDetailViewModel.cs" />
+    <Compile Include="ViewModel\LedgerEntryListViewModel.cs" />
     <Compile Include="Views\BackupConfirmPage.xaml.cs">
       <DependentUpon>BackupConfirmPage.xaml</DependentUpon>
     </Compile>
@@ -166,8 +166,8 @@
     <Compile Include="Views\TransactionDetailPage.xaml.cs">
       <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TransactionListControl.xaml.cs">
-      <DependentUpon>TransactionListControl.xaml</DependentUpon>
+    <Compile Include="Controls\LedgerEntryListControlListControl.xaml.cs">
+      <DependentUpon>LedgerEntryListControlListControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -269,7 +269,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\TransactionListControl.xaml">
+    <Page Include="Controls\LedgerEntryListControlListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

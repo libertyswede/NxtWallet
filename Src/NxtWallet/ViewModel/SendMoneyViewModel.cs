@@ -2,9 +2,9 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using NxtWallet.Controls;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Core.Models;
 using NxtWallet.Core;
+using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
 {
@@ -12,7 +12,7 @@ namespace NxtWallet.ViewModel
     {
         private readonly INxtServer _nxtServer;
         private readonly IWalletRepository _walletRepository;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IAccountLedgerRepository _accountLedgerRepository;
         private readonly ISendMoneyDialog _sendMoneyDialog;
 
         private string _recipient;
@@ -40,11 +40,11 @@ namespace NxtWallet.ViewModel
         public RelayCommand SendMoneyCommand { get; }
 
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository,
-            ITransactionRepository transactionRepository, ISendMoneyDialog sendMoneyDialog)
+            IAccountLedgerRepository accountLedgerRepository, ISendMoneyDialog sendMoneyDialog)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
-            _transactionRepository = transactionRepository;
+            _accountLedgerRepository = accountLedgerRepository;
             _sendMoneyDialog = sendMoneyDialog;
             SendMoneyCommand = new RelayCommand(SendMoney);
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.CanExecute(_nxtServer.IsOnline);
@@ -66,7 +66,7 @@ namespace NxtWallet.ViewModel
                 var amount = decimal.Parse(Amount);
                 var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
                 SetBalance(ledgerEntry);
-                await _transactionRepository.SaveTransactionAsync(ledgerEntry);
+                await _accountLedgerRepository.SaveEntryAsync(ledgerEntry);
                 await _walletRepository.UpdateBalanceAsync((ledgerEntry.NqtBalance/100000000M).ToFormattedString());
                 //await Task.Delay(5000); // For testing purposes
             });
