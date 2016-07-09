@@ -113,13 +113,13 @@
     <Compile Include="Fakes\FakeNxtServer.cs" />
     <Compile Include="Fakes\FakeWalletRepository.cs" />
     <Compile Include="MapperConfig.cs" />
-    <Compile Include="Migrations\20160618203238_Initial.cs" />
-    <Compile Include="Migrations\20160618203238_Initial.designer.cs">
-      <DependentUpon>20160618203238_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160709194900_Initial.cs" />
+    <Compile Include="Migrations\20160709194900_Initial.designer.cs">
+      <DependentUpon>20160709194900_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Model\LedgerEntryDto.cs" />
-    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Migrations\Model\ContactDto.cs" />
+    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Models\LedgerEntryType.cs" />
     <Compile Include="Repositories\AccountLedgerRepository.cs" />
     <Compile Include="Repositories\ContactRepository.cs" />
