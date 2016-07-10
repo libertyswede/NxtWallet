@@ -26,7 +26,7 @@ namespace NxtWallet.ViewModel
 
         private void UpdateTransactionLink()
         {
-            LedgerEntryLink = $"https://nxtportal.org/transactions/{LedgerEntry.NxtId}";
+            LedgerEntryLink = $"https://nxtportal.org/transactions/{LedgerEntry.TransactionId}";
         }
     }
 }

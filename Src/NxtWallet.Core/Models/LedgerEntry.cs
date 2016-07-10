@@ -19,7 +19,7 @@ namespace NxtWallet.Core.Models
         public int Id { get; set; }
 
         [JsonIgnore]
-        public ulong? NxtId { get; set; }
+        public ulong? TransactionId { get; set; }
 
         [JsonIgnore]
         public DateTime Timestamp { get; set; }
@@ -64,10 +64,13 @@ namespace NxtWallet.Core.Models
         public string Message { get; set; }
 
         [JsonIgnore]
-        public LedgerEntryType TransactionType { get; set; }
+        public LedgerEntryType LedgerEntryType { get; set; }
 
         [JsonIgnore]
         public int Height { get; set; }
+
+        [JsonIgnore]
+        public Transaction Transaction { get; set; }
 
         [JsonIgnore]
         public Attachment Attachment { get; set; }
@@ -138,12 +141,12 @@ namespace NxtWallet.Core.Models
 
         public override int GetHashCode()
         {
-            return NxtId.GetHashCode();
+            return TransactionId.GetHashCode();
         }
 
         public virtual bool Equals(LedgerEntry other)
         {
-            return other?.NxtId == NxtId && other?.TransactionType == TransactionType;
+            return other?.TransactionId == TransactionId && other?.LedgerEntryType == LedgerEntryType;
         }
 
         public long GetAmount()
@@ -173,17 +176,17 @@ namespace NxtWallet.Core.Models
 
         private bool UserIsAmountRecipientCalculation()
         {
-            if (TransactionType == LedgerEntryType.DividendPayment)
+            if (LedgerEntryType == LedgerEntryType.AssetDividendPayment)
             {
                 return !UserIsTransactionSender;
             }
-            if (TransactionType == LedgerEntryType.CurrencyUndoCrowdfunding ||
-                TransactionType == LedgerEntryType.ReserveClaim ||
-                TransactionType == LedgerEntryType.ExchangeSell)
+            if (LedgerEntryType == LedgerEntryType.CurrencyUndoCrowdfunding ||
+                LedgerEntryType == LedgerEntryType.CurrencyReserveClaim ||
+                LedgerEntryType == LedgerEntryType.CurrencyExchangeSell)
             {
                 return true;
             }
-            return UserIsTransactionRecipient != (TransactionType == LedgerEntryType.DigitalGoodsDelivery);
+            return UserIsTransactionRecipient != (LedgerEntryType == LedgerEntryType.DigitalGoodsDelivery);
         }
     }
 }

@@ -54,9 +54,9 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.LedgerEntry.NxtId.HasValue, Converter={StaticResource BoolToVisiblityConverter}}" Margin="0,40,0,20" FontSize="21.333" >
+        <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.LedgerEntry.TransactionId.HasValue, Converter={StaticResource BoolToVisiblityConverter}}" Margin="0,40,0,20" FontSize="21.333" >
             <Run Text="Transaction:" />
-            <Hyperlink NavigateUri="{x:Bind ViewModel.LedgerEntryLink}" ><Run Text="{x:Bind ViewModel.LedgerEntry.NxtId.Value}" /></Hyperlink>
+            <Hyperlink NavigateUri="{x:Bind ViewModel.LedgerEntryLink}" ><Run Text="{x:Bind ViewModel.LedgerEntry.TransactionId.Value}" /></Hyperlink>
         </TextBlock>
         <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
             <Grid >

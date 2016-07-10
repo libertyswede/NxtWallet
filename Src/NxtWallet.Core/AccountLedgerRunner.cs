@@ -2,6 +2,9 @@
 using NxtWallet.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NxtWallet.Core
 {
@@ -46,8 +49,7 @@ namespace NxtWallet.Core
 
         public async Task TryCheckAllTransactions()
         {
-            var accountLedger = await _nxtServer.GetAccountLedgerEntriesAsync();
-
+            var ledgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync();
         }
 
         protected virtual void OnTransactionConfirmationUpdated(LedgerEntry ledgerEntry)

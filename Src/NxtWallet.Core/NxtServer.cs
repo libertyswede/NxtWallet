@@ -28,9 +28,9 @@ namespace NxtWallet.Core
         Task<Block<ulong>> GetBlockAsync(ulong blockId);
         Task<Block<ulong>> GetBlockAsync(int height);
         Task<long> GetUnconfirmedNqtBalanceAsync();
-        Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp);
-        Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType);
-        Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync();
+        Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp);
+        Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType);
+        Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync();
         Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
         Task<LedgerEntry> GetTransactionAsync(ulong transactionId);
@@ -177,15 +177,18 @@ namespace NxtWallet.Core
             }
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
+        public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
         {
-            var transactionList = new List<LedgerEntry>();
+            var ledgerEntries = new List<LedgerEntry>();
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
-                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount, 0, 10, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
-                transactionList.AddRange(_mapper.Map<List<LedgerEntry>>(accountLedger.Entries));
-                UpdateIsMyAddress(transactionList);
+                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount, 0, 10, 
+                    holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
+                var entries = GroupLedgerEntries(accountLedger.Entries);
+
+                ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(entries));
+                UpdateIsMyAddress(ledgerEntries);
                 IsOnline = true;
             }
             catch (HttpRequestException e)
@@ -198,10 +201,31 @@ namespace NxtWallet.Core
                 IsOnline = false;
                 throw new Exception("Error when parsing response", e);
             }
-            return transactionList.OrderByDescending(t => t.Timestamp);
+            return ledgerEntries.OrderByDescending(t => t.Timestamp).ToList();
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
+        private List<AccountLedgerEntry> GroupLedgerEntries(List<AccountLedgerEntry> ledgerEntries)
+        {
+            var feeEntries = ledgerEntries.Where(e => e.EventType == "TRANSACTION_FEE").ToList();
+            var others = ledgerEntries.Except(feeEntries).ToList();
+            var grouped = new List<AccountLedgerEntry>();
+
+            foreach (var feeEntry in feeEntries)
+            {
+                var other = others.SingleOrDefault(e => e.IsTransactionEvent && 
+                    e.Transaction?.TransactionId == feeEntry.Transaction?.TransactionId && 
+                    e.Timestamp.Equals(feeEntry.Timestamp));
+
+                if (other == null)
+                {
+                    grouped.Add(feeEntry);
+                    continue;
+                }
+            }
+            return grouped.Union(others).ToList();
+        }
+
+        public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
         {
             var transactionList = new List<LedgerEntry>();
             try
@@ -222,10 +246,10 @@ namespace NxtWallet.Core
                 IsOnline = false;
                 throw new Exception("Error when parsing response", e);
             }
-            return transactionList.OrderByDescending(t => t.Timestamp);
+            return transactionList.OrderByDescending(t => t.Timestamp).ToList();
         }
 
-        public Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync()
+        public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
         {
             return GetAccountLedgerEntriesAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
         }
@@ -246,7 +270,7 @@ namespace NxtWallet.Core
 
                 var ledgerEntry = _mapper.Map<LedgerEntry>(sendMoneyReply.Transaction);
                 UpdateIsMyAddress(ledgerEntry);
-                ledgerEntry.NxtId = broadcastReply.TransactionId;
+                ledgerEntry.TransactionId = broadcastReply.TransactionId;
                 return ledgerEntry;
             }
             catch (HttpRequestException e)
@@ -278,10 +302,10 @@ namespace NxtWallet.Core
             return sendMoneyReply;
         }
 
-        private void UpdateIsMyAddress<T>(List<T> transactions) where T : LedgerEntry
+        private void UpdateIsMyAddress<T>(List<T> ledgerEntries) where T : LedgerEntry
         {
-            transactions.ForEach(t => t.UserIsTransactionRecipient = accountRs == t.AccountTo);
-            transactions.ForEach(t => t.UserIsTransactionSender = accountRs == t.AccountFrom);
+            ledgerEntries.ForEach(t => t.UserIsTransactionRecipient = accountRs == t.AccountTo);
+            ledgerEntries.ForEach(t => t.UserIsTransactionSender = accountRs == t.AccountFrom);
         }
 
         private void UpdateIsMyAddress(LedgerEntry transaction)

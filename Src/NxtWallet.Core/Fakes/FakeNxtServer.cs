@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
@@ -39,30 +38,31 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(11 * 100000000L);
         }
 
-        public Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
+        public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
         {
-            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>());
         }
 
-        public Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync()
+        public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
         {
             return GetAccountLedgerEntriesAsync(DateTime.UtcNow);
         }
 
-        public Task<IEnumerable<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
+        public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
         {
-            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>());
         }
 
-        public Task<IEnumerable<LedgerEntry>> GetDividendTransactionsAsync(string account, DateTime timestamp)
+        public Task<List<LedgerEntry>> GetDividendTransactionsAsync(string account, DateTime timestamp)
         {
-            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>());
         }
 
         public Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             return Task.FromResult(new LedgerEntry());
         }
+
         public void UpdateNxtServer(string newServerAddress)
         {
         }

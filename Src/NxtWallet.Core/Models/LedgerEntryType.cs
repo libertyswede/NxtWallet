@@ -10,7 +10,7 @@
         AliasAssignment,
         PollCreation,
         VoteCasting,
-        HubTerminalAnnouncement,
+        HubAnnouncement,
         AccountInfo,
         AliasSell,
         AliasBuy,
@@ -22,15 +22,16 @@
         // ColoredCoins
         AssetIssuance,
         AssetTransfer,
-        AskOrderPlacement,
-        BidOrderPlacement,
-        AskOrderCancellation,
-        BidOrderCancellation,
-        DividendPayment,
+        AssetAskOrderPlacement,
+        AssetBidOrderPlacement,
+        AssetAskOrderCancellation,
+        AssetBidOrderCancellation,
+        AssetDividendPayment,
         AssetDelete,
 
         // DigitalGoods
         DigitalGoodsListing,
+        DigitalGoodsDelisted,
         DigitalGoodsDelisting,
         DigitalGoodsPriceChange,
         DigitalGoodsQuantityChange,
@@ -40,17 +41,17 @@
         DigitalGoodsRefund,
 
         // AccountControl
-        EffectiveBalanceLeasing,
-        SetPhasingOnly,
+        AccountControlEffectiveBalanceLeasing,
+        AccountControlPhasingOnly,
 
         // MonetarySystem
         CurrencyIssuance,
-        ReserveIncrease,
-        ReserveClaim,
+        CurrencyReserveIncrease,
+        CurrencyReserveClaim,
         CurrencyTransfer,
-        PublishExchangeOffer,
-        ExchangeBuy,
-        ExchangeSell,
+        CurrencyPublishExchangeOffer,
+        CurrencyExchangeBuy,
+        CurrencyExchangeSell,
         CurrencyMinting,
         CurrencyDeletion,
 
@@ -68,13 +69,15 @@
 
         // Technically not transactions
         AssetTrade = 1001,
-        ForgeIncome = 1002,
+        BlockGenerated = 1002,
         DigitalGoodsPurchaseExpired = 1003,
         CurrencyUndoCrowdfunding = 1004,
         CurrencyExchange = 1005,
         CurrencyOfferExpired = 1006,
         ShufflingRefund = 1007,
-        ShufflingDistribution = 1008
+        ShufflingReplaced = 1008,
+        ShufflingDistribution = 1009,
+        TransactionFee = 1010
     }
 
     // NRS Account Ledger Events
