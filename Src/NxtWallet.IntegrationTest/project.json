@@ -2,7 +2,7 @@
   "dependencies": {
     "AutoMapper": "4.2.1",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-    "NxtLib": "1.1.16"
+    "NxtLib": "1.1.17"
   },
   "frameworks": {
     "uap10.0": {}

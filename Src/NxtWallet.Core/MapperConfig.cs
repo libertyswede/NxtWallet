@@ -31,7 +31,7 @@ namespace NxtWallet.Core
 
                 cfg.CreateMap<AccountLedgerEntry, LedgerEntry>()
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.IsTransactionEvent ? src.EventId : 0))
-                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => Math.Abs(src.Change)))
+                    .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Change))
                     .ForMember(dest => dest.NqtBalance, opt => opt.MapFrom(src => (long)src.Balance))
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Transaction.Fee.Nqt))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.SenderRs : string.Empty))

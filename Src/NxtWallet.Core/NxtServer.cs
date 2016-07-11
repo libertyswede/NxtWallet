@@ -201,7 +201,7 @@ namespace NxtWallet.Core
                 IsOnline = false;
                 throw new Exception("Error when parsing response", e);
             }
-            return ledgerEntries.OrderByDescending(t => t.Timestamp).ToList();
+            return ledgerEntries.ToList();
         }
 
         private List<AccountLedgerEntry> GroupLedgerEntries(List<AccountLedgerEntry> ledgerEntries)
@@ -218,14 +218,15 @@ namespace NxtWallet.Core
 
                 if (other != null && other.Transaction.SenderRs == myAccountRs)
                 {
-                    other.Transaction.Fee = Amount.CreateAmountFromNqt(Math.Abs(feeEntry.Change));
+                    other.Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
+                    ledgerEntries.Remove(feeEntry);
                 }
                 else
                 {
-                    grouped.Add(feeEntry);
+                    feeEntry.Change = 0;
                 }
             }
-            return grouped.Union(others).ToList();
+            return ledgerEntries;
         }
 
         public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
