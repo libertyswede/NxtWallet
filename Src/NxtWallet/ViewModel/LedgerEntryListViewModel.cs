@@ -25,24 +25,24 @@ namespace NxtWallet.ViewModel
         public LedgerEntryListViewModel(IAccountLedgerRepository accountLedgerRepository, IAccountLedgerRunner accountLedgerRunner,
             IContactRepository contactRepository)
         {
-            accountLedgerRunner.AccountLedgerAdded += (sender, transaction) =>
+            accountLedgerRunner.AccountLedgerAdded += (sender, ledgerEntry) =>
             {
-                DispatcherHelper.CheckBeginInvokeOnUI(() => InsertLedgerEntry(transaction));
+                DispatcherHelper.CheckBeginInvokeOnUI(() => InsertLedgerEntry(ledgerEntry));
             };
-            accountLedgerRunner.AccountLedgerBalanceUpdated += (sender, transaction) =>
+            accountLedgerRunner.AccountLedgerBalanceUpdated += (sender, ledgerEntry) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    var existingTransaction = LedgerEntries.Single(t => t.Equals(transaction));
-                    existingTransaction.NqtBalance = transaction.NqtBalance;
+                    var existingTransaction = LedgerEntries.Single(t => t.Equals(ledgerEntry));
+                    existingTransaction.NqtBalance = ledgerEntry.NqtBalance;
                 });
             };
-            accountLedgerRunner.AccountLedgerConfirmationUpdated += (sender, transaction) =>
+            accountLedgerRunner.AccountLedgerConfirmationUpdated += (sender, ledgerEntry) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    var existingTransaction = LedgerEntries.Single(t => t.Equals(transaction));
-                    existingTransaction.IsConfirmed = transaction.IsConfirmed;
+                    var existingTransaction = LedgerEntries.Single(t => t.Equals(ledgerEntry));
+                    existingTransaction.IsConfirmed = ledgerEntry.IsConfirmed;
                 });
             };
 

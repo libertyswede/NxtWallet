@@ -43,26 +43,29 @@ namespace NxtWallet.Core
             while (!token.IsCancellationRequested)
             {
                 await TryCheckAllTransactions();
-                await Task.Delay(_walletRepository.SleepTime, token);
+                //await Task.Delay(_walletRepository.SleepTime, token);
+                await Task.Delay(int.MaxValue, token);
             }
         }
 
         public async Task TryCheckAllTransactions()
         {
             var ledgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync();
+            ledgerEntries.ForEach(e => OnLedgerEntryAdded(e));
         }
 
-        protected virtual void OnTransactionConfirmationUpdated(LedgerEntry ledgerEntry)
+        protected virtual void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
         {
             AccountLedgerConfirmationUpdated?.Invoke(this, ledgerEntry);
         }
 
-        protected virtual void OnTransactionBalanceUpdated(LedgerEntry ledgerEntry)
+        protected virtual void OnLedgerEntryBalanceUpdated(LedgerEntry ledgerEntry)
         {
             AccountLedgerBalanceUpdated?.Invoke(this, ledgerEntry);
         }
 
-        protected virtual void OnTransactionAdded(LedgerEntry ledgerEntry)
+        protected virtual void OnLedgerEntryAdded
+            (LedgerEntry ledgerEntry)
         {
             AccountLedgerAdded?.Invoke(this, ledgerEntry);
         }

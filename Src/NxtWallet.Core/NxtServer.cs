@@ -43,7 +43,7 @@ namespace NxtWallet.Core
         private bool _isOnline;
         private IServiceFactory _serviceFactory;
         private ulong requireBlock => _walletRepository.LastLedgerEntryBlockId;
-        private string accountRs => _walletRepository.NxtAccount.AccountRs;
+        private string myAccountRs => _walletRepository.NxtAccount.AccountRs;
 
         public bool IsOnline
         {
@@ -183,7 +183,7 @@ namespace NxtWallet.Core
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
-                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount, 0, 10, 
+                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount,
                     holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
                 var entries = GroupLedgerEntries(accountLedger.Entries);
 
@@ -216,10 +216,13 @@ namespace NxtWallet.Core
                     e.Transaction?.TransactionId == feeEntry.Transaction?.TransactionId && 
                     e.Timestamp.Equals(feeEntry.Timestamp));
 
-                if (other == null)
+                if (other != null && other.Transaction.SenderRs == myAccountRs)
+                {
+                    other.Transaction.Fee = Amount.CreateAmountFromNqt(Math.Abs(feeEntry.Change));
+                }
+                else
                 {
                     grouped.Add(feeEntry);
-                    continue;
                 }
             }
             return grouped.Union(others).ToList();
@@ -227,13 +230,13 @@ namespace NxtWallet.Core
 
         public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
         {
-            var transactionList = new List<LedgerEntry>();
+            var ledgerEntries = new List<LedgerEntry>();
             try
             {
                 var transactionService = _serviceFactory.CreateTransactionService();
                 var transactions = await transactionService.GetBlockchainTransactions(account, transactionType: transactionSubType);
-                transactionList.AddRange(_mapper.Map<List<LedgerEntry>>(transactions.Transactions));
-                UpdateIsMyAddress(transactionList);
+                ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(transactions.Transactions));
+                UpdateIsMyAddress(ledgerEntries);
                 IsOnline = true;
             }
             catch (HttpRequestException e)
@@ -246,7 +249,7 @@ namespace NxtWallet.Core
                 IsOnline = false;
                 throw new Exception("Error when parsing response", e);
             }
-            return transactionList.OrderByDescending(t => t.Timestamp).ToList();
+            return ledgerEntries.OrderByDescending(t => t.Timestamp).ToList();
         }
 
         public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
@@ -302,16 +305,15 @@ namespace NxtWallet.Core
             return sendMoneyReply;
         }
 
-        private void UpdateIsMyAddress<T>(List<T> ledgerEntries) where T : LedgerEntry
+        private void UpdateIsMyAddress(List<LedgerEntry> ledgerEntries)
         {
-            ledgerEntries.ForEach(t => t.UserIsTransactionRecipient = accountRs == t.AccountTo);
-            ledgerEntries.ForEach(t => t.UserIsTransactionSender = accountRs == t.AccountFrom);
+            ledgerEntries.ForEach(t => UpdateIsMyAddress(t));
         }
 
-        private void UpdateIsMyAddress(LedgerEntry transaction)
+        private void UpdateIsMyAddress(LedgerEntry ledgerEntry)
         {
-            transaction.UserIsTransactionRecipient = accountRs == transaction.AccountTo;
-            transaction.UserIsTransactionSender = accountRs == transaction.AccountFrom;
+            ledgerEntry.UserIsTransactionRecipient = myAccountRs == ledgerEntry.AccountTo;
+            ledgerEntry.UserIsTransactionSender = myAccountRs == ledgerEntry.AccountFrom;
         }
     }
 }

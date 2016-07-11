@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="AccountLedgerRunner.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Fakes\FakeAccountLedgerRepository.cs" />
     <Compile Include="Fakes\FakeContactRepository.cs" />
     <Compile Include="Fakes\FakeNxtServer.cs" />
     <Compile Include="Fakes\FakeWalletRepository.cs" />

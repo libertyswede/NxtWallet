@@ -30,6 +30,7 @@ namespace NxtWallet
             {
                 SimpleIoc.Default.Register<INxtServer, FakeNxtServer>();
                 SimpleIoc.Default.Register<IWalletRepository, FakeWalletRepository>();
+                SimpleIoc.Default.Register<IAccountLedgerRepository, FakeAccountLedgerRepository>();
                 SimpleIoc.Default.Register<IContactRepository, FakeContactRepository>();
                 SimpleIoc.Default.Register<IToastManager, FakeToastManager>();
             }
