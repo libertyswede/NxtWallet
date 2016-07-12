@@ -28,19 +28,13 @@ namespace NxtWallet.Core.Models
         public long NqtAmount { get; set; }
 
         [JsonIgnore]
-        public string FormattedAmount => (UserIsAmountRecipient || NqtAmount == 0 ? "" : "-") + FormattedAmountAbsolute;
-
-        [JsonIgnore]
-        public string FormattedAmountAbsolute => (NqtAmount / (decimal)100000000).ToFormattedString();
+        public string FormattedAmount => (NqtAmount / (decimal)100000000).ToFormattedString();
 
         [JsonIgnore]
         public long NqtFee { get; set; }
 
         [JsonIgnore]
-        public string FormattedFee => UserIsTransactionSender ? "-" + FormattedFeeAbsolute : string.Empty;
-
-        [JsonIgnore]
-        public string FormattedFeeAbsolute => (NqtFee / (decimal)100000000).ToFormattedString();
+        public string FormattedFee => NqtFee < 0 ? (NqtFee / (decimal)100000000).ToFormattedString() : string.Empty;
 
         [JsonIgnore]
         public long NqtBalance { get; set; }

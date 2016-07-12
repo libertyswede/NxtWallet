@@ -5,7 +5,6 @@ using NxtWallet.Core.Fakes;
 using NxtWallet.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NxtWallet.IntegrationTest
@@ -65,8 +64,8 @@ namespace NxtWallet.IntegrationTest
             {
                 var addedLedgerEntry = _addedLedgerEntries[i];
                 var calculatedBalance = previousBalance;
-                calculatedBalance += (addedLedgerEntry.UserIsAmountRecipient) ? addedLedgerEntry.NqtAmount : -addedLedgerEntry.NqtAmount;
-                calculatedBalance -= (addedLedgerEntry.UserIsTransactionSender) ? addedLedgerEntry.NqtFee : 0;
+                calculatedBalance += addedLedgerEntry.NqtAmount;
+                calculatedBalance += (addedLedgerEntry.UserIsTransactionSender) ? addedLedgerEntry.NqtFee : 0;
                 if (addedLedgerEntry.NqtBalance != calculatedBalance)
                 {
                     throw new Exception("Error!");

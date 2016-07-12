@@ -212,17 +212,21 @@ namespace NxtWallet.Core
 
             foreach (var feeEntry in feeEntries)
             {
-                var other = others.SingleOrDefault(e => e.IsTransactionEvent && 
-                    e.Transaction?.TransactionId == feeEntry.Transaction?.TransactionId && 
-                    e.Timestamp.Equals(feeEntry.Timestamp));
+                var siblings = others.Where(s => s.IsTransactionEvent && 
+                    s.Transaction?.TransactionId == feeEntry.Transaction?.TransactionId &&
+                    s.Transaction.SenderRs == myAccountRs)
+                    .OrderBy(s => s.LedgerId)
+                    .ToList();
 
-                if (other != null && other.Transaction.SenderRs == myAccountRs)
+                if (siblings.Any())
                 {
-                    other.Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
+                    siblings.First().Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
+                    siblings.Skip(1).ToList().ForEach(s => s.Transaction.Fee = Amount.Zero);
                     ledgerEntries.Remove(feeEntry);
                 }
                 else
                 {
+                    feeEntry.Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
                     feeEntry.Change = 0;
                 }
             }

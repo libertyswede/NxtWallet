@@ -75,13 +75,13 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="AmountLabelTextBlock" Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" FontSize="{StaticResource TextBlockFontNormalSize}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
                 <TextBlock x:Name="AmountValueTextBlock" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedAmountAbsolute}" />
+                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedAmount}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
                 <TextBlock x:Name="FeeLabelTextBlock" Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedFeeAbsolute}" />
+                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedFee}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <TextBlock x:Name="BalanceLabelTextBlock" Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
