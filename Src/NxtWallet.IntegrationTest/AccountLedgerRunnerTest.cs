@@ -47,18 +47,6 @@ namespace NxtWallet.IntegrationTest
 
             await runner.TryCheckAllTransactions();
 
-            var previousTimestamp = DateTime.MinValue;
-            for (int i = _addedLedgerEntries.Count - 1; i >= 0; i--)
-            {
-                var addedLedgerEntry = _addedLedgerEntries[i];
-                if (addedLedgerEntry.Timestamp < previousTimestamp)
-                {
-                    throw new Exception("Error!");
-                }
-                previousTimestamp = addedLedgerEntry.Timestamp;
-            }
-
-
             var previousBalance = 0L;
             for (int i = _addedLedgerEntries.Count - 1; i >= 0; i--)
             {
