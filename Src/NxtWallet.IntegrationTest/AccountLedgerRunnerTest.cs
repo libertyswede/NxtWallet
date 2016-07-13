@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace NxtWallet.IntegrationTest
 {
@@ -20,7 +21,7 @@ namespace NxtWallet.IntegrationTest
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountTest()
         {
-            await TryCheckAllTransactionsTest("NXT-G885-AKDX-5G2B-BLUCG");
+            await TryCheckAllTransactionsTest("NXT-6KPX-Y9ZT-QH79-7RU7S");
         }
 
         [TestMethod]
@@ -61,7 +62,14 @@ namespace NxtWallet.IntegrationTest
             _addedLedgerEntries.Clear();
             runner.AccountLedgerAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);
 
-            await runner.TryCheckAllTransactions();
+            try
+            {
+                await runner.TryCheckAllTransactions();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Exception with account: {accountRs}", e);
+            }
 
             var previousBalance = 0L;
             for (int i = _addedLedgerEntries.Count - 1; i >= 0; i--)
@@ -70,9 +78,10 @@ namespace NxtWallet.IntegrationTest
                 var calculatedBalance = previousBalance;
                 calculatedBalance += addedLedgerEntry.NqtAmount;
                 calculatedBalance += (addedLedgerEntry.UserIsTransactionSender) ? addedLedgerEntry.NqtFee : 0;
+
                 if (addedLedgerEntry.NqtBalance != calculatedBalance)
                 {
-                    throw new Exception($"Wrong balance for account: {accountRs}");
+                    throw new Exception($"Wrong balance for account: {accountRs}, expected: {calculatedBalance} but got: {addedLedgerEntry.NqtBalance} on height: {addedLedgerEntry.Height}");
                 }
                 previousBalance = calculatedBalance;
             }

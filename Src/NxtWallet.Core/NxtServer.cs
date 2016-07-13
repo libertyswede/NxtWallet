@@ -183,11 +183,25 @@ namespace NxtWallet.Core
             try
             {
                 var accountService = _serviceFactory.CreateAccountService();
-                var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount,
-                    holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
-                var entries = GroupLedgerEntries(accountLedger.Entries);
 
-                ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(entries));
+                var firstIndex = 0;
+                const int count = 100;
+                bool hasMore = true;
+
+                var accountLedgerEntries = new List<AccountLedgerEntry>();
+
+                while (hasMore)
+                {
+                    var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount,
+                        firstIndex, firstIndex + count - 1, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
+                    accountLedgerEntries.AddRange(accountLedger.Entries);
+                    firstIndex += count;
+                    hasMore = accountLedger.Entries.Count == count;
+                }
+
+                accountLedgerEntries = GroupLedgerEntries(accountLedgerEntries);
+
+                ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(accountLedgerEntries));
                 UpdateIsMyAddress(ledgerEntries);
                 IsOnline = true;
             }
@@ -206,23 +220,45 @@ namespace NxtWallet.Core
 
         private List<AccountLedgerEntry> GroupLedgerEntries(List<AccountLedgerEntry> ledgerEntries)
         {
-            var feeEntries = ledgerEntries.Where(e => e.EventType == "TRANSACTION_FEE").ToList();
+            var feeEntries = ledgerEntries.Where(e => e.EventType == "TRANSACTION_FEE")
+                    .OrderBy(s => s.LedgerId)
+                    .ToList();
             var others = ledgerEntries.Except(feeEntries).ToList();
+
+            foreach (var other in others.Where(o => o.Transaction != null))
+            {
+                other.Transaction.Fee = Amount.Zero;
+            }
+
             var grouped = new List<AccountLedgerEntry>();
 
             foreach (var feeEntry in feeEntries)
             {
-                var siblings = others.Where(s => s.IsTransactionEvent && 
+                var firstSibling = others.Where(s => s.IsTransactionEvent &&
                     s.Transaction?.TransactionId == feeEntry.Transaction?.TransactionId &&
+                    s.Height == feeEntry.Height &&
                     s.Transaction.SenderRs == myAccountRs)
                     .OrderBy(s => s.LedgerId)
-                    .ToList();
+                    .FirstOrDefault();
 
-                if (siblings.Any())
+                if (firstSibling != null)
                 {
-                    siblings.First().Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
-                    siblings.Skip(1).ToList().ForEach(s => s.Transaction.Fee = Amount.Zero);
+                    firstSibling.Transaction.Fee = Amount.CreateAmountFromNqt(feeEntry.Change);
                     ledgerEntries.Remove(feeEntry);
+
+                    var affectedEntryBalances = ledgerEntries.Where(e => e.Height == feeEntry.Height && e != feeEntry &&
+                                                                         e.LedgerId >= Math.Min(feeEntry.LedgerId, firstSibling.LedgerId) &&
+                                                                         e.LedgerId < Math.Max(feeEntry.LedgerId, firstSibling.LedgerId))
+                                                                         .ToList();
+
+                    if (feeEntry.LedgerId < firstSibling.LedgerId)
+                    {
+                        affectedEntryBalances.ForEach(e => e.Balance -= feeEntry.Change);
+                    }
+                    else
+                    {
+                        affectedEntryBalances.ForEach(e => e.Balance += feeEntry.Change);
+                    }
                 }
                 else
                 {
