@@ -30,10 +30,10 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (int)src.LedgerEntryType));
 
                 cfg.CreateMap<AccountLedgerEntry, LedgerEntry>()
-                    .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.IsTransactionEvent ? src.EventId : 0))
+                    .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.IsTransactionEvent ? (ulong?)src.EventId : null))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Change))
-                    .ForMember(dest => dest.NqtBalance, opt => opt.MapFrom(src => (long)src.Balance))
-                    .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Transaction.Fee.Nqt))
+                    .ForMember(dest => dest.NqtBalance, opt => opt.MapFrom(src => src.Balance))
+                    .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Fee.Nqt : 0))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.SenderRs : string.Empty))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.RecipientRs : string.Empty))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))

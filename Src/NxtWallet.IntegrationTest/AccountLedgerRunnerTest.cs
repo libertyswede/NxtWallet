@@ -5,6 +5,8 @@ using NxtWallet.Core.Fakes;
 using NxtWallet.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace NxtWallet.IntegrationTest
@@ -16,10 +18,24 @@ namespace NxtWallet.IntegrationTest
         private static IMapper _mapper = MapperConfig.Setup().CreateMapper();
 
         [TestMethod]
-        public async Task TryCheckAllTransactionsForAllTestnetAccountsTest()
+        public async Task TryCheckAllTransactionsForAllTestnetAccountTest()
         {
             await TryCheckAllTransactionsTest("NXT-G885-AKDX-5G2B-BLUCG");
-            //await TryCheckAllTransactionsTest("NXT-7A48-47JL-T7LD-D5FS3");
+        }
+
+        [TestMethod]
+        public async Task TryCheckAllTransactionsForAllTestnetAccountsTest()
+        {
+            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream("NxtWallet.IntegrationTest.known_testnet_addresses.txt"))
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var accountRs = reader.ReadLine();
+                    Debug.WriteLine($"Checking account: {accountRs}");
+                    await TryCheckAllTransactionsTest(accountRs);
+                }
+            }
         }
 
         public async Task TryCheckAllTransactionsTest(string accountRs)
@@ -56,7 +72,7 @@ namespace NxtWallet.IntegrationTest
                 calculatedBalance += (addedLedgerEntry.UserIsTransactionSender) ? addedLedgerEntry.NqtFee : 0;
                 if (addedLedgerEntry.NqtBalance != calculatedBalance)
                 {
-                    throw new Exception("Error!");
+                    throw new Exception($"Wrong balance for account: {accountRs}");
                 }
                 previousBalance = calculatedBalance;
             }
