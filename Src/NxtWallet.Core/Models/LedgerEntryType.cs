@@ -77,7 +77,9 @@
         ShufflingRefund = 1007,
         ShufflingReplaced = 1008,
         ShufflingDistribution = 1009,
-        TransactionFee = 1010
+        TransactionFee = 1010,
+        RejectPhasedTransaction = 1011,
+        CurrencyDistribution = 1012
     }
 
     // NRS Account Ledger Events

@@ -63,8 +63,8 @@ namespace NxtWallet.Core
             {
                 case "BLOCK_GENERATED":
                     return LedgerEntryType.BlockGenerated;
-                //case "REJECT_PHASED_TRANSACTION":
-                //    return LedgerEntryType.xxx;
+                case "REJECT_PHASED_TRANSACTION":
+                    return LedgerEntryType.RejectPhasedTransaction;
                 case "TRANSACTION_FEE":
                     return (LedgerEntryType)(int)accountLedgerEntry.Transaction.SubType;
                 case "ORDINARY_PAYMENT":
@@ -137,8 +137,8 @@ namespace NxtWallet.Core
                     return LedgerEntryType.AccountControlPhasingOnly;
                 case "CURRENCY_DELETION":
                     return LedgerEntryType.CurrencyDeletion;
-                //case "CURRENCY_DISTRIBUTION":
-                //    return LedgerEntryType.xxx;
+                case "CURRENCY_DISTRIBUTION":
+                    return LedgerEntryType.CurrencyDistribution;
                 case "CURRENCY_EXCHANGE":
                     return LedgerEntryType.CurrencyExchange;
                 case "CURRENCY_EXCHANGE_BUY":
