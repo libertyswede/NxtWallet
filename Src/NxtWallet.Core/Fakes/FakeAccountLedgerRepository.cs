@@ -13,7 +13,7 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
         }
 
-        public Task SaveEntryAsync(LedgerEntry ledgerEntry)
+        public Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry)
         {
             return Task.CompletedTask;
         }

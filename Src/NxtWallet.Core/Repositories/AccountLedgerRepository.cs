@@ -12,7 +12,7 @@ namespace NxtWallet.Core.Repositories
     public interface IAccountLedgerRepository
     {
         Task<IEnumerable<LedgerEntry>> GetAllLedgerEntriesAsync();
-        Task SaveEntryAsync(LedgerEntry ledgerEntry);
+        Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry);
     }
 
     public class AccountLedgerRepository : IAccountLedgerRepository
@@ -40,7 +40,7 @@ namespace NxtWallet.Core.Repositories
             }
         }
 
-        public Task SaveEntryAsync(LedgerEntry ledgerEntry)
+        public Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry)
         {
             throw new NotImplementedException();
         }

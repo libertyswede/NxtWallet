@@ -66,7 +66,7 @@ namespace NxtWallet.ViewModel
                 var amount = decimal.Parse(Amount);
                 var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
                 SetBalance(ledgerEntry);
-                await _accountLedgerRepository.SaveEntryAsync(ledgerEntry);
+                await _accountLedgerRepository.SaveLedgerEntryAsync(ledgerEntry);
                 await _walletRepository.UpdateBalanceAsync((ledgerEntry.NqtBalance/100000000M).ToFormattedString());
                 //await Task.Delay(5000); // For testing purposes
             });
