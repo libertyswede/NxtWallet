@@ -3,8 +3,7 @@ using NxtWallet.Core.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using NxtLib;
 
 namespace NxtWallet.Core
 {
@@ -30,11 +29,14 @@ namespace NxtWallet.Core
 
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
+        private readonly IAccountLedgerRepository _accountLedgerRepository;
 
-        public AccountLedgerRunner(IWalletRepository walletRepository, INxtServer nxtServer)
+        public AccountLedgerRunner(IWalletRepository walletRepository, INxtServer nxtServer, 
+            IAccountLedgerRepository accountLedgerRepository)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
+            _accountLedgerRepository = accountLedgerRepository;
         }
 
         public async Task Run(CancellationToken token)
@@ -49,17 +51,31 @@ namespace NxtWallet.Core
 
         public async Task TryCheckAllLedgerEntries()
         {
-            // Pseudo code below, replace with real stuff...
-
             // Fork check...
             // Get last known block from DB.
             // Get blockchain status from NRS.
             // If fork, roll back local db 10 blocks, if still on fork, roll back to genesis.
             // Things to roll back: ledger events, balance, unconfirmed transactions
             // Fire events (removed)
-
+            try
+            {
+                var blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
+                var lastKnownBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastLedgerEntryBlockId);
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle(e =>
+                {
+                    if ((e as NxtException)?.Message == "Unknown block")
+                    {
+                        // Handle fork
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            
             // Fetch stuff...
-            // Get balance from DB.
             // Get previously unconfirmed transactions from DB.
             // Get new ledger entries since last known block from NRS
             // Get unconfirmed balance from NRS

@@ -83,7 +83,7 @@ namespace NxtWallet.Core
             try
             {
                 var blockService = _serviceFactory.CreateBlockService();
-                var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId), requireBlock: requireBlock);
+                var blockReply = await blockService.GetBlock(BlockLocator.ByBlockId(blockId));
                 IsOnline = true;
                 return blockReply;
             }
