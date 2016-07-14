@@ -17,6 +17,8 @@ namespace NxtWallet.IntegrationTest
     {
         private List<LedgerEntry> _addedLedgerEntries = new List<LedgerEntry>();
         private static IMapper _mapper = MapperConfig.Setup().CreateMapper();
+        private const string _testnetFile = "known_testnet_addresses";
+        private const string _mainnetFile = "known_mainnet_addresses";
 
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountTest()
@@ -27,7 +29,7 @@ namespace NxtWallet.IntegrationTest
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountsTest()
         {
-            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream("NxtWallet.IntegrationTest.known_testnet_addresses.txt"))
+            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream($"NxtWallet.IntegrationTest.{_mainnetFile}.txt"))
             using (var reader = new System.IO.StreamReader(stream))
             {
                 while (!reader.EndOfStream)
@@ -47,7 +49,7 @@ namespace NxtWallet.IntegrationTest
             walletRepository.Balance = "0";
             walletRepository.SecretPhrase = string.Empty;
             walletRepository.LastLedgerEntryBlockId = 2680262203532249785UL;
-            walletRepository.NxtServer = "http://localhost:6876/nxt";
+            walletRepository.NxtServer = "http://localhost:7876/nxt";
             walletRepository.SleepTime = 10000;
             walletRepository.BackupCompleted = true;
             walletRepository.NotificationsEnabled = false;
