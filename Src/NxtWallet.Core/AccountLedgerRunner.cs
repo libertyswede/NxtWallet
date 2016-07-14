@@ -50,6 +50,36 @@ namespace NxtWallet.Core
 
         public async Task TryCheckAllLedgerEntries()
         {
+            // Pseudo code below, replace with real stuff...
+
+            // Fork check...
+            // Get last known block from DB.
+            // Get blockchain status from NRS.
+            // If fork, roll back local db 10 blocks, if still on fork, roll back to genesis.
+            // Things to roll back: ledger events, balance, unconfirmed transactions
+            // Fire events (removed)
+
+            // Fetch stuff...
+            // Get balance from DB.
+            // Get previously unconfirmed transactions from DB.
+            // Get new ledger entries since last known block from NRS
+            // Get unconfirmed balance from NRS
+            // Get unconfirmed transactions from NRS, non-phased sendMoney only.
+
+            // Update transaction statuses..
+            // If previously unconfirmed transactions are now account ledger events
+            //   Remove them from unconfirmed transactions table in DB.
+            //   Add to AccountLedgerConfirmationUpdated
+            // If previously unconfirmed transaction is not to be found in account ledger events
+            //   Remove them from unconfirmed transactions table in DB.
+            //   Add to AccountLedgerRemoved
+
+            // Check stuff...
+            // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
+            //   Log error, throw exception!
+            // Save stuff to local DB.
+            // Fire event(s).
+
             var ledgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync();
             ledgerEntries.ForEach(e => OnLedgerEntryAdded(e));
         }
