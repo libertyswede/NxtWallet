@@ -8,7 +8,7 @@ using NxtWallet.Repositories.Model;
 namespace NxtWallet.Core.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20160709194900_Initial")]
+    [Migration("20160714230404_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,15 +46,11 @@ namespace NxtWallet.Core.Migrations
                     b.Property<string>("AccountTo")
                         .HasAnnotation("MaxLength", 25);
 
-                    b.Property<long>("BlockId");
-
                     b.Property<int>("Height");
 
                     b.Property<bool>("IsConfirmed")
                         .HasAnnotation("Relational:DefaultValue", "True")
                         .HasAnnotation("Relational:DefaultValueType", "System.Boolean");
-
-                    b.Property<bool>("IsTransactionEvent");
 
                     b.Property<string>("Message");
 

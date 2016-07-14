@@ -56,10 +56,10 @@ namespace NxtWallet.IntegrationTest
 
             var serviceFactory = new NxtLib.ServiceFactory(walletRepository.NxtServer);
             var nxtServer = new NxtServer(walletRepository, _mapper, serviceFactory);
-            var transactionRepository = new FakeAccountLedgerRepository();
+            var accountLedgerRepository = new FakeAccountLedgerRepository();
             var contactRepository = new FakeContactRepository();
 
-            var runner = new AccountLedgerRunner(walletRepository, nxtServer);
+            var runner = new AccountLedgerRunner(walletRepository, nxtServer, accountLedgerRepository);
 
             _addedLedgerEntries.Clear();
             runner.LedgerEntryAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);

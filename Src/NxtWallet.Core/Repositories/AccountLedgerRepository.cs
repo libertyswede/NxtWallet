@@ -6,6 +6,7 @@ using NxtWallet.Repositories.Model;
 using System.Linq;
 using Microsoft.Data.Entity;
 using AutoMapper;
+using NxtWallet.Core.Migrations.Model;
 
 namespace NxtWallet.Core.Repositories
 {
@@ -13,6 +14,7 @@ namespace NxtWallet.Core.Repositories
     {
         Task<IEnumerable<LedgerEntry>> GetAllLedgerEntriesAsync();
         Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry);
+        Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries);
     }
 
     public class AccountLedgerRepository : IAccountLedgerRepository
@@ -37,6 +39,21 @@ namespace NxtWallet.Core.Repositories
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
                 UpdateIsMyAddress(ledgerEntries);
                 return ledgerEntries.AsEnumerable();
+            }
+        }
+
+        public async Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries)
+        {
+            using (var context = new WalletContext())
+            {
+                var dtos = _mapper.Map<List<LedgerEntryDto>>(ledgerEntries);
+                context.LedgerEntries.AddRange(dtos);
+                await context.SaveChangesAsync();
+
+                for (int i = 0; i < dtos.Count; i++)
+                {
+                    ledgerEntries[i].Id = dtos[i].Id;
+                }
             }
         }
 

@@ -38,14 +38,6 @@ namespace NxtWallet.Repositories.Model
         private void OnLedgerEntryCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LedgerEntryDto>()
-                .Property(t => t.IsTransactionEvent)
-                .IsRequired();
-
-            modelBuilder.Entity<LedgerEntryDto>()
-                .Property(t => t.BlockId)
-                .IsRequired();
-
-            modelBuilder.Entity<LedgerEntryDto>()
                 .Property(t => t.Height)
                 .IsRequired();
 

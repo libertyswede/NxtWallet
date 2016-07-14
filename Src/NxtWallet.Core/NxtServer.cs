@@ -167,10 +167,14 @@ namespace NxtWallet.Core
                 while (hasMore)
                 {
                     var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount,
-                        firstIndex, firstIndex + count - 1, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true);
-                    accountLedgerEntries.AddRange(accountLedger.Entries);
+                        firstIndex, firstIndex + count - 1, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true, 
+                        requireBlock: _walletRepository.LastLedgerEntryBlockId);
+
+                    var newAccountLedgerEntries = accountLedger.Entries.Where(e => e.Timestamp > lastTimestamp).ToList();
+                    
+                    accountLedgerEntries.AddRange(newAccountLedgerEntries);
                     firstIndex += count;
-                    hasMore = accountLedger.Entries.Count == count;
+                    hasMore = accountLedger.Entries.Count == newAccountLedgerEntries.Count;
                 }
 
                 accountLedgerEntries = GroupLedgerEntries(accountLedgerEntries);

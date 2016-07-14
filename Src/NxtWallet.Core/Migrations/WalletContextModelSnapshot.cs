@@ -45,15 +45,11 @@ namespace NxtWallet.Core.Migrations
                     b.Property<string>("AccountTo")
                         .HasAnnotation("MaxLength", 25);
 
-                    b.Property<long>("BlockId");
-
                     b.Property<int>("Height");
 
                     b.Property<bool>("IsConfirmed")
                         .HasAnnotation("Relational:DefaultValue", "True")
                         .HasAnnotation("Relational:DefaultValueType", "System.Boolean");
-
-                    b.Property<bool>("IsTransactionEvent");
 
                     b.Property<string>("Message");
 

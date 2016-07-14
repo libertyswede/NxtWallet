@@ -7,9 +7,7 @@ namespace NxtWallet.Core.Migrations.Model
     public class LedgerEntryDto : IEquatable<LedgerEntryDto>
     {
         public int Id { get; set; }
-        public bool IsTransactionEvent { get; set; }
         public long? TransactionId { get; set; }
-        public long BlockId { get; set; }
         public int Height { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtBalance { get; set; }

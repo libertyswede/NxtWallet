@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using NxtLib;
+using NxtLib.Local;
+using NxtLib.ServerInfo;
 
 namespace NxtWallet.Core
 {
@@ -44,13 +46,16 @@ namespace NxtWallet.Core
             while (!token.IsCancellationRequested)
             {
                 await TryCheckAllLedgerEntries();
-                //await Task.Delay(_walletRepository.SleepTime, token);
-                await Task.Delay(int.MaxValue, token);
+                await Task.Delay(_walletRepository.SleepTime, token);
+                //await Task.Delay(int.MaxValue, token);
             }
         }
 
         public async Task TryCheckAllLedgerEntries()
         {
+            Block<ulong> lastKnownBlock = null;
+            BlockchainStatus blockchainStatus = null;
+
             // Fork check...
             // Get last known block from DB.
             // Get blockchain status from NRS.
@@ -59,8 +64,8 @@ namespace NxtWallet.Core
             // Fire events (removed)
             try
             {
-                var blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
-                var lastKnownBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastLedgerEntryBlockId);
+                blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
+                lastKnownBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastLedgerEntryBlockId);
             }
             catch (AggregateException ae)
             {
@@ -74,20 +79,14 @@ namespace NxtWallet.Core
                     return false;
                 });
             }
-            
+
             // Fetch stuff...
             // Get previously unconfirmed transactions from DB.
             // Get new ledger entries since last known block from NRS
-            // Get unconfirmed balance from NRS
-            // Get unconfirmed transactions from NRS, non-phased sendMoney only.
+            // Get unconfirmedconfirmed balance from NRS
 
-            // Update transaction statuses..
-            // If previously unconfirmed transactions are now account ledger events
-            //   Remove them from unconfirmed transactions table in DB.
-            //   Add to AccountLedgerConfirmationUpdated
-            // If previously unconfirmed transaction is not to be found in account ledger events
-            //   Remove them from unconfirmed transactions table in DB.
-            //   Add to AccountLedgerRemoved
+            var newLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
+            var unconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
 
             // Check stuff...
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
@@ -95,8 +94,10 @@ namespace NxtWallet.Core
             // Save stuff to local DB.
             // Fire event(s).
 
-            var ledgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync();
-            ledgerEntries.ForEach(e => OnLedgerEntryAdded(e));
+            await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
+            await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
+            newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
+
         }
 
         protected virtual void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
