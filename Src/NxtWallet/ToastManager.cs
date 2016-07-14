@@ -26,7 +26,7 @@ namespace NxtWallet
         {
             _accountLedgerRunner.AccountLedgerAdded += (sender, ledgerEntry) =>
             {
-                if (ledgerEntry.UserIsTransactionRecipient && _walletRepository.NotificationsEnabled)
+                if (ledgerEntry.UserIsRecipient && _walletRepository.NotificationsEnabled)
                     PopNewLedgerEntryToast(ledgerEntry);
             };
         }
@@ -39,7 +39,7 @@ namespace NxtWallet
             var xmlToast =  "<toast launch=\"app-defined-string\">" +
                                 "<visual>" +
                                 "<binding template =\"ToastGeneric\">" +
-                                    "<text>New NXT transaction</text>" +
+                                    "<text>New NXT ledger entry</text>" +
                                     "<text>" +
                                     $"You received {ledgerEntry.FormattedAmount} NXT from {from}.\n" + 
                                     $"Your new balance is {ledgerEntry.FormattedBalance} NXT." +

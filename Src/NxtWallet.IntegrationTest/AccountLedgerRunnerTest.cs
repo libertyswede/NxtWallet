@@ -66,7 +66,7 @@ namespace NxtWallet.IntegrationTest
 
             try
             {
-                await runner.TryCheckAllTransactions();
+                await runner.TryCheckAllLedgerEntries();
             }
             catch (Exception e)
             {
@@ -79,7 +79,7 @@ namespace NxtWallet.IntegrationTest
                 var addedLedgerEntry = _addedLedgerEntries[i];
                 var calculatedBalance = previousBalance;
                 calculatedBalance += addedLedgerEntry.NqtAmount;
-                calculatedBalance += (addedLedgerEntry.UserIsTransactionSender) ? addedLedgerEntry.NqtFee : 0;
+                calculatedBalance += (addedLedgerEntry.UserIsSender) ? addedLedgerEntry.NqtFee : 0;
 
                 if (addedLedgerEntry.NqtBalance != calculatedBalance)
                 {

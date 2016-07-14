@@ -163,8 +163,8 @@
     <Compile Include="Views\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TransactionDetailPage.xaml.cs">
-      <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
+    <Compile Include="Views\LedgerEntryDetailPage.xaml.cs">
+      <DependentUpon>LedgerEntryDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\LedgerEntryListControl.xaml.cs">
       <DependentUpon>LedgerEntryListControl.xaml</DependentUpon>
@@ -265,7 +265,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TransactionDetailPage.xaml">
+    <Page Include="Views\LedgerEntryDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

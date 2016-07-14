@@ -42,13 +42,13 @@ namespace NxtWallet.Core
         {
             while (!token.IsCancellationRequested)
             {
-                await TryCheckAllTransactions();
+                await TryCheckAllLedgerEntries();
                 //await Task.Delay(_walletRepository.SleepTime, token);
                 await Task.Delay(int.MaxValue, token);
             }
         }
 
-        public async Task TryCheckAllTransactions()
+        public async Task TryCheckAllLedgerEntries()
         {
             var ledgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync();
             ledgerEntries.ForEach(e => OnLedgerEntryAdded(e));

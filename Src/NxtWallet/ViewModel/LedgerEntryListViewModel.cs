@@ -33,16 +33,16 @@ namespace NxtWallet.ViewModel
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    var existingTransaction = LedgerEntries.Single(t => t.Equals(ledgerEntry));
-                    existingTransaction.NqtBalance = ledgerEntry.NqtBalance;
+                    var existingLedgerEntry = LedgerEntries.Single(t => t.Equals(ledgerEntry));
+                    existingLedgerEntry.NqtBalance = ledgerEntry.NqtBalance;
                 });
             };
             accountLedgerRunner.AccountLedgerConfirmationUpdated += (sender, ledgerEntry) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    var existingTransaction = LedgerEntries.Single(t => t.Equals(ledgerEntry));
-                    existingTransaction.IsConfirmed = ledgerEntry.IsConfirmed;
+                    var existingLedgerEntry = LedgerEntries.Single(t => t.Equals(ledgerEntry));
+                    existingLedgerEntry.IsConfirmed = ledgerEntry.IsConfirmed;
                 });
             };
 
@@ -53,15 +53,15 @@ namespace NxtWallet.ViewModel
 
         public void LoadLedgerEntriesFromRepository()
         {
-            var transactions = Task.Run(async () => await _accountLedgerRepository.GetAllLedgerEntriesAsync()).Result.ToList();
+            var ledgerEntries = Task.Run(async () => await _accountLedgerRepository.GetAllLedgerEntriesAsync()).Result.ToList();
             var contacts = Task.Run(async () => await _contactRepository.GetAllContactsAsync())
                 .Result
                 .ToDictionary(contact => contact.NxtAddressRs);
-            transactions.ForEach(t => t.UpdateWithContactInfo(contacts));
-            InsertTransactions(transactions);
+            ledgerEntries.ForEach(t => t.UpdateWithContactInfo(contacts));
+            InsertLedgerEntries(ledgerEntries);
         }
 
-        private void InsertTransactions(IEnumerable<LedgerEntry> ledgerEntries)
+        private void InsertLedgerEntries(IEnumerable<LedgerEntry> ledgerEntries)
         {
             foreach (var ledgerEntry in ledgerEntries.Except(LedgerEntries))
             {
@@ -96,8 +96,8 @@ namespace NxtWallet.ViewModel
 
         private int? GetPreviousLedgerEntryIndex(LedgerEntry ledgerEntry)
         {
-            var previousTransaction = GetPreviousLedgerEntry(ledgerEntry);
-            return previousTransaction == null ? null : (int?)LedgerEntries.IndexOf(previousTransaction);
+            var previousLedgerEntry = GetPreviousLedgerEntry(ledgerEntry);
+            return previousLedgerEntry == null ? null : (int?)LedgerEntries.IndexOf(previousLedgerEntry);
         }
     }
 }

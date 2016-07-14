@@ -48,16 +48,6 @@ namespace NxtWallet.Core.Fakes
             return GetAccountLedgerEntriesAsync(DateTime.UtcNow);
         }
 
-        public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
-        {
-            return Task.FromResult(new List<LedgerEntry>());
-        }
-
-        public Task<List<LedgerEntry>> GetDividendTransactionsAsync(string account, DateTime timestamp)
-        {
-            return Task.FromResult(new List<LedgerEntry>());
-        }
-
         public Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)
         {
             return Task.FromResult(new LedgerEntry());

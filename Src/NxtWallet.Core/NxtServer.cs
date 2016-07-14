@@ -29,11 +29,9 @@ namespace NxtWallet.Core
         Task<Block<ulong>> GetBlockAsync(int height);
         Task<long> GetUnconfirmedNqtBalanceAsync();
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp);
-        Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType);
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync();
         Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
-        Task<LedgerEntry> GetTransactionAsync(ulong transactionId);
     }
 
     public class NxtServer : ObservableObject, INxtServer
@@ -153,30 +151,6 @@ namespace NxtWallet.Core
             return 0;
         }
 
-        public async Task<LedgerEntry> GetTransactionAsync(ulong transactionId)
-        {
-            try
-            {
-                var transactionService = _serviceFactory.CreateTransactionService();
-                var transactionReply = await transactionService.GetTransaction(GetTransactionLocator.ByTransactionId(transactionId),
-                    requireBlock: requireBlock);
-                IsOnline = true;
-                var transaction = _mapper.Map<LedgerEntry>(transactionReply);
-                UpdateIsMyAddress(transaction);
-                return transaction;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-        }
-
         public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
         {
             var ledgerEntries = new List<LedgerEntry>();
@@ -269,30 +243,6 @@ namespace NxtWallet.Core
             return ledgerEntries;
         }
 
-        public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(string account, TransactionSubType transactionSubType)
-        {
-            var ledgerEntries = new List<LedgerEntry>();
-            try
-            {
-                var transactionService = _serviceFactory.CreateTransactionService();
-                var transactions = await transactionService.GetBlockchainTransactions(account, transactionType: transactionSubType);
-                ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(transactions.Transactions));
-                UpdateIsMyAddress(ledgerEntries);
-                IsOnline = true;
-            }
-            catch (HttpRequestException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
-            }
-            catch (JsonReaderException e)
-            {
-                IsOnline = false;
-                throw new Exception("Error when parsing response", e);
-            }
-            return ledgerEntries.OrderByDescending(t => t.Timestamp).ToList();
-        }
-
         public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
         {
             return GetAccountLedgerEntriesAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
@@ -353,8 +303,8 @@ namespace NxtWallet.Core
 
         private void UpdateIsMyAddress(LedgerEntry ledgerEntry)
         {
-            ledgerEntry.UserIsTransactionRecipient = myAccountRs == ledgerEntry.AccountTo;
-            ledgerEntry.UserIsTransactionSender = myAccountRs == ledgerEntry.AccountFrom;
+            ledgerEntry.UserIsRecipient = myAccountRs == ledgerEntry.AccountTo;
+            ledgerEntry.UserIsSender = myAccountRs == ledgerEntry.AccountFrom;
         }
     }
 }

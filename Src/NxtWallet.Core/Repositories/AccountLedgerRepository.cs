@@ -47,8 +47,8 @@ namespace NxtWallet.Core.Repositories
 
         private void UpdateIsMyAddress(List<LedgerEntry> ledgerEntries)
         {
-            ledgerEntries.ForEach(t => t.UserIsTransactionRecipient = _walletRepository.NxtAccount.AccountRs == t.AccountTo);
-            ledgerEntries.ForEach(t => t.UserIsTransactionSender = _walletRepository.NxtAccount.AccountRs == t.AccountFrom);
+            ledgerEntries.ForEach(t => t.UserIsRecipient = _walletRepository.NxtAccount.AccountRs == t.AccountTo);
+            ledgerEntries.ForEach(t => t.UserIsSender = _walletRepository.NxtAccount.AccountRs == t.AccountFrom);
         }
     }
 }

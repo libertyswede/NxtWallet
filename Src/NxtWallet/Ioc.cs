@@ -14,7 +14,7 @@ namespace NxtWallet
     {
         public OverviewViewModel OverviewViewModel => ServiceLocator.Current.GetInstance<OverviewViewModel>();
         public SendMoneyViewModel SendMoneyViewModel => ServiceLocator.Current.GetInstance<SendMoneyViewModel>();
-        public LedgerEntryDetailViewModel TransactionDetailViewModel => ServiceLocator.Current.GetInstance<LedgerEntryDetailViewModel>();
+        public LedgerEntryDetailViewModel LedgerEntryDetailViewModel => ServiceLocator.Current.GetInstance<LedgerEntryDetailViewModel>();
         public LedgerEntryListViewModel LedgerEntryListViewModel => ServiceLocator.Current.GetInstance<LedgerEntryListViewModel>();
         public SettingsViewModel SettingsViewModel => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public ReceiveMoneyViewModel ReceiveMoneyViewModel => ServiceLocator.Current.GetInstance<ReceiveMoneyViewModel>();

@@ -4,11 +4,11 @@ using NxtWallet.Core.Models;
 
 namespace NxtWallet.Views
 {
-    public sealed partial class TransactionDetailPage
+    public sealed partial class LedgerEntryDetailPage
     {
         private LedgerEntryDetailViewModel ViewModel => (LedgerEntryDetailViewModel) DataContext;
 
-        public TransactionDetailPage()
+        public LedgerEntryDetailPage()
         {
             InitializeComponent();
         }

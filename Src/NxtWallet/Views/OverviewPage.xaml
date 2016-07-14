@@ -27,7 +27,7 @@
                             </Setter.Value>
                         </Setter>
                         <Setter Target="BalanceTextBlock.(TextBlock.FontSize)" Value="16"/>
-                        <Setter Target="TransactionsTextBlock.(TextBlock.FontSize)" Value="16"/>
+                        <Setter Target="AccountLedgerTextBlock.(TextBlock.FontSize)" Value="16"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateMin540">
@@ -64,8 +64,8 @@
                     <Run Text="{x:Bind ViewModel.Balance, Mode=OneWay}" />
                 </TextBlock>
             </Border>
-            <TextBlock x:Name="TransactionsTextBlock" Grid.Row="2" Text="Transactions" FontSize="21.333" Margin="0,20,0,0" />
-            <controls:LedgerEntryListControl Grid.Row="3" x:Name="TransactionList" Margin="0,10,0,0" />
+            <TextBlock x:Name="AccountLedgerTextBlock" Grid.Row="2" Text="Account Ledger" FontSize="21.333" Margin="0,20,0,0" />
+            <controls:LedgerEntryListControl Grid.Row="3" x:Name="AccountLedgerList" Margin="0,10,0,0" />
         </Grid>
         <controls:NetworkIndicatorControl Grid.Row="0" Grid.Column="1" />
     </Grid>

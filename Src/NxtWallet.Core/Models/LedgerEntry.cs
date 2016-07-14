@@ -70,7 +70,7 @@ namespace NxtWallet.Core.Models
         public Attachment Attachment { get; set; }
 
         [JsonIgnore]
-        public bool UserIsTransactionRecipient
+        public bool UserIsRecipient
         {
             get { return _userIsRecipient; }
             set
@@ -81,7 +81,7 @@ namespace NxtWallet.Core.Models
         }
 
         [JsonIgnore]
-        public bool UserIsTransactionSender
+        public bool UserIsSender
         {
             get { return _userIsSender; }
             set
@@ -103,11 +103,11 @@ namespace NxtWallet.Core.Models
 
         public void UpdateWithContactInfo(IList<Contact> contacts)
         {
-            if (!UserIsTransactionSender)
+            if (!UserIsSender)
             {
                 ContactListAccountFrom = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountFrom))?.Name ?? AccountFrom;
             }
-            if (!UserIsTransactionRecipient && AccountTo != null)
+            if (!UserIsRecipient && AccountTo != null)
             {
                 ContactListAccountTo = contacts.SingleOrDefault(c => c.NxtAddressRs.Equals(AccountTo))?.Name ?? AccountTo;
             }
@@ -117,11 +117,11 @@ namespace NxtWallet.Core.Models
         {
             Contact contact;
             
-            if (!UserIsTransactionSender)
+            if (!UserIsSender)
             {
                 ContactListAccountFrom = contacts.TryGetValue(AccountFrom, out contact) ? contact.Name : AccountFrom;
             }
-            if (!UserIsTransactionRecipient && AccountTo != null)
+            if (!UserIsRecipient && AccountTo != null)
             {
                 ContactListAccountTo = contacts.TryGetValue(AccountTo, out contact) ? contact.Name : AccountTo;
             }
@@ -172,7 +172,7 @@ namespace NxtWallet.Core.Models
         {
             if (LedgerEntryType == LedgerEntryType.AssetDividendPayment)
             {
-                return !UserIsTransactionSender;
+                return !UserIsSender;
             }
             if (LedgerEntryType == LedgerEntryType.CurrencyUndoCrowdfunding ||
                 LedgerEntryType == LedgerEntryType.CurrencyReserveClaim ||
@@ -180,7 +180,7 @@ namespace NxtWallet.Core.Models
             {
                 return true;
             }
-            return UserIsTransactionRecipient != (LedgerEntryType == LedgerEntryType.DigitalGoodsDelivery);
+            return UserIsRecipient != (LedgerEntryType == LedgerEntryType.DigitalGoodsDelivery);
         }
     }
 }

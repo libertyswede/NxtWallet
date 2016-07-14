@@ -12,7 +12,7 @@ namespace NxtWallet.Views
         public OverviewPage()
         {
             InitializeComponent();
-            TransactionList.SelectedLedgerEntryChanged += OnSelectedTransactionChanged;
+            AccountLedgerList.SelectedLedgerEntryChanged += OnSelectedLedgerEntryChanged;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -21,11 +21,11 @@ namespace NxtWallet.Views
             Bindings.Update();
         }
 
-        private void OnSelectedTransactionChanged(object source, SelectionChangedEventArgs selectionChangedEventArgs)
+        private void OnSelectedLedgerEntryChanged(object source, SelectionChangedEventArgs selectionChangedEventArgs)
         {
             if (selectionChangedEventArgs.AddedItems.Any())
             {
-                Frame.Navigate(typeof(TransactionDetailPage), selectionChangedEventArgs.AddedItems.Single());
+                Frame.Navigate(typeof(LedgerEntryDetailPage), selectionChangedEventArgs.AddedItems.Single());
             }
         }
     }
