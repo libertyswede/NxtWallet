@@ -15,20 +15,19 @@ namespace NxtWallet.Core
     {
         Task Run(CancellationToken token);
 
-        event AccountLedgerHandler AccountLedgerConfirmationUpdated;
-        event AccountLedgerHandler AccountLedgerBalanceUpdated;
-        event AccountLedgerHandler AccountLedgerAdded;
+        event AccountLedgerHandler LedgerEntryAdded;
+        event AccountLedgerHandler LedgerEntryRemoved;
+        event AccountLedgerHandler LedgerEntryConfirmationUpdated;
         event BalanceHandler BalanceUpdated;
     }
 
     public class AccountLedgerRunner : IAccountLedgerRunner
     {
-
+        public event AccountLedgerHandler LedgerEntryAdded;
+        public event AccountLedgerHandler LedgerEntryRemoved;
+        public event AccountLedgerHandler LedgerEntryConfirmationUpdated;
         public event BalanceHandler BalanceUpdated;
-        public event AccountLedgerHandler AccountLedgerAdded;
-        public event AccountLedgerHandler AccountLedgerBalanceUpdated;
-        public event AccountLedgerHandler AccountLedgerConfirmationUpdated;
-        
+
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
 
@@ -86,18 +85,18 @@ namespace NxtWallet.Core
 
         protected virtual void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
         {
-            AccountLedgerConfirmationUpdated?.Invoke(this, ledgerEntry);
+            LedgerEntryConfirmationUpdated?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnLedgerEntryBalanceUpdated(LedgerEntry ledgerEntry)
         {
-            AccountLedgerBalanceUpdated?.Invoke(this, ledgerEntry);
+            LedgerEntryRemoved?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnLedgerEntryAdded
             (LedgerEntry ledgerEntry)
         {
-            AccountLedgerAdded?.Invoke(this, ledgerEntry);
+            LedgerEntryAdded?.Invoke(this, ledgerEntry);
         }
 
         protected virtual void OnBalanceUpdated(string balance)

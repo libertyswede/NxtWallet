@@ -62,7 +62,7 @@ namespace NxtWallet.IntegrationTest
             var runner = new AccountLedgerRunner(walletRepository, nxtServer);
 
             _addedLedgerEntries.Clear();
-            runner.AccountLedgerAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);
+            runner.LedgerEntryAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);
 
             try
             {

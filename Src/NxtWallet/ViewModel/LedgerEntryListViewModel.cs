@@ -25,19 +25,11 @@ namespace NxtWallet.ViewModel
         public LedgerEntryListViewModel(IAccountLedgerRepository accountLedgerRepository, IAccountLedgerRunner accountLedgerRunner,
             IContactRepository contactRepository)
         {
-            accountLedgerRunner.AccountLedgerAdded += (sender, ledgerEntry) =>
+            accountLedgerRunner.LedgerEntryAdded += (sender, ledgerEntry) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() => InsertLedgerEntry(ledgerEntry));
             };
-            accountLedgerRunner.AccountLedgerBalanceUpdated += (sender, ledgerEntry) =>
-            {
-                DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                {
-                    var existingLedgerEntry = LedgerEntries.Single(t => t.Equals(ledgerEntry));
-                    existingLedgerEntry.NqtBalance = ledgerEntry.NqtBalance;
-                });
-            };
-            accountLedgerRunner.AccountLedgerConfirmationUpdated += (sender, ledgerEntry) =>
+            accountLedgerRunner.LedgerEntryConfirmationUpdated += (sender, ledgerEntry) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {

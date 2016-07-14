@@ -24,7 +24,7 @@ namespace NxtWallet
 
         public void Register()
         {
-            _accountLedgerRunner.AccountLedgerAdded += (sender, ledgerEntry) =>
+            _accountLedgerRunner.LedgerEntryAdded += (sender, ledgerEntry) =>
             {
                 if (ledgerEntry.UserIsRecipient && _walletRepository.NotificationsEnabled)
                     PopNewLedgerEntryToast(ledgerEntry);
