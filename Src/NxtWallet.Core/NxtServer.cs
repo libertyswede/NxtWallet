@@ -156,6 +156,7 @@ namespace NxtWallet.Core
             var ledgerEntries = new List<LedgerEntry>();
             try
             {
+                lastTimestamp = AdjustIfGenesisBlock(lastTimestamp);
                 var accountService = _serviceFactory.CreateAccountService();
 
                 var firstIndex = 0;
@@ -167,11 +168,11 @@ namespace NxtWallet.Core
                 while (hasMore)
                 {
                     var accountLedger = await accountService.GetAccountLedger(_walletRepository.NxtAccount,
-                        firstIndex, firstIndex + count - 1, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true, 
+                        firstIndex, firstIndex + count - 1, holdingType: "UNCONFIRMED_NXT_BALANCE", includeTransactions: true,
                         requireBlock: _walletRepository.LastLedgerEntryBlockId);
 
                     var newAccountLedgerEntries = accountLedger.Entries.Where(e => e.Timestamp > lastTimestamp).ToList();
-                    
+
                     accountLedgerEntries.AddRange(newAccountLedgerEntries);
                     firstIndex += count;
                     hasMore = accountLedger.Entries.Any() && accountLedger.Entries.Count == newAccountLedgerEntries.Count;
@@ -194,6 +195,16 @@ namespace NxtWallet.Core
                 throw new Exception("Error when parsing response", e);
             }
             return ledgerEntries.ToList();
+        }
+
+        private static DateTime AdjustIfGenesisBlock(DateTime lastTimestamp)
+        {
+            if (lastTimestamp == Constants.EpochBeginning)
+            {
+                lastTimestamp = lastTimestamp.AddSeconds(-1);
+            }
+
+            return lastTimestamp;
         }
 
         private List<AccountLedgerEntry> GroupLedgerEntries(List<AccountLedgerEntry> ledgerEntries)
