@@ -174,7 +174,7 @@ namespace NxtWallet.Core
                     
                     accountLedgerEntries.AddRange(newAccountLedgerEntries);
                     firstIndex += count;
-                    hasMore = accountLedger.Entries.Count == newAccountLedgerEntries.Count;
+                    hasMore = accountLedger.Entries.Any() && accountLedger.Entries.Count == newAccountLedgerEntries.Count;
                 }
 
                 accountLedgerEntries = GroupLedgerEntries(accountLedgerEntries);
