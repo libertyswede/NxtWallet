@@ -23,7 +23,7 @@ namespace NxtWallet.IntegrationTest
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountTest()
         {
-            await TryCheckAllTransactionsTest("NXT-6KPX-Y9ZT-QH79-7RU7S");
+            await TryCheckAllTransactionsTest("NXT-MRCC-2YLS-8M54-3CMAJ");
         }
 
         [TestMethod]
