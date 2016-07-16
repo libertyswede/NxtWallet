@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using NxtLib;
-using NxtLib.Local;
 using NxtLib.ServerInfo;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace NxtWallet.Core
 {
@@ -85,8 +86,22 @@ namespace NxtWallet.Core
             // Get new ledger entries since last known block from NRS
             // Get unconfirmedconfirmed balance from NRS
 
+            var knownUnconfirmedEntries = await _accountLedgerRepository.GetUnconfirmedLedgerEntriesAsync();
             var newLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
             var unconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+            var updatedLedgerEntries = new List<LedgerEntry>();
+
+            foreach (var unconfirmedEntry in knownUnconfirmedEntries)
+            {
+                var confirmedEntry = newLedgerEntries.SingleOrDefault(e => e.TransactionId == unconfirmedEntry.TransactionId);
+                if (confirmedEntry == null)
+                {
+                    continue;
+                }
+                confirmedEntry.Id = unconfirmedEntry.Id;
+                newLedgerEntries.Remove(confirmedEntry);
+                updatedLedgerEntries.Add(confirmedEntry);
+            }
 
             // Check stuff...
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
@@ -95,9 +110,17 @@ namespace NxtWallet.Core
             // Fire event(s).
 
             await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
+            var formattedUnconfirmedBalance = unconfirmedBalance.NqtToNxt().ToFormattedString();
+            if (_walletRepository.Balance != formattedUnconfirmedBalance)
+            {
+                await _walletRepository.UpdateBalanceAsync(formattedUnconfirmedBalance);
+                OnBalanceUpdated(formattedUnconfirmedBalance);
+            }
             await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
             newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
-
+            
+            await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
+            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
         }
 
         protected virtual void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)

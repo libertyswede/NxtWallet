@@ -12,9 +12,11 @@ namespace NxtWallet.Core.Repositories
 {
     public interface IAccountLedgerRepository
     {
-        Task<IEnumerable<LedgerEntry>> GetAllLedgerEntriesAsync();
-        Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry);
+        Task<List<LedgerEntry>> GetAllLedgerEntriesAsync();
+        Task<List<LedgerEntry>> GetUnconfirmedLedgerEntriesAsync();
+        Task AddLedgerEntryAsync(LedgerEntry ledgerEntry);
         Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries);
+        Task UpdateLedgerEntriesAsync(List<LedgerEntry> updatedLedgerEntries);
     }
 
     public class AccountLedgerRepository : IAccountLedgerRepository
@@ -28,7 +30,22 @@ namespace NxtWallet.Core.Repositories
             _walletRepository = walletRepository;
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetAllLedgerEntriesAsync()
+        public async Task<List<LedgerEntry>> GetUnconfirmedLedgerEntriesAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                var ledgerEntryDtos = await context.LedgerEntries
+                    .Where(e => e.IsConfirmed == false)
+                    .OrderByDescending(entry => entry.Timestamp)
+                    .ToListAsync();
+
+                var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
+                UpdateIsMyAddress(ledgerEntries);
+                return ledgerEntries;
+            }
+        }
+
+        public async Task<List<LedgerEntry>> GetAllLedgerEntriesAsync()
         {
             using (var context = new WalletContext())
             {
@@ -38,7 +55,7 @@ namespace NxtWallet.Core.Repositories
 
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
                 UpdateIsMyAddress(ledgerEntries);
-                return ledgerEntries.AsEnumerable();
+                return ledgerEntries;
             }
         }
 
@@ -57,9 +74,29 @@ namespace NxtWallet.Core.Repositories
             }
         }
 
-        public Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry)
+        public async Task AddLedgerEntryAsync(LedgerEntry ledgerEntry)
         {
-            throw new NotImplementedException();
+            using (var context = new WalletContext())
+            {
+                var dto = _mapper.Map<LedgerEntryDto>(ledgerEntry);
+                context.LedgerEntries.Add(dto);
+                await context.SaveChangesAsync();
+                ledgerEntry.Id = dto.Id;
+            }
+        }
+
+        public async Task UpdateLedgerEntriesAsync(List<LedgerEntry> updatedLedgerEntries)
+        {
+            using (var context = new WalletContext())
+            {
+                var dtos = _mapper.Map<List<LedgerEntryDto>>(updatedLedgerEntries);
+                foreach (var dto in dtos)
+                {
+                    context.LedgerEntries.Add(dto);
+                    context.Entry(dto).State = EntityState.Modified;
+                }
+                await context.SaveChangesAsync();
+            }
         }
 
         private void UpdateIsMyAddress(List<LedgerEntry> ledgerEntries)

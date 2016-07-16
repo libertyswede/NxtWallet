@@ -2,23 +2,33 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.Models;
-using System.Linq;
 using System;
 
 namespace NxtWallet.Core.Fakes
 {
     public class FakeAccountLedgerRepository : IAccountLedgerRepository
     {
-        public Task<IEnumerable<LedgerEntry>> GetAllLedgerEntriesAsync()
+        public Task<List<LedgerEntry>> GetAllLedgerEntriesAsync()
         {
-            return Task.FromResult(new List<LedgerEntry>().AsEnumerable());
+            return Task.FromResult(new List<LedgerEntry>());
         }
+
+        public Task<List<LedgerEntry>> GetUnconfirmedLedgerEntriesAsync()
+        {
+            return Task.FromResult(new List<LedgerEntry>());
+        }
+
         public Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries)
         {
             return Task.CompletedTask;
         }
 
-        public Task SaveLedgerEntryAsync(LedgerEntry ledgerEntry)
+        public Task AddLedgerEntryAsync(LedgerEntry ledgerEntry)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateLedgerEntriesAsync(List<LedgerEntry> updatedLedgerEntries)
         {
             return Task.CompletedTask;
         }

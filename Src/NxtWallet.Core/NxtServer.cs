@@ -280,6 +280,9 @@ namespace NxtWallet.Core
                 var ledgerEntry = _mapper.Map<LedgerEntry>(sendMoneyReply.Transaction);
                 UpdateIsMyAddress(ledgerEntry);
                 ledgerEntry.TransactionId = broadcastReply.TransactionId;
+                ledgerEntry.NqtFee *= -1;
+                ledgerEntry.NqtAmount *= -1;
+                ledgerEntry.IsConfirmed = false;
                 return ledgerEntry;
             }
             catch (HttpRequestException e)
