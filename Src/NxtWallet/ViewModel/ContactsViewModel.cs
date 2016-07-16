@@ -44,6 +44,7 @@ namespace NxtWallet.ViewModel
         {
             _contactRepository = contactRepository;
             _navigationService = navigationService;
+            
             SaveSelectedContact = new RelayCommand(SaveContact, () => SelectedContact != null);
             AddCommand = new RelayCommand(AddContact);
             DeleteCommand = new RelayCommand(DeleteContact, () => SelectedContact != null);

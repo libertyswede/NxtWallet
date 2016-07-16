@@ -112,6 +112,7 @@
     <Compile Include="Controls\NavMenuListView.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="FakeToastManager.cs" />
+    <Compile Include="IsEnabledConverter.cs" />
     <Compile Include="NavigationService.cs" />
     <Compile Include="Ioc.cs" />
     <Compile Include="Controls\NavMenuItem.cs" />

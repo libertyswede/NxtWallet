@@ -66,7 +66,7 @@ namespace NxtWallet.ViewModel
                 var amount = decimal.Parse(Amount);
                 var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
                 SetBalance(ledgerEntry);
-                await _accountLedgerRepository.SaveLedgerEntryAsync(ledgerEntry);
+                await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                 await _walletRepository.UpdateBalanceAsync((ledgerEntry.NqtBalance/100000000M).ToFormattedString());
                 //await Task.Delay(5000); // For testing purposes
             });
@@ -77,8 +77,8 @@ namespace NxtWallet.ViewModel
         {
             // TODO: Could be a problem with different decimal separator signs in different regions
             var currentBalanceNxt = decimal.Parse(_walletRepository.Balance);
-            var currentBalanceNqt = (long)currentBalanceNxt *100000000;
-            var newBalanceNqt = currentBalanceNqt - ledgerEntry.NqtAmount - ledgerEntry.NqtFee;
+            var currentBalanceNqt = (long)(currentBalanceNxt * 100000000M);
+            var newBalanceNqt = currentBalanceNqt + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
             ledgerEntry.NqtBalance = newBalanceNqt;
         }
     }

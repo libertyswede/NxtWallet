@@ -11,6 +11,7 @@
     Loaded="ContactsPage_OnLoaded">
     <Page.Resources>
         <nxtWallet:NoopConverter x:Key="NoopConverter" />
+        <nxtWallet:IsEnabledConverter x:Key="IsEnabledConverter" />
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
@@ -77,9 +78,9 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Contact Details" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" />
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="10" Text="Name:" HorizontalAlignment="Right"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.Name, Mode=TwoWay}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.Name, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" Text="Nxt Address:" HorizontalAlignment="Right"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.NxtAddressRs, Mode=TwoWay}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.NxtAddressRs, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
             <Button Grid.Row="3" Grid.Column="1" Content="Save" Height="30" Margin="10" Width="128" Command="{x:Bind ViewModel.SaveSelectedContact}"/>
         </Grid>
     </Grid>
