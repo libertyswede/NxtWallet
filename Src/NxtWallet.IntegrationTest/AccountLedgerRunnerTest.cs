@@ -19,11 +19,12 @@ namespace NxtWallet.IntegrationTest
         private static IMapper _mapper = MapperConfig.Setup().CreateMapper();
         private const string _testnetFile = "known_testnet_addresses";
         private const string _mainnetFile = "known_mainnet_addresses";
+        private readonly HashSet<string> ignoreAccounts = new HashSet<string> { "NXT-6MVF-XTDR-MDTK-DPHEU" };
 
         [TestMethod]
         public async Task TryCheckAllTransactionsForAllTestnetAccountTest()
         {
-            await TryCheckAllTransactionsTest("NXT-MRCC-2YLS-8M54-3CMAJ");
+            await TryCheckAllTransactionsTest("NXT-6GT3-FZH7-4MG9-BF8RZ");
         }
 
         [TestMethod]
@@ -35,6 +36,10 @@ namespace NxtWallet.IntegrationTest
                 while (!reader.EndOfStream)
                 {
                     var accountRs = reader.ReadLine();
+                    if (ignoreAccounts.Contains(accountRs))
+                    {
+                        continue;
+                    }
                     Debug.WriteLine($"Checking account: {accountRs}");
                     await TryCheckAllTransactionsTest(accountRs);
                 }
