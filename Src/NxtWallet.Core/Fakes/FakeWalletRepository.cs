@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using NxtLib;
 using NxtWallet.Core.Repositories;
@@ -68,6 +69,12 @@ namespace NxtWallet.Core.Fakes
         public Task UpdateLastLedgerEntryBlockIdAsync(ulong blockId)
         {
             LastLedgerEntryBlockId = blockId;
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateReadOnlyNxtAccountAsync(string nxtAccount)
+        {
+            NxtAccount = new AccountWithPublicKey("NXT-5XAB-J4KK-5JKF-EA42X", "f91588343ba5a14e2a4960b2bfcf027e44e0d9337f683e0169d0e021714d3313");
             return Task.CompletedTask;
         }
     }

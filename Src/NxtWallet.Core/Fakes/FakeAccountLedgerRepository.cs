@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.Models;
-using System;
 
 namespace NxtWallet.Core.Fakes
 {
@@ -39,6 +38,11 @@ namespace NxtWallet.Core.Fakes
         }
 
         public Task RemoveLedgerEntriesOnBlockAsync(ulong blockId)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAllLedgerEntriesAsync()
         {
             return Task.CompletedTask;
         }
