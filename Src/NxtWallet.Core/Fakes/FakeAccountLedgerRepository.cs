@@ -32,5 +32,10 @@ namespace NxtWallet.Core.Fakes
         {
             return Task.CompletedTask;
         }
+
+        public Task DeleteAllLedgerEntriesAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

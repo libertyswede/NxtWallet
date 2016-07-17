@@ -17,6 +17,7 @@ namespace NxtWallet.Core.Repositories
         Task AddLedgerEntryAsync(LedgerEntry ledgerEntry);
         Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries);
         Task UpdateLedgerEntriesAsync(List<LedgerEntry> updatedLedgerEntries);
+        Task DeleteAllLedgerEntriesAsync();
     }
 
     public class AccountLedgerRepository : IAccountLedgerRepository
@@ -96,6 +97,14 @@ namespace NxtWallet.Core.Repositories
                     context.Entry(dto).State = EntityState.Modified;
                 }
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAllLedgerEntriesAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                await context.Database.ExecuteSqlCommandAsync($"DELETE FROM {LedgerEntryDto.TableName}");
             }
         }
 

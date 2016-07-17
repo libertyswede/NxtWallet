@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NxtWallet.Core.Migrations.Model
 {
-    [Table("LedgerEntry")]
+    [Table(TableName)]
     public class LedgerEntryDto : IEquatable<LedgerEntryDto>
     {
+        internal const string TableName = "LedgerEntry";
+
         public int Id { get; set; }
         public long? TransactionId { get; set; }
         public int Height { get; set; }

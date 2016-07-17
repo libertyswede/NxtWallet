@@ -31,6 +31,7 @@ namespace NxtWallet.Core.Repositories
         Task UpdateBackupCompletedAsync(bool completed);
         Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
         Task UpdateLastLedgerEntryBlockIdAsync(ulong blockId);
+        Task UpdateReadOnlyNxtAccountAsync(string nxtAccount);
     }
 
     public class WalletRepository : IWalletRepository
@@ -121,6 +122,12 @@ namespace NxtWallet.Core.Repositories
         {
             await Update(LastLedgerEntryBlockIdKey, blockId.ToString());
             LastLedgerEntryBlockId = blockId;
+        }
+
+        public async Task UpdateReadOnlyNxtAccountAsync(string nxtAccount)
+        {
+            await Update(ReadOnlyAccountKey, nxtAccount);
+            SetupAccounts(nxtAccount);
         }
 
         private static async Task Update<T>(string key, T value)
