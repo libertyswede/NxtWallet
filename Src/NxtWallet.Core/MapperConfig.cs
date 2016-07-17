@@ -22,10 +22,12 @@ namespace NxtWallet.Core
                 cfg.CreateMap<ContactDto, Contact>();
                 cfg.CreateMap<Contact, ContactDto>();
                 cfg.CreateMap<LedgerEntryDto, LedgerEntry>()
+                    .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (ulong?)src.BlockId))
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => (ulong?)src.TransactionId))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)src.TransactionType));
 
                 cfg.CreateMap<LedgerEntry, LedgerEntryDto>()
+                    .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (long?)src.BlockId))
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => (long?)src.TransactionId))
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (int)src.LedgerEntryType));
 

@@ -7,6 +7,7 @@ using NxtLib;
 using NxtLib.ServerInfo;
 using System.Linq;
 using System.Collections.Generic;
+using NxtLib.Local;
 
 namespace NxtWallet.Core
 {
@@ -48,49 +49,86 @@ namespace NxtWallet.Core
             {
                 await TryCheckAllLedgerEntries();
                 await Task.Delay(_walletRepository.SleepTime, token);
-                //await Task.Delay(int.MaxValue, token);
             }
         }
 
         public async Task TryCheckAllLedgerEntries()
         {
-            Block<ulong> lastKnownBlock = null;
-            BlockchainStatus blockchainStatus = null;
-
-            // Fork check...
-            // Get last known block from DB.
-            // Get blockchain status from NRS.
-            // If fork, roll back local db 10 blocks, if still on fork, roll back to genesis.
-            // Things to roll back: ledger events, balance, unconfirmed transactions
-            // Fire events (removed)
-            try
-            {
-                blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
-                lastKnownBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastLedgerEntryBlockId);
-            }
-            catch (AggregateException ae)
-            {
-                ae.Handle(e =>
-                {
-                    if ((e as NxtException)?.Message == "Unknown block")
-                    {
-                        // Handle fork
-                        return true;
-                    }
-                    return false;
-                });
-            }
-
-            // Fetch stuff...
-            // Get previously unconfirmed transactions from DB.
-            // Get new ledger entries since last known block from NRS
-            // Get unconfirmedconfirmed balance from NRS
+            var syncBlockInfo = await SyncToLastCommonBlock();
+            var blockchainStatus = syncBlockInfo.Item1;
+            var lastKnownBlock = syncBlockInfo.Item2;
 
             var knownUnconfirmedEntries = await _accountLedgerRepository.GetUnconfirmedLedgerEntriesAsync();
             var newLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
             var unconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
             var updatedLedgerEntries = new List<LedgerEntry>();
+            CheckForConfirmedEntries(knownUnconfirmedEntries, newLedgerEntries, updatedLedgerEntries);
+            
+            // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
+            //   Log error, throw exception!
 
+            await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
+            var formattedUnconfirmedBalance = unconfirmedBalance.NqtToNxt().ToFormattedString();
+            if (_walletRepository.Balance != formattedUnconfirmedBalance)
+            {
+                await _walletRepository.UpdateBalanceAsync(formattedUnconfirmedBalance);
+                OnBalanceUpdated(formattedUnconfirmedBalance);
+            }
+            await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
+            newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
+
+            await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
+            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
+        }
+
+        private async Task<Tuple<BlockchainStatus, Block<ulong>>> SyncToLastCommonBlock()
+        {
+            Block<ulong> lastKnownBlock = null;
+            BlockchainStatus blockchainStatus = null;
+
+            while (lastKnownBlock == null)
+            {
+                try
+                {
+                    blockchainStatus = await _nxtServer.GetBlockchainStatusAsync();
+                    lastKnownBlock = await _nxtServer.GetBlockAsync(_walletRepository.LastLedgerEntryBlockId);
+                }
+                catch (NxtException e)
+                {
+                    if (e.Message != "Unknown block")
+                        throw;
+                    await RollbackToPreviousHeight();
+                }
+            }
+            return new Tuple<BlockchainStatus, Block<ulong>>(blockchainStatus, lastKnownBlock);
+        }
+
+        private async Task RollbackToPreviousHeight()
+        {
+            var ledgerEntries = await _accountLedgerRepository.GetLedgerEntriesOnLastBlockAsync();
+
+            if (!ledgerEntries.Any())
+            {
+                await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(Constants.GenesisBlockId);
+                return;
+            }
+
+            var lastLedgerEntryBlockId = ledgerEntries.First().BlockId.Value;
+            try
+            {
+                var block = await _nxtServer.GetBlockAsync(lastLedgerEntryBlockId);
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle(e => (e as NxtException)?.Message == "Unknown block");
+            }
+            await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(lastLedgerEntryBlockId);
+            await _accountLedgerRepository.RemoveLedgerEntriesOnBlockAsync(lastLedgerEntryBlockId);
+            ledgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
+        }
+
+        private static void CheckForConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries, List<LedgerEntry> updatedLedgerEntries)
+        {
             foreach (var unconfirmedEntry in knownUnconfirmedEntries)
             {
                 var confirmedEntry = newLedgerEntries.SingleOrDefault(e => e.TransactionId == unconfirmedEntry.TransactionId);
@@ -102,44 +140,24 @@ namespace NxtWallet.Core
                 newLedgerEntries.Remove(confirmedEntry);
                 updatedLedgerEntries.Add(confirmedEntry);
             }
-
-            // Check stuff...
-            // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
-            //   Log error, throw exception!
-            // Save stuff to local DB.
-            // Fire event(s).
-
-            await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
-            var formattedUnconfirmedBalance = unconfirmedBalance.NqtToNxt().ToFormattedString();
-            if (_walletRepository.Balance != formattedUnconfirmedBalance)
-            {
-                await _walletRepository.UpdateBalanceAsync(formattedUnconfirmedBalance);
-                OnBalanceUpdated(formattedUnconfirmedBalance);
-            }
-            await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
-            newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
-            
-            await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
-            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
         }
 
-        protected virtual void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
-        {
-            LedgerEntryConfirmationUpdated?.Invoke(this, ledgerEntry);
-        }
-
-        protected virtual void OnLedgerEntryBalanceUpdated(LedgerEntry ledgerEntry)
-        {
-            LedgerEntryRemoved?.Invoke(this, ledgerEntry);
-        }
-
-        protected virtual void OnLedgerEntryAdded
-            (LedgerEntry ledgerEntry)
+        private void OnLedgerEntryAdded(LedgerEntry ledgerEntry)
         {
             LedgerEntryAdded?.Invoke(this, ledgerEntry);
         }
 
-        protected virtual void OnBalanceUpdated(string balance)
+        private void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
+        {
+            LedgerEntryConfirmationUpdated?.Invoke(this, ledgerEntry);
+        }
+
+        private void OnLedgerEntryRemoved(LedgerEntry ledgerEntry)
+        {
+            LedgerEntryRemoved?.Invoke(this, ledgerEntry);
+        }
+
+        private void OnBalanceUpdated(string balance)
         {
             BalanceUpdated?.Invoke(this, balance);
         }

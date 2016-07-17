@@ -45,7 +45,9 @@ namespace NxtWallet.Core.Migrations
                     b.Property<string>("AccountTo")
                         .HasAnnotation("MaxLength", 25);
 
-                    b.Property<int>("Height");
+                    b.Property<long?>("BlockId");
+
+                    b.Property<int?>("Height");
 
                     b.Property<bool>("IsConfirmed")
                         .HasAnnotation("Relational:DefaultValue", "True")

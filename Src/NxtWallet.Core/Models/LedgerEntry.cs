@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
-using Newtonsoft.Json;
 using NxtLib;
 
 namespace NxtWallet.Core.Models
@@ -15,61 +14,26 @@ namespace NxtWallet.Core.Models
         private bool _userIsRecipient;
         private bool _userIsSender;
 
-        [JsonIgnore]
         public int Id { get; set; }
-
-        [JsonIgnore]
         public ulong? TransactionId { get; set; }
-
-        [JsonIgnore]
+        public int? Height { get; set; }
+        public ulong? BlockId { get; set; }
         public DateTime Timestamp { get; set; }
-
-        [JsonIgnore]
         public long NqtAmount { get; set; }
-
-        [JsonIgnore]
         public string FormattedAmount => (NqtAmount / (decimal)100000000).ToFormattedString();
-
-        [JsonIgnore]
         public long NqtFee { get; set; }
-
-        [JsonIgnore]
         public string FormattedFee => NqtFee < 0 ? (NqtFee / (decimal)100000000).ToFormattedString() : string.Empty;
-
-        [JsonIgnore]
         public long NqtBalance { get; set; }
-
-        [JsonIgnore]
         public string FormattedBalance => (NqtBalance / (decimal)100000000).ToFormattedString();
-
-        [JsonIgnore]
         public string AccountFrom { get; set; }
-
-        [JsonIgnore]
         public string ContactListAccountFrom { get; private set; }
-
-        [JsonIgnore]
         public string AccountTo { get; set; }
-
-        [JsonIgnore]
         public string ContactListAccountTo { get; private set; }
-
-        [JsonIgnore]
         public string Message { get; set; }
-
-        [JsonIgnore]
         public LedgerEntryType LedgerEntryType { get; set; }
-
-        [JsonIgnore]
-        public int Height { get; set; }
-
-        [JsonIgnore]
         public Transaction Transaction { get; set; }
-
-        [JsonIgnore]
         public Attachment Attachment { get; set; }
 
-        [JsonIgnore]
         public bool UserIsRecipient
         {
             get { return _userIsRecipient; }
@@ -80,7 +44,6 @@ namespace NxtWallet.Core.Models
             }
         }
 
-        [JsonIgnore]
         public bool UserIsSender
         {
             get { return _userIsSender; }
@@ -91,10 +54,8 @@ namespace NxtWallet.Core.Models
             }
         }
 
-        [JsonIgnore]
         public bool UserIsAmountRecipient => UserIsAmountRecipientCalculation();
 
-        [JsonIgnore]
         public bool IsConfirmed
         {
             get { return _isConfirmed; }

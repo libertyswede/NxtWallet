@@ -14,9 +14,11 @@ namespace NxtWallet.Core.Repositories
     {
         Task<List<LedgerEntry>> GetAllLedgerEntriesAsync();
         Task<List<LedgerEntry>> GetUnconfirmedLedgerEntriesAsync();
+        Task<List<LedgerEntry>> GetLedgerEntriesOnLastBlockAsync();
         Task AddLedgerEntryAsync(LedgerEntry ledgerEntry);
         Task AddLedgerEntriesAsync(List<LedgerEntry> ledgerEntries);
         Task UpdateLedgerEntriesAsync(List<LedgerEntry> updatedLedgerEntries);
+        Task RemoveLedgerEntriesOnBlockAsync(ulong blockId);
     }
 
     public class AccountLedgerRepository : IAccountLedgerRepository
@@ -51,6 +53,20 @@ namespace NxtWallet.Core.Repositories
             {
                 var ledgerEntryDtos = await context.LedgerEntries
                     .OrderByDescending(entry => entry.Timestamp)
+                    .ToListAsync();
+
+                var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
+                UpdateIsMyAddress(ledgerEntries);
+                return ledgerEntries;
+            }
+        }
+
+        public async Task<List<LedgerEntry>> GetLedgerEntriesOnLastBlockAsync()
+        {
+            using (var context = new WalletContext())
+            {
+                var ledgerEntryDtos = await context.LedgerEntries
+                    .Where(e => e.Height == context.LedgerEntries.Where(e2 => e2.Height != null).Max(e2 => e2.Height))
                     .ToListAsync();
 
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
@@ -95,6 +111,16 @@ namespace NxtWallet.Core.Repositories
                     context.LedgerEntries.Add(dto);
                     context.Entry(dto).State = EntityState.Modified;
                 }
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task RemoveLedgerEntriesOnBlockAsync(ulong blockId)
+        {
+            using (var context = new WalletContext())
+            {
+                var entries = await context.LedgerEntries.Where(e => e.BlockId == (long)blockId).ToListAsync();
+                entries.ForEach(e => context.Entry(e).State = EntityState.Deleted);
                 await context.SaveChangesAsync();
             }
         }

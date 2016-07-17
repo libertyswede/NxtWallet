@@ -32,5 +32,15 @@ namespace NxtWallet.Core.Fakes
         {
             return Task.CompletedTask;
         }
+
+        public Task<List<LedgerEntry>> GetLedgerEntriesOnLastBlockAsync()
+        {
+            return Task.FromResult(new List<LedgerEntry>());
+        }
+
+        public Task RemoveLedgerEntriesOnBlockAsync(ulong blockId)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

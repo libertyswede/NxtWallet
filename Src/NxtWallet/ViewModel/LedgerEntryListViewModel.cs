@@ -37,6 +37,13 @@ namespace NxtWallet.ViewModel
                     existingLedgerEntry.IsConfirmed = ledgerEntry.IsConfirmed;
                 });
             };
+            accountLedgerRunner.LedgerEntryRemoved += (sender, ledgerEntry) =>
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    LedgerEntries.Remove(LedgerEntries.Single(t => t.Equals(ledgerEntry)));
+                });
+            };
 
             _accountLedgerRepository = accountLedgerRepository;
             _contactRepository = contactRepository;

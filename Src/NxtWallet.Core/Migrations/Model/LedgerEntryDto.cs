@@ -8,7 +8,8 @@ namespace NxtWallet.Core.Migrations.Model
     {
         public int Id { get; set; }
         public long? TransactionId { get; set; }
-        public int Height { get; set; }
+        public int? Height { get; set; }
+        public long? BlockId { get; set; }
         public DateTime Timestamp { get; set; }
         public long NqtBalance { get; set; }
         public long NqtAmount { get; set; }
