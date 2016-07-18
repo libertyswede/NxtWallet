@@ -77,5 +77,11 @@ namespace NxtWallet.Core.Fakes
             NxtAccount = new AccountWithPublicKey("NXT-5XAB-J4KK-5JKF-EA42X", "f91588343ba5a14e2a4960b2bfcf027e44e0d9337f683e0169d0e021714d3313");
             return Task.CompletedTask;
         }
+
+        public Task UpdateSecretPhraseAsync(string secretPhrase)
+        {
+            SecretPhrase = secretPhrase;
+            return Task.CompletedTask;
+        }
     }
 }

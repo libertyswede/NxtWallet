@@ -14,6 +14,7 @@ namespace NxtWallet.ViewModel
         private string _serverAddress;
         private string _readOnlyAddress;
         private bool? _isNotificationsEnabled;
+        private string _secretPhrase;
 
         public string ServerAddress
         {
@@ -30,7 +31,13 @@ namespace NxtWallet.ViewModel
         public string ReadOnlyAddress
         {
             get { return _readOnlyAddress; }
-            set { Set(ref _readOnlyAddress); }
+            set { Set(ref _readOnlyAddress, value); }
+        }
+
+        public string SecretPhrase
+        {
+            get { return _secretPhrase; }
+            set { Set(ref _secretPhrase, value); }
         }
 
         public RelayCommand SaveCommand { get; }
@@ -44,6 +51,7 @@ namespace NxtWallet.ViewModel
             ServerAddress = _walletRepository.NxtServer;
             IsNotificationsEnabled = _walletRepository.NotificationsEnabled;
             ReadOnlyAddress = _walletRepository.IsReadOnlyAccount ? _walletRepository.NxtAccount.AccountRs : string.Empty;
+            SecretPhrase = _walletRepository.SecretPhrase;
         }
 
         private async void Save()
@@ -54,18 +62,24 @@ namespace NxtWallet.ViewModel
                 await _walletRepository.UpdateNxtServerAsync(_serverAddress);
                 await _walletRepository.UpdateNotificationsEnabledAsync(IsNotificationsEnabled ?? true);
             });
-            if (ReadOnlyAddress != _walletRepository.NxtAccount.AccountRs)
+            if (SecretPhrase != _walletRepository.SecretPhrase)
             {
-                // TODO: Implement
-                // Verify address.
-                // Show error if not valid.
                 await Task.Run(async () =>
                 {
                     await _accountLedgerRepository.DeleteAllLedgerEntriesAsync();
-                    await _walletRepository.UpdateReadOnlyNxtAccountAsync(ReadOnlyAddress);
+                    await _walletRepository.UpdateSecretPhraseAsync(SecretPhrase);
                     await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(NxtLib.Local.Constants.GenesisBlockId);
                 });
             }
+            //if (ReadOnlyAddress != _walletRepository.NxtAccount.AccountRs)
+            //{
+            //    await Task.Run(async () =>
+            //    {
+            //        await _accountLedgerRepository.DeleteAllLedgerEntriesAsync();
+            //        await _walletRepository.UpdateReadOnlyNxtAccountAsync(ReadOnlyAddress);
+            //        await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(NxtLib.Local.Constants.GenesisBlockId);
+            //    });
+            //}
         }
     }
 }
