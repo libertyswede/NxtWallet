@@ -68,7 +68,7 @@ namespace NxtWallet.Core.Repositories
                 NqtBalance = ReadOrGenerate(dbSettings, context, BalanceKey, () => 0L);
                 SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
                 var readOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
-                NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
+                NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => "https://node1.ardorcrypto.com/nxt");
                 SleepTime = ReadOrGenerate(dbSettings, context, SleepTimeKey, () => 30000);
                 LastLedgerEntryBlockId = ReadOrGenerate(dbSettings, context, LastLedgerEntryBlockIdKey, () => Constants.GenesisBlockId);
                 BackupCompleted = ReadOrGenerate(dbSettings, context, BackupCompletedKey, () => false);
