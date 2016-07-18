@@ -11,6 +11,7 @@
         <x:Double x:Key="TextBlockFontNormalSize">16</x:Double>
         <x:Double x:Key="TextBlockFontSmallSize">12</x:Double>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisiblityConverter" />
+        <nxtWallet:StringFormatConverter x:Key="StringFormatConverter" />
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
@@ -75,18 +76,18 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="AmountLabelTextBlock" Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" FontSize="{StaticResource TextBlockFontNormalSize}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
                 <TextBlock x:Name="AmountValueTextBlock" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedAmount}" />
+                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtAmount, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
                 <TextBlock x:Name="FeeLabelTextBlock" Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedFee}" />
+                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtFee, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <TextBlock x:Name="BalanceLabelTextBlock" Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="BalanceValueTextBlock" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.FormattedBalance}" />
+                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtBalance, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
                     <Run Text="NXT" />
                 </TextBlock>
                 <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
