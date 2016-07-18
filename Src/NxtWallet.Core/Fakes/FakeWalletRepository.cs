@@ -12,7 +12,7 @@ namespace NxtWallet.Core.Fakes
         public string NxtServer { get; set; }
         public string SecretPhrase { get; set; }
         public bool IsReadOnlyAccount { get; set; }
-        public string Balance { get; set; }
+        public long NqtBalance { get; set; }
         public bool BackupCompleted { get; set; }
         public int SleepTime { get; set; }
         public bool NotificationsEnabled { get; set; }
@@ -30,7 +30,7 @@ namespace NxtWallet.Core.Fakes
         {
             NxtAccount = new AccountWithPublicKey("NXT-5XAB-J4KK-5JKF-EA42X", "f91588343ba5a14e2a4960b2bfcf027e44e0d9337f683e0169d0e021714d3313");
             NxtAccountWithPublicKey = new AccountWithPublicKey("NXT-5XAB-J4KK-5JKF-EA42X", "f91588343ba5a14e2a4960b2bfcf027e44e0d9337f683e0169d0e021714d3313");
-            Balance = "1100000000";
+            NqtBalance = 1100000000;
             BackupCompleted = false;
             SleepTime = 10000;
             NotificationsEnabled = true;
@@ -42,9 +42,9 @@ namespace NxtWallet.Core.Fakes
             return Task.CompletedTask;
         }
 
-        public Task UpdateBalanceAsync(string balance)
+        public Task UpdateBalanceAsync(long nqtBalance)
         {
-            Balance = balance;
+            NqtBalance = nqtBalance;
             return Task.CompletedTask;
         }
 

@@ -51,7 +51,7 @@ namespace NxtWallet.IntegrationTest
             var walletRepository = new FakeWalletRepository();
             walletRepository.NxtAccount = accountRs;
             walletRepository.IsReadOnlyAccount = true;
-            walletRepository.Balance = "0";
+            walletRepository.NqtBalance = 0;
             walletRepository.SecretPhrase = string.Empty;
             walletRepository.LastLedgerEntryBlockId = 2680262203532249785UL;
             walletRepository.NxtServer = "http://localhost:7876/nxt";

@@ -118,6 +118,7 @@
     <Compile Include="Controls\NavMenuItem.cs" />
     <Compile Include="NetworkIndicatorTrigger.cs" />
     <Compile Include="NoopConverter.cs" />
+    <Compile Include="StringFormatConverter.cs" />
     <Compile Include="StringNewlineConverter.cs" />
     <Compile Include="ToastManager.cs" />
     <Compile Include="IDialog.cs" />

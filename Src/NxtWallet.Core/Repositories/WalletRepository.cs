@@ -19,14 +19,14 @@ namespace NxtWallet.Core.Repositories
         string SecretPhrase { get; }
         bool IsReadOnlyAccount { get; }
         string NxtServer { get; }
-        string Balance { get; }
+        long NqtBalance { get; }
         bool BackupCompleted { get; }
         int SleepTime { get; }
         bool NotificationsEnabled { get; }
         ulong LastLedgerEntryBlockId { get; }
 
         Task LoadAsync();
-        Task UpdateBalanceAsync(string balance);
+        Task UpdateBalanceAsync(long nqtBalance);
         Task UpdateNxtServerAsync(string newServerAddress);
         Task UpdateBackupCompletedAsync(bool completed);
         Task UpdateNotificationsEnabledAsync(bool newNotificationsEnabled);
@@ -55,7 +55,7 @@ namespace NxtWallet.Core.Repositories
         public int SleepTime { get; private set; }
         public bool NotificationsEnabled { get; private set; }
         public ulong LastLedgerEntryBlockId { get; private set; }
-        public string Balance { get; private set; }
+        public long NqtBalance { get; private set; }
 
         public async Task LoadAsync()
         {
@@ -65,7 +65,7 @@ namespace NxtWallet.Core.Repositories
 
                 var dbSettings = await context.Settings.ToListAsync();
 
-                Balance = ReadOrGenerate(dbSettings, context, BalanceKey, () => "0.0");
+                NqtBalance = ReadOrGenerate(dbSettings, context, BalanceKey, () => 0L);
                 SecretPhrase = ReadOrGenerate(dbSettings, context, SecretPhraseKey, () => new LocalPasswordGenerator().GeneratePassword());
                 var readOnlyAccount = ReadOrGenerate(dbSettings, context, ReadOnlyAccountKey, () => "");
                 NxtServer = ReadOrGenerate(dbSettings, context, NxtServerKey, () => Constants.DefaultNxtUrl);
@@ -95,10 +95,10 @@ namespace NxtWallet.Core.Repositories
             }
         }
 
-        public async Task UpdateBalanceAsync(string balance)
+        public async Task UpdateBalanceAsync(long nqtBalance)
         {
-            await Update(BalanceKey, balance);
-            Balance = balance;
+            await Update(BalanceKey, nqtBalance);
+            NqtBalance = nqtBalance;
         }
 
         public async Task UpdateNxtServerAsync(string newServerAddress)
@@ -134,6 +134,7 @@ namespace NxtWallet.Core.Repositories
         public async Task UpdateSecretPhraseAsync(string secretPhrase)
         {
             await Update(SecretPhraseKey, secretPhrase);
+            SecretPhrase = secretPhrase;
             SetupAccounts(string.Empty);
         }
 

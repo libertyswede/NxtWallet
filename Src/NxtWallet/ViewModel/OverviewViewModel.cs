@@ -9,7 +9,7 @@ namespace NxtWallet.ViewModel
     {
         private readonly IWalletRepository _walletRepository;
 
-        private string _balance;
+        private decimal _nxtBalance;
         private string _nxtAddress;
         private bool _showAddress;
 
@@ -19,10 +19,10 @@ namespace NxtWallet.ViewModel
             set { Set(ref _nxtAddress, value); }
         }
 
-        public string Balance
+        public decimal NxtBalance
         {
-            get { return _balance; }
-            set { Set(ref _balance, value); }
+            get { return _nxtBalance; }
+            set { Set(ref _nxtBalance, value); }
         }
 
         public bool ShowAddress
@@ -35,15 +35,15 @@ namespace NxtWallet.ViewModel
         {
             _walletRepository = walletRepository;
 
-            Balance = "0.0";
+            NxtBalance = 0M;
             NxtAddress = walletRepository.NxtAccount.AccountRs;
 
-            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => Balance = balance);
+            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = balance / 100000000M);
         }
 
         public void LoadFromRepository()
         {
-            Balance = _walletRepository.Balance;
+            NxtBalance = _walletRepository.NqtBalance / 100000000M;
             ShowAddress = _walletRepository.BackupCompleted;
         }
     }

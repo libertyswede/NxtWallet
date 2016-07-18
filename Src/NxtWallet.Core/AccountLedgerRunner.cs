@@ -12,7 +12,7 @@ using NxtLib.Local;
 namespace NxtWallet.Core
 {
     public delegate void AccountLedgerHandler(IAccountLedgerRunner sender, LedgerEntry ledgerEntry);
-    public delegate void BalanceHandler(IAccountLedgerRunner sender, string balance);
+    public delegate void BalanceHandler(IAccountLedgerRunner sender, long nqtBalance);
 
     public interface IAccountLedgerRunner
     {
@@ -68,11 +68,10 @@ namespace NxtWallet.Core
             //   Log error, throw exception!
 
             await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
-            var formattedUnconfirmedBalance = unconfirmedBalance.NqtToNxt().ToFormattedString();
-            if (_walletRepository.Balance != formattedUnconfirmedBalance)
+            if (_walletRepository.NqtBalance != unconfirmedBalance)
             {
-                await _walletRepository.UpdateBalanceAsync(formattedUnconfirmedBalance);
-                OnBalanceUpdated(formattedUnconfirmedBalance);
+                await _walletRepository.UpdateBalanceAsync(unconfirmedBalance);
+                OnBalanceUpdated(unconfirmedBalance);
             }
             await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
             newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
@@ -157,9 +156,9 @@ namespace NxtWallet.Core
             LedgerEntryRemoved?.Invoke(this, ledgerEntry);
         }
 
-        private void OnBalanceUpdated(string balance)
+        private void OnBalanceUpdated(long nqtBalance)
         {
-            BalanceUpdated?.Invoke(this, balance);
+            BalanceUpdated?.Invoke(this, nqtBalance);
         }
     }
 }

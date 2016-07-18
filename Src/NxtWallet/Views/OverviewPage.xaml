@@ -10,6 +10,7 @@
     DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
     <Page.Resources>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisibilityConverter" />
+        <nxtWallet:StringFormatConverter x:Key="StringFormatConverter" />
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -61,7 +62,7 @@
             <Border Grid.Row="1" Margin="0,5,0,0" Padding="0,0,0,10" BorderBrush="AliceBlue" BorderThickness="0,0,0,2">
                 <TextBlock x:Name="BalanceTextBlock" TextWrapping="NoWrap" FontSize="21.333">
                     <Run Text="Balance:" />
-                    <Run Text="{x:Bind ViewModel.Balance, Mode=OneWay}" />
+                    <Run Text="{x:Bind ViewModel.NxtBalance, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00}'}" />
                 </TextBlock>
             </Border>
             <TextBlock x:Name="AccountLedgerTextBlock" Grid.Row="2" Text="Account Ledger" FontSize="21.333" Margin="0,20,0,0" />
