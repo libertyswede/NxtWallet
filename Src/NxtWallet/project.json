@@ -7,7 +7,7 @@
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.0.0",
     "Microsoft.ApplicationInsights.WindowsApps": "1.0.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-    "MvvmLight": "5.2.0",
+    "MvvmLight": "5.3.0",
     "NxtLib": "1.1.18",
     "ZXing.Net": "0.14.0.1"
   },
