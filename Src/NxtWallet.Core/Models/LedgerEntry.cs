@@ -21,13 +21,10 @@ namespace NxtWallet.Core.Models
         public DateTime Timestamp { get; set; }
         public long NqtAmount { get; set; }
         public decimal NxtAmount => (NqtAmount / 100000000M);
-        public string FormattedAmount => (NqtAmount / (decimal)100000000).ToFormattedString();
         public long NqtFee { get; set; }
         public decimal NxtFee => (NqtFee / 100000000M);
-        public string FormattedFee => NqtFee < 0 ? (NqtFee / (decimal)100000000).ToFormattedString() : string.Empty;
         public long NqtBalance { get; set; }
         public decimal NxtBalance => (NqtBalance / 100000000M);
-        public string FormattedBalance => (NqtBalance / (decimal)100000000).ToFormattedString();
         public string AccountFrom { get; set; }
         public string ContactListAccountFrom { get; private set; }
         public string AccountTo { get; set; }

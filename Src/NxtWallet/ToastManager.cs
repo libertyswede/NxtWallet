@@ -41,8 +41,8 @@ namespace NxtWallet
                                 "<binding template =\"ToastGeneric\">" +
                                     "<text>New NXT ledger entry</text>" +
                                     "<text>" +
-                                    $"You received {ledgerEntry.FormattedAmount} NXT from {from}.\n" + 
-                                    $"Your new balance is {ledgerEntry.FormattedBalance} NXT." +
+                                    $"You received {ledgerEntry.NxtAmount.ToString("#,##0.00;;")} NXT from {from}.\n" + 
+                                    $"Your new balance is {ledgerEntry.NxtBalance.ToString("#,##0.00;;")} NXT." +
                                     $"{message}" + 
                                     "</text>" +
                                 "</binding>" +
