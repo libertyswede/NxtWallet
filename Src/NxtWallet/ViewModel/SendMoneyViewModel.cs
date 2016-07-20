@@ -7,6 +7,7 @@ using NxtWallet.Core.Repositories;
 using Prism.Windows.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System;
 
 namespace NxtWallet.ViewModel
 {
@@ -30,17 +31,26 @@ namespace NxtWallet.ViewModel
         }
 
         [Required(ErrorMessage = "Amount is required")]
+        [Decimal(ErrorMessage = "Must be a valid decimal number")]
         [NxtAmount(ErrorMessage = "Must be a valid decimal number between 0 and 1000000000")]
         public string Amount
         {
             get { return _amount; }
-            set { SetProperty(ref _amount, value); }
+            set
+            {
+                SetProperty(ref _amount, value);
+                SendMoneyCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public string Message
         {
             get { return _message; }
-            set { SetProperty(ref _message, value); }
+            set
+            {
+                SetProperty(ref _message, value);
+                SendMoneyCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public RelayCommand SendMoneyCommand { get; }
@@ -52,9 +62,19 @@ namespace NxtWallet.ViewModel
             _walletRepository = walletRepository;
             _accountLedgerRepository = accountLedgerRepository;
             _sendMoneyDialog = sendMoneyDialog;
-            SendMoneyCommand = new RelayCommand(SendMoney);
-            nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.CanExecute(_nxtServer.IsOnline);
-            ErrorsChanged += (sender, args) => SendMoneyCommand.CanExecute(!Errors.Errors.Any());
+            SendMoneyCommand = new RelayCommand(SendMoney, () => CanSendMoney());
+            nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
+            ErrorsChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
+        }
+
+        private bool CanSendMoney()
+        {
+            return _nxtServer.IsOnline && !GetAllErrors().Any() && FormHasValues();
+        }
+
+        private bool FormHasValues()
+        {
+            return !string.IsNullOrEmpty(Recipient) && !string.IsNullOrEmpty(Amount);
         }
 
         public void OnNavigatedTo(Contact contact)

@@ -6,9 +6,6 @@ namespace NxtWallet
 {
     public class NxtAmountAttribute : ValidationAttribute
     {
-        public decimal MinValue { get; set; }
-        public decimal MaxValue { get; set; }
-
         public override bool IsValid(object value)
         {
             try
