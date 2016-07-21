@@ -122,12 +122,28 @@ namespace NxtWallet.ViewModel
             Contact contact = null;
             await Task.Run(async () =>
             {
-                account = await _nxtServer.GetAccountAsync(Recipient);
+                try
+                {
+                    account = await _nxtServer.GetAccountAsync(Recipient);
+                }
+                catch (NxtException e)
+                {
+                    if (e.Message != "Unknown account")
+                    {
+                        throw;
+                    }
+                }
                 contact = await _contactRepository.GetContactAsync(Recipient);
             });
 
+            if (account == null)
+            {
+                RecipientInfo = "The recipient account is an unknown account, meaning it has never had an incoming or outgoing transaction.";
+                return;
+            }
+
             var recipientInfo = "The recipient";
-            var name = (contact != null) ? contact.Name : (!string.IsNullOrEmpty(account?.Name)) ? account.Name : string.Empty;
+            var name = (contact != null) ? contact.Name : (!string.IsNullOrEmpty(account.Name)) ? account.Name : string.Empty;
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -165,6 +181,7 @@ namespace NxtWallet.ViewModel
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
+                    // await Task.Delay(5000);
                 });
             }
             catch (NxtException e)
