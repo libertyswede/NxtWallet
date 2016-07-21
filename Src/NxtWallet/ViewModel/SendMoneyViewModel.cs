@@ -8,6 +8,8 @@ using Prism.Windows.Validation;
 using System.ComponentModel.DataAnnotations;
 using System;
 using NxtLib;
+using System.Linq;
+using NxtLib.Accounts;
 
 namespace NxtWallet.ViewModel
 {
@@ -17,18 +19,27 @@ namespace NxtWallet.ViewModel
         private readonly IWalletRepository _walletRepository;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
         private readonly ISendMoneyDialog _sendMoneyDialog;
+        private readonly IContactRepository _contactRepository;
 
         private string _recipient;
         private string _amount;
         private string _message;
         private string _nrsErrorMessage;
+        private string _recipientInfo;
 
         [Required(ErrorMessage = "Recipient is required")]
         [NxtRsAddress(ErrorMessage = "Incorrect recipient address")]
         public string Recipient
         {
             get { return _recipient; }
-            set { SetProperty(ref _recipient, value); }
+            set
+            {
+                if (!string.Equals(_recipient, value))
+                {
+                    SetProperty(ref _recipient, value);
+                    UpdateRecipientInfo();
+                }
+            }
         }
 
         [Required(ErrorMessage = "Amount is required")]
@@ -66,15 +77,24 @@ namespace NxtWallet.ViewModel
             }
         }
 
+        public string RecipientInfo
+        {
+            get { return _recipientInfo; }
+            set { SetProperty(ref _recipientInfo, value); }
+        }
+
         public RelayCommand SendMoneyCommand { get; }
 
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository,
-            IAccountLedgerRepository accountLedgerRepository, ISendMoneyDialog sendMoneyDialog)
+            IAccountLedgerRepository accountLedgerRepository, ISendMoneyDialog sendMoneyDialog, 
+            IContactRepository contactRepository)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
             _accountLedgerRepository = accountLedgerRepository;
             _sendMoneyDialog = sendMoneyDialog;
+            _contactRepository = contactRepository;
+
             SendMoneyCommand = new RelayCommand(SendMoney, () => CanSendMoney());
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
             ErrorsChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
@@ -88,6 +108,33 @@ namespace NxtWallet.ViewModel
         private bool FormHasValues()
         {
             return !string.IsNullOrEmpty(Recipient) && !string.IsNullOrEmpty(Amount);
+        }
+
+        private async void UpdateRecipientInfo()
+        {
+            if (string.IsNullOrEmpty(Recipient) || Errors[nameof(Recipient)].Any())
+            {
+                RecipientInfo = string.Empty;
+                return;
+            }
+
+            AccountReply account = null;
+            Contact contact = null;
+            await Task.Run(async () =>
+            {
+                account = await _nxtServer.GetAccountAsync(Recipient);
+                contact = await _contactRepository.GetContactAsync(Recipient);
+            });
+
+            var recipientInfo = "The recipient";
+            var name = (contact != null) ? contact.Name : (!string.IsNullOrEmpty(account?.Name)) ? account.Name : string.Empty;
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                recipientInfo += $", {name}";
+            }
+            recipientInfo += $" has a balance of {account.Balance.Nxt.ToFormattedStringTwoDecimals()} NXT";
+            RecipientInfo = recipientInfo;
         }
 
         public void OnNavigatedTo(Contact contact)

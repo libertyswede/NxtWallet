@@ -30,6 +30,7 @@ namespace NxtWallet.Core
         Task<long> GetUnconfirmedNqtBalanceAsync();
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp);
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync();
+        Task<AccountReply> GetAccountAsync(string recipient);
         Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
     }
@@ -261,6 +262,27 @@ namespace NxtWallet.Core
         public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
         {
             return GetAccountLedgerEntriesAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
+        }
+
+        public async Task<AccountReply> GetAccountAsync(string recipient)
+        {
+            try
+            {
+                var accountService = _serviceFactory.CreateAccountService();
+                var account = await accountService.GetAccount(recipient);
+                IsOnline = true;
+                return account;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = true;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         public async Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)

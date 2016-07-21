@@ -16,8 +16,14 @@
 
         public static decimal NqtToNxt(this long nqtAmount)
         {
-            var nxtAmount = nqtAmount/100000000m;
-            return nxtAmount;
+            var amount = NxtLib.Amount.CreateAmountFromNqt(nqtAmount);
+            return amount.Nxt;
+        }
+
+        public static long NxtToNqt(this decimal nxtAmount)
+        {
+            var amount = NxtLib.Amount.CreateAmountFromNxt(nxtAmount);
+            return amount.Nqt;
         }
     }
 }

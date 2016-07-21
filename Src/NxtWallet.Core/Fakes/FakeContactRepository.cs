@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NxtWallet.Core.Models;
 using System.Linq;
 using NxtWallet.Core.Repositories;
+using System;
 
 namespace NxtWallet.Core.Fakes
 {
@@ -52,6 +53,12 @@ namespace NxtWallet.Core.Fakes
         {
             var contacts = Contacts.Where(c => nxtRsAddresses.Contains(c.NxtAddressRs)).ToList();
             return Task.FromResult(contacts);
+        }
+
+        public Task<Contact> GetContactAsync(string rsAddress)
+        {
+            var contact = Contacts.SingleOrDefault(c => c.NxtAddressRs == rsAddress);
+            return Task.FromResult(contact);
         }
 
         private void UseDesignTimeData()

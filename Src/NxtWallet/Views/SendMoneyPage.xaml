@@ -56,9 +56,15 @@
             
             <Button Grid.Column="1" Grid.Row="6" Content="Send" HorizontalAlignment="Left" Command="{x:Bind ViewModel.SendMoneyCommand}" />
 
-            <StackPanel Grid.Column="1" Grid.Row="7" Background="#FFFF8A8A" Width="300" HorizontalAlignment="Left" Margin="0,10,0,0"
+            <StackPanel Grid.Column="1" Grid.Row="7" HorizontalAlignment="Left" Margin="0,10,0,0">
+                <Border HorizontalAlignment="Left" Background="#FFFF8A8A" Width="300" 
                         Visibility="{x:Bind ViewModel.NrsErrorMessage, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}">
-                <TextBlock Text="{x:Bind ViewModel.NrsErrorMessage, Mode=OneWay}" Padding="10" />
+                    <TextBlock Text="{x:Bind ViewModel.NrsErrorMessage, Mode=OneWay}" Padding="10" />
+                </Border>
+                <StackPanel HorizontalAlignment="Left" Background="#FF8FD3F1" Padding="10"
+                            Visibility="{x:Bind ViewModel.RecipientInfo, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}">
+                    <TextBlock Text="{x:Bind ViewModel.RecipientInfo, Mode=OneWay}" />
+                </StackPanel>
             </StackPanel>
             
             <controls:NetworkIndicatorControl Grid.Row="0" Grid.Column="2" />

@@ -6,6 +6,7 @@ using Microsoft.Data.Entity;
 using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
 using NxtWallet.Repositories.Model;
+using System;
 
 namespace NxtWallet.Core.Repositories
 {
@@ -16,6 +17,7 @@ namespace NxtWallet.Core.Repositories
         Task<Contact> AddContactAsync(Contact contact);
         Task DeleteContactAsync(Contact contact);
         Task<List<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
+        Task<Contact> GetContactAsync(string rsAddress);
     }
 
     public class ContactRepository : IContactRepository
@@ -63,6 +65,15 @@ namespace NxtWallet.Core.Repositories
             {
                 var list = await context.Contacts.Where(c => nxtRsAddresses.Contains(c.NxtAddressRs)).ToListAsync();
                 return _mapper.Map<List<Contact>>(list);
+            }
+        }
+
+        public async Task<Contact> GetContactAsync(string rsAddress)
+        {
+            using (var context = new WalletContext())
+            {
+                var contact = await context.Contacts.SingleOrDefaultAsync(c => c.NxtAddressRs == rsAddress);
+                return _mapper.Map<Contact>(contact);
             }
         }
 

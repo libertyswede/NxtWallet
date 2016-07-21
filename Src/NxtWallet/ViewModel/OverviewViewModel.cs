@@ -38,12 +38,12 @@ namespace NxtWallet.ViewModel
             NxtBalance = 0M;
             NxtAddress = walletRepository.NxtAccount.AccountRs;
 
-            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = balance / 100000000M);
+            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = balance.NqtToNxt());
         }
 
         public void LoadFromRepository()
         {
-            NxtBalance = _walletRepository.NqtBalance / 100000000M;
+            NxtBalance = _walletRepository.NqtBalance.NqtToNxt();
             ShowAddress = _walletRepository.BackupCompleted;
         }
     }

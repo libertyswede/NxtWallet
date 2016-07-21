@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using NxtLib;
+using NxtLib.Accounts;
 using NxtLib.ServerInfo;
 using NxtWallet.Core.Models;
 
@@ -60,6 +61,11 @@ namespace NxtWallet.Core.Fakes
         public Task<LedgerEntry> GetTransactionAsync(ulong transactionId)
         {
             return Task.FromResult(new LedgerEntry());
+        }
+
+        public Task<AccountReply> GetAccountAsync(string recipient)
+        {
+            return Task.FromResult(new AccountReply());
         }
     }
 }
