@@ -6,7 +6,6 @@ using NxtWallet.Core;
 using NxtWallet.Core.Repositories;
 using Prism.Windows.Validation;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System;
 
 namespace NxtWallet.ViewModel
@@ -21,6 +20,7 @@ namespace NxtWallet.ViewModel
         private string _recipient;
         private string _amount;
         private string _message;
+        private string _nrsErrorMessage;
 
         [Required(ErrorMessage = "Recipient is required")]
         [NxtRsAddress(ErrorMessage = "Incorrect recipient address")]
@@ -43,12 +43,24 @@ namespace NxtWallet.ViewModel
             }
         }
 
+        public string Fee { get; set; } = "1 NXT";
+
         public string Message
         {
             get { return _message; }
             set
             {
                 SetProperty(ref _message, value);
+                SendMoneyCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        public string NrsErrorMessage
+        {
+            get { return _nrsErrorMessage; }
+            set
+            {
+                SetProperty(ref _nrsErrorMessage, value);
                 SendMoneyCommand.RaiseCanExecuteChanged();
             }
         }
@@ -69,7 +81,7 @@ namespace NxtWallet.ViewModel
 
         private bool CanSendMoney()
         {
-            return _nxtServer.IsOnline && !GetAllErrors().Any() && FormHasValues();
+            return _nxtServer.IsOnline && FormHasValues() && ValidateProperties();
         }
 
         private bool FormHasValues()
@@ -93,25 +105,17 @@ namespace NxtWallet.ViewModel
 
         private async void SendMoney()
         {
-            // ReSharper disable once UnusedVariable
             var ignore = _sendMoneyDialog.ShowAsync();
             await Task.Run(async () =>
             {
-                // TODO: Could be a problem with different decimal separator signs in different regions
                 var amount = decimal.Parse(Amount);
                 var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
-                SetBalance(ledgerEntry);
+                ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                 await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                 await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
                 //await Task.Delay(5000); // For testing purposes
             });
             _sendMoneyDialog.Hide();
-        }
-
-        private void SetBalance(LedgerEntry ledgerEntry)
-        {
-            var newBalanceNqt = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
-            ledgerEntry.NqtBalance = newBalanceNqt;
         }
     }
 }

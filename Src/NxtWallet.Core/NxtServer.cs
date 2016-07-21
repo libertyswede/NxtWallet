@@ -308,7 +308,7 @@ namespace NxtWallet.Core
             var createTransactionByPublicKey = new CreateTransactionByPublicKey(1440, Amount.Zero, _walletRepository.NxtAccountWithPublicKey.PublicKey);
             if (!string.IsNullOrEmpty(message))
             {
-                createTransactionByPublicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message);
+                createTransactionByPublicKey.Message = new CreateTransactionParameters.UnencryptedMessage(message, true);
             }
             var sendMoneyReply = await accountService.SendMoney(createTransactionByPublicKey, recipient, amount);
             return sendMoneyReply;
