@@ -4,14 +4,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:NxtWallet.Controls"
+    xmlns:nxtWallet="using:NxtWallet"
     x:Class="NxtWallet.Views.SendMoneyPage"
     mc:Ignorable="d"
     DataContext="{Binding Path=SendMoneyViewModel, Source={StaticResource Ioc}}">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <nxtWallet:HasTextToVisiblityConverter x:Key="HasTextToVisiblityConverter" />
+        </ResourceDictionary>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid Canvas.ZIndex="0" Margin="15,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -47,6 +55,12 @@
 				Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2"/>
             
             <Button Grid.Column="1" Grid.Row="6" Content="Send" HorizontalAlignment="Left" Command="{x:Bind ViewModel.SendMoneyCommand}" />
+
+            <StackPanel Grid.Column="1" Grid.Row="7" Background="#FFFF8A8A" Width="300" HorizontalAlignment="Left" Margin="0,10,0,0"
+                        Visibility="{x:Bind ViewModel.NrsErrorMessage, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}">
+                <TextBlock Text="{x:Bind ViewModel.NrsErrorMessage, Mode=OneWay}" Padding="10" />
+            </StackPanel>
+            
             <controls:NetworkIndicatorControl Grid.Row="0" Grid.Column="2" />
         </Grid>
     </Grid>

@@ -7,6 +7,7 @@ using NxtWallet.Core.Repositories;
 using Prism.Windows.Validation;
 using System.ComponentModel.DataAnnotations;
 using System;
+using NxtLib;
 
 namespace NxtWallet.ViewModel
 {
@@ -95,6 +96,7 @@ namespace NxtWallet.ViewModel
             Recipient = string.Empty;
             Amount = string.Empty;
             Message = string.Empty;
+            NrsErrorMessage = string.Empty;
 
             Errors.IsValidationEnabled = true;
             if (contact != null)
@@ -106,16 +108,29 @@ namespace NxtWallet.ViewModel
         private async void SendMoney()
         {
             var ignore = _sendMoneyDialog.ShowAsync();
-            await Task.Run(async () =>
+            try
             {
-                var amount = decimal.Parse(Amount);
-                var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, NxtLib.Amount.CreateAmountFromNxt(amount), Message);
-                ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
-                await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
-                await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
-                //await Task.Delay(5000); // For testing purposes
-            });
-            _sendMoneyDialog.Hide();
+                await Task.Run(async () =>
+                {
+                    var amount = NxtLib.Amount.CreateAmountFromNxt(decimal.Parse(Amount));
+                    var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, amount, Message);
+                    NrsErrorMessage = string.Empty;
+                    ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
+                    await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
+                    await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
+                });
+            }
+            catch (NxtException e)
+            {
+                if (e.Message == "Not enough funds")
+                {
+                    NrsErrorMessage = e.Message;
+                }
+            }
+            finally
+            {
+                _sendMoneyDialog.Hide();
+            }
         }
     }
 }
