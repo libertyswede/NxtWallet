@@ -1,4 +1,4 @@
-﻿namespace NxtWallet.Controls
+﻿namespace NxtWallet.Views
 {
     public interface ISendMoneyDialog : IDialog
     {

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Command;
-using NxtWallet.Controls;
 using NxtWallet.Core.Models;
 using NxtWallet.Core;
 using NxtWallet.Core.Repositories;
@@ -10,6 +9,7 @@ using System;
 using NxtLib;
 using System.Linq;
 using NxtLib.Accounts;
+using NxtWallet.Views;
 
 namespace NxtWallet.ViewModel
 {
