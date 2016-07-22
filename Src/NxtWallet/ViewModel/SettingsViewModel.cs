@@ -66,15 +66,6 @@ namespace NxtWallet.ViewModel
                 await _walletRepository.UpdateNxtServerAsync(_serverAddress);
                 await _walletRepository.UpdateNotificationsEnabledAsync(IsNotificationsEnabled ?? true);
             });
-            if (SecretPhrase != _walletRepository.SecretPhrase)
-            {
-                await Task.Run(async () =>
-                {
-                    await _accountLedgerRepository.DeleteAllLedgerEntriesAsync();
-                    await _walletRepository.UpdateSecretPhraseAsync(SecretPhrase);
-                    await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(NxtLib.Local.Constants.GenesisBlockId);
-                });
-            }
             //if (ReadOnlyAddress != _walletRepository.NxtAccount.AccountRs)
             //{
             //    await Task.Run(async () =>

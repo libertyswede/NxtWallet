@@ -10,13 +10,13 @@ namespace NxtWallet.Views
 
         public ImportSecretPhraseInfoDialog()
         {
-            Messenger.Default.Register<ImportSecretPhraseMessage>(this, (message) => DoShow());
+            Messenger.Default.Register<ImportSecretPhraseMessage>(this, (message) => DoShow(message));
             InitializeComponent();
         }
 
-        private void DoShow()
+        private void DoShow(ImportSecretPhraseMessage message)
         {
-            if (!_showing)
+            if (message.MessageState == ImportSecretPhraseMessage.State.ShowInfo && _showing == false)
             {
                 _showing = true;
                 var ignore = ShowAsync();
@@ -25,11 +25,14 @@ namespace NxtWallet.Views
 
         private void ContinueButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            _showing = false;
             Hide();
+            Messenger.Default.Send(new ImportSecretPhraseMessage(ImportSecretPhraseMessage.State.Import));
         }
 
         private void CancelButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            _showing = false;
             Hide();
         }
     }

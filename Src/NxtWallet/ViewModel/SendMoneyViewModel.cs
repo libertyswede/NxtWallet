@@ -9,9 +9,7 @@ using System;
 using NxtLib;
 using System.Linq;
 using NxtLib.Accounts;
-using NxtWallet.Views;
 using GalaSoft.MvvmLight.Messaging;
-using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet.ViewModel
 {
@@ -25,7 +23,6 @@ namespace NxtWallet.ViewModel
         private string _recipient;
         private string _amount;
         private string _message;
-        private string _nrsErrorMessage;
         private string _recipientInfo;
 
         [Required(ErrorMessage = "Recipient is required")]

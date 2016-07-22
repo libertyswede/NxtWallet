@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using NxtLib;
-using NxtWallet.Controls;
 using NxtWallet.Core;
 using NxtWallet.Core.Fakes;
 using NxtWallet.ViewModel;
@@ -22,6 +21,7 @@ namespace NxtWallet
         public ContactsViewModel ContactsViewModel => ServiceLocator.Current.GetInstance<ContactsViewModel>();
         public BackupSecretPhraseViewModel BackupSecretPhraseViewModel => ServiceLocator.Current.GetInstance<BackupSecretPhraseViewModel>();
         public BackupConfirmViewModel BackupConfirmViewModel => ServiceLocator.Current.GetInstance<BackupConfirmViewModel>();
+        public ImportSecretPhraseDialogViewModel ImportSecretPhraseDialogViewModel => ServiceLocator.Current.GetInstance<ImportSecretPhraseDialogViewModel>();
 
         static Ioc()
         {
@@ -62,6 +62,9 @@ namespace NxtWallet
             SimpleIoc.Default.Register<BackupSecretPhraseViewModel>();
             SimpleIoc.Default.Register<BackupConfirmViewModel>();
             SimpleIoc.Default.Register<SendMoneyDialogViewModel>();
+            SimpleIoc.Default.Register<ImportSecretPhraseDialogViewModel>();
+            SimpleIoc.Default.Register<ImportSecretPhraseInfoDialog>();
+            SimpleIoc.Default.Register<ImportSecretPhraseDialog>();
         }
 
         public static void Register()

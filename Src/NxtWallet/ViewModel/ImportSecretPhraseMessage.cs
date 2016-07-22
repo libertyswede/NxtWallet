@@ -1,9 +1,19 @@
 ﻿namespace NxtWallet.ViewModel
 {
-    internal class ImportSecretPhraseMessage
+    public class ImportSecretPhraseMessage
     {
-        public ImportSecretPhraseMessage()
+        public enum State
         {
+            ShowInfo,
+            Import,
+            Imported
+        }
+
+        public State MessageState { get; set; } = State.ShowInfo;
+
+        public ImportSecretPhraseMessage(State messageState = State.ShowInfo)
+        {
+            MessageState = messageState;
         }
     }
 }

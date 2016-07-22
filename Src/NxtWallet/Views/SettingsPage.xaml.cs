@@ -1,4 +1,5 @@
-﻿using NxtWallet.ViewModel;
+﻿using Microsoft.Practices.ServiceLocation;
+using NxtWallet.ViewModel;
 
 namespace NxtWallet.Views
 {
@@ -9,6 +10,8 @@ namespace NxtWallet.Views
         public SettingsPage()
         {
             InitializeComponent();
+            ServiceLocator.Current.GetInstance<ImportSecretPhraseInfoDialog>(); // init dialog
+            ServiceLocator.Current.GetInstance<ImportSecretPhraseDialog>(); // init dialog
         }
     }
 }
