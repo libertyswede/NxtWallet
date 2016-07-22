@@ -1,7 +1,6 @@
 ﻿using System;
 using Windows.UI.Xaml.Media.Imaging;
 using GalaSoft.MvvmLight;
-using NxtWallet.Repositories.Model;
 using NxtWallet.Views;
 using ZXing;
 using NxtWallet.Core.Repositories;
