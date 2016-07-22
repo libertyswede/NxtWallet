@@ -1,6 +1,7 @@
 ﻿using Windows.UI.Xaml.Navigation;
 using NxtWallet.ViewModel;
 using NxtWallet.Core.Models;
+using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet.Views
 {
@@ -11,6 +12,7 @@ namespace NxtWallet.Views
         public SendMoneyPage()
         {
             InitializeComponent();
+            ServiceLocator.Current.GetInstance<ISendMoneyDialog>(); // init dialog
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

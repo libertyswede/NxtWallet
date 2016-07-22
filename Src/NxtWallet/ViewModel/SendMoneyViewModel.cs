@@ -11,6 +11,7 @@ using System.Linq;
 using NxtLib.Accounts;
 using NxtWallet.Views;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Practices.ServiceLocation;
 
 namespace NxtWallet.ViewModel
 {
@@ -19,7 +20,6 @@ namespace NxtWallet.ViewModel
         private readonly INxtServer _nxtServer;
         private readonly IWalletRepository _walletRepository;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
-        private readonly ISendMoneyDialog _sendMoneyDialog;
         private readonly IContactRepository _contactRepository;
 
         private string _recipient;
@@ -77,13 +77,11 @@ namespace NxtWallet.ViewModel
         public RelayCommand SendMoneyCommand { get; }
 
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository,
-            IAccountLedgerRepository accountLedgerRepository, ISendMoneyDialog sendMoneyDialog, 
-            IContactRepository contactRepository)
+            IAccountLedgerRepository accountLedgerRepository, IContactRepository contactRepository)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
             _accountLedgerRepository = accountLedgerRepository;
-            _sendMoneyDialog = sendMoneyDialog;
             _contactRepository = contactRepository;
 
             SendMoneyCommand = new RelayCommand(SendMoney, () => CanSendMoney());

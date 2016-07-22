@@ -41,13 +41,17 @@ namespace NxtWallet.ViewModel
         }
 
         public RelayCommand SaveCommand { get; }
+        public RelayCommand ImportSecretPhraseCommand { get; }
 
         public SettingsViewModel(IWalletRepository walletRepository, INxtServer nxtServer, IAccountLedgerRepository accountLedgerRepository)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
             _accountLedgerRepository = accountLedgerRepository;
+
             SaveCommand = new RelayCommand(Save);
+            ImportSecretPhraseCommand = new RelayCommand(() => MessengerInstance.Send(new ImportSecretPhraseMessage()));
+
             ServerAddress = _walletRepository.NxtServer;
             IsNotificationsEnabled = _walletRepository.NotificationsEnabled;
             ReadOnlyAddress = _walletRepository.IsReadOnlyAccount ? _walletRepository.NxtAccount.AccountRs : string.Empty;

@@ -133,6 +133,7 @@
     <Compile Include="ViewModel\BackupConfirmViewModel.cs" />
     <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
+    <Compile Include="ViewModel\ImportSecretPhraseMessage.cs" />
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyDialogMessage.cs" />
@@ -155,6 +156,9 @@
     </Compile>
     <Compile Include="Views\ContactsPage.xaml.cs">
       <DependentUpon>ContactsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ImportSecretPhraseInfoDialog.xaml.cs">
+      <DependentUpon>ImportSecretPhraseInfoDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\OverviewPage.xaml.cs">
       <DependentUpon>OverviewPage.xaml</DependentUpon>
@@ -247,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ContactsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ImportSecretPhraseInfoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
