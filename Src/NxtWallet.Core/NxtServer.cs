@@ -30,6 +30,7 @@ namespace NxtWallet.Core
         Task<long> GetUnconfirmedNqtBalanceAsync();
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp);
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync();
+        Task<List<LedgerEntry>> GetUnconfirmedAccountLedgerEntriesAsync();
         Task<AccountReply> GetAccountAsync(string recipient);
         Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message);
         void UpdateNxtServer(string newServerAddress);
@@ -152,6 +153,43 @@ namespace NxtWallet.Core
             return 0;
         }
 
+        public async Task<List<LedgerEntry>> GetUnconfirmedAccountLedgerEntriesAsync()
+        {
+            try
+            {
+                var transactionService = _serviceFactory.CreateTransactionService();
+                var unconfirmedTransactions = await transactionService.GetUnconfirmedTransactions(new List<Account> { _walletRepository.NxtAccount });
+                var filteredTransactions = unconfirmedTransactions.UnconfirmedTransactions
+                    .Where(t => t.SubType == TransactionSubType.PaymentOrdinaryPayment)
+                    .ToList();
+
+                var ledgerEntries = _mapper.Map<List<LedgerEntry>>(filteredTransactions);
+
+                UpdateIsMyAddress(ledgerEntries);
+                foreach (var ledgerEntry in ledgerEntries)
+                {
+                    if (ledgerEntry.UserIsSender)
+                    {
+                        ledgerEntry.NqtFee *= -1;
+                        ledgerEntry.NqtAmount *= -1;
+                    }
+                }
+
+                IsOnline = true;
+                return ledgerEntries;
+            }
+            catch (HttpRequestException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when connecting to nxt server", e);
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = false;
+                throw new Exception("Error when parsing response", e);
+            }
+        }
+
         public async Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync(DateTime lastTimestamp)
         {
             var ledgerEntries = new List<LedgerEntry>();
@@ -195,7 +233,7 @@ namespace NxtWallet.Core
                 IsOnline = false;
                 throw new Exception("Error when parsing response", e);
             }
-            return ledgerEntries.ToList();
+            return ledgerEntries;
         }
 
         private static DateTime AdjustIfGenesisBlock(DateTime lastTimestamp)

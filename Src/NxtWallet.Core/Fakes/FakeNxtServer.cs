@@ -67,5 +67,10 @@ namespace NxtWallet.Core.Fakes
         {
             return Task.FromResult(new AccountReply());
         }
+
+        public Task<List<LedgerEntry>> GetUnconfirmedAccountLedgerEntriesAsync()
+        {
+            return Task.FromResult(new List<LedgerEntry>());
+        }
     }
 }

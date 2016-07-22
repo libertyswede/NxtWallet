@@ -59,10 +59,13 @@ namespace NxtWallet.Core
             var lastKnownBlock = syncBlockInfo.Item2;
 
             var knownUnconfirmedEntries = await _accountLedgerRepository.GetUnconfirmedLedgerEntriesAsync();
+            var newUnconfirmedLedgerEntries = await _nxtServer.GetUnconfirmedAccountLedgerEntriesAsync();
             var newLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
             var unconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
             var updatedLedgerEntries = new List<LedgerEntry>();
             CheckForConfirmedEntries(knownUnconfirmedEntries, newLedgerEntries, updatedLedgerEntries);
+
+            
             
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
             //   Log error, throw exception!
@@ -126,10 +129,12 @@ namespace NxtWallet.Core
             ledgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
         }
 
-        private static void CheckForConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries, List<LedgerEntry> updatedLedgerEntries)
+        private static void CheckForConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries, 
+            List<LedgerEntry> updatedLedgerEntries)
         {
-            foreach (var unconfirmedEntry in knownUnconfirmedEntries)
+            for (int i = 0; i < knownUnconfirmedEntries.Count - 1; i++)
             {
+                var unconfirmedEntry = knownUnconfirmedEntries[i];
                 var confirmedEntry = newLedgerEntries.SingleOrDefault(e => e.TransactionId == unconfirmedEntry.TransactionId);
                 if (confirmedEntry == null)
                 {
@@ -138,6 +143,7 @@ namespace NxtWallet.Core
                 confirmedEntry.Id = unconfirmedEntry.Id;
                 newLedgerEntries.Remove(confirmedEntry);
                 updatedLedgerEntries.Add(confirmedEntry);
+                knownUnconfirmedEntries.RemoveAt(i);
             }
         }
 
