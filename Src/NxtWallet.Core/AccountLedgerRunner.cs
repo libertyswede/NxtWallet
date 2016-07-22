@@ -59,28 +59,36 @@ namespace NxtWallet.Core
             var lastKnownBlock = syncBlockInfo.Item2;
 
             var knownUnconfirmedEntries = await _accountLedgerRepository.GetUnconfirmedLedgerEntriesAsync();
-            var newUnconfirmedLedgerEntries = await _nxtServer.GetUnconfirmedAccountLedgerEntriesAsync();
-            var newLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
-            var unconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
-            var updatedLedgerEntries = new List<LedgerEntry>();
-            CheckForConfirmedEntries(knownUnconfirmedEntries, newLedgerEntries, updatedLedgerEntries);
+            var nrsUnconfirmedLedgerEntries = await _nxtServer.GetUnconfirmedAccountLedgerEntriesAsync();
+            var nrsConfirmedLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
+            var nrsUnconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
+            var updatedLedgerEntries = GetConfirmedEntries(knownUnconfirmedEntries, nrsConfirmedLedgerEntries).ToList();
+            var deletedLedgerEntries = GetLostUnconfirmedEntries(knownUnconfirmedEntries, nrsUnconfirmedLedgerEntries).ToList();
 
-            
-            
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
             //   Log error, throw exception!
 
             await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
-            if (_walletRepository.NqtBalance != unconfirmedBalance)
+            if (_walletRepository.NqtBalance != nrsUnconfirmedBalance)
             {
-                await _walletRepository.UpdateBalanceAsync(unconfirmedBalance);
-                OnBalanceUpdated(unconfirmedBalance);
+                await _walletRepository.UpdateBalanceAsync(nrsUnconfirmedBalance);
+                OnBalanceUpdated(nrsUnconfirmedBalance);
             }
-            await _accountLedgerRepository.AddLedgerEntriesAsync(newLedgerEntries);
-            newLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
+
+            await _accountLedgerRepository.AddLedgerEntriesAsync(nrsConfirmedLedgerEntries);
+            nrsConfirmedLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
 
             await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
             updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
+
+            await _accountLedgerRepository.RemoveLedgerEntriesAsync(deletedLedgerEntries);
+            deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
+        }
+
+        private static IEnumerable<LedgerEntry> GetLostUnconfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, 
+            List<LedgerEntry> nrsUnconfirmedLedgerEntries)
+        {
+            return knownUnconfirmedEntries.Where(known => nrsUnconfirmedLedgerEntries.All(nrs => nrs.TransactionId != known.TransactionId));
         }
 
         private async Task<Tuple<BlockchainStatus, Block<ulong>>> SyncToLastCommonBlock()
@@ -129,8 +137,7 @@ namespace NxtWallet.Core
             ledgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
         }
 
-        private static void CheckForConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries, 
-            List<LedgerEntry> updatedLedgerEntries)
+        private static IEnumerable<LedgerEntry> GetConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries)
         {
             for (int i = 0; i < knownUnconfirmedEntries.Count - 1; i++)
             {
@@ -142,7 +149,7 @@ namespace NxtWallet.Core
                 }
                 confirmedEntry.Id = unconfirmedEntry.Id;
                 newLedgerEntries.Remove(confirmedEntry);
-                updatedLedgerEntries.Add(confirmedEntry);
+                yield return confirmedEntry;
                 knownUnconfirmedEntries.RemoveAt(i);
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NxtWallet.Core.Models;
+using System;
 
 namespace NxtWallet.Core.Fakes
 {
@@ -43,6 +44,11 @@ namespace NxtWallet.Core.Fakes
         }
 
         public Task DeleteAllLedgerEntriesAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveLedgerEntriesAsync(List<LedgerEntry> ledgerEntries)
         {
             return Task.CompletedTask;
         }
