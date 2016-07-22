@@ -106,6 +106,7 @@
     <Compile Include="AppShell.xaml.cs">
       <DependentUpon>AppShell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BoolInverseConverter.cs" />
     <Compile Include="BoolToVisiblityConverter.cs" />
     <Compile Include="Controls\SelectableTextBlock.cs" />
     <Compile Include="Controls\LedgerEntryListView.cs" />
@@ -134,6 +135,8 @@
     <Compile Include="ViewModel\ContactsViewModel.cs" />
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
+    <Compile Include="ViewModel\SendMoneyDialogMessage.cs" />
+    <Compile Include="ViewModel\SendMoneyDialogViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\LedgerEntryDetailViewModel.cs" />

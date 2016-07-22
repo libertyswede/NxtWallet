@@ -4,12 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nxtWallet="using:NxtWallet"
     mc:Ignorable="d"
+    DataContext="{Binding Path=SendMoneyDialogViewModel, Source={StaticResource Ioc}}"
     Title="Sending Transaction">
+    <ContentDialog.Resources>
+        <ResourceDictionary>
+            <nxtWallet:BoolInverseConverter x:Key="BoolInverseConverter" />
+        </ResourceDictionary>
+    </ContentDialog.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical" Padding="40">
-            <ProgressBar IsIndeterminate="True"/>
-            <TextBlock Text="Please wait..." HorizontalAlignment="Center" Margin="0,20,0,0" />
+        <StackPanel Orientation="Vertical">
+            <ProgressBar IsIndeterminate="{x:Bind ViewModel.IsDone, Mode=OneWay, Converter={StaticResource BoolInverseConverter}}" Margin="40,40,40,20"/>
+            <TextBlock Text="{x:Bind Path=ViewModel.Message, Mode=OneWay}" HorizontalAlignment="Center" />
+            <Button Content="Close" IsEnabled="{x:Bind ViewModel.IsDone, Mode=OneWay}" Margin="10" Click="Close_Click" />
         </StackPanel>
     </Grid>
 </ContentDialog>

@@ -10,6 +10,7 @@ using NxtLib;
 using System.Linq;
 using NxtLib.Accounts;
 using NxtWallet.Views;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet.ViewModel
 {
@@ -63,16 +64,6 @@ namespace NxtWallet.ViewModel
             set
             {
                 SetProperty(ref _message, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        public string NrsErrorMessage
-        {
-            get { return _nrsErrorMessage; }
-            set
-            {
-                SetProperty(ref _nrsErrorMessage, value);
                 SendMoneyCommand.RaiseCanExecuteChanged();
             }
         }
@@ -159,7 +150,6 @@ namespace NxtWallet.ViewModel
             Recipient = string.Empty;
             Amount = string.Empty;
             Message = string.Empty;
-            NrsErrorMessage = string.Empty;
 
             Errors.IsValidationEnabled = true;
             if (contact != null)
@@ -170,30 +160,31 @@ namespace NxtWallet.ViewModel
 
         private async void SendMoney()
         {
-            var ignore = _sendMoneyDialog.ShowAsync();
+            Messenger.Default.Send(new SendMoneyDialogMessage { State = SendMoneyDialogMessage.DialogState.Progress });
+
             try
             {
                 await Task.Run(async () =>
                 {
                     var amount = NxtLib.Amount.CreateAmountFromNxt(decimal.Parse(Amount));
                     var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, amount, Message);
-                    NrsErrorMessage = string.Empty;
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
                     // await Task.Delay(5000);
                 });
+                Messenger.Default.Send(new SendMoneyDialogMessage { State = SendMoneyDialogMessage.DialogState.Done });
             }
             catch (NxtException e)
             {
                 if (e.Message == "Not enough funds")
                 {
-                    NrsErrorMessage = e.Message;
+                    Messenger.Default.Send(new SendMoneyDialogMessage
+                    {
+                        ErrorMessage = e.Message,
+                        State = SendMoneyDialogMessage.DialogState.Error
+                    });
                 }
-            }
-            finally
-            {
-                _sendMoneyDialog.Hide();
             }
         }
     }
