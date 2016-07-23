@@ -114,9 +114,9 @@
     <Compile Include="Fakes\FakeNxtServer.cs" />
     <Compile Include="Fakes\FakeWalletRepository.cs" />
     <Compile Include="MapperConfig.cs" />
-    <Compile Include="Migrations\20160717210022_Initial.cs" />
-    <Compile Include="Migrations\20160717210022_Initial.designer.cs">
-      <DependentUpon>20160717210022_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160723225117_Initial.cs" />
+    <Compile Include="Migrations\20160723225117_Initial.designer.cs">
+      <DependentUpon>20160723225117_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Model\LedgerEntryDto.cs" />
     <Compile Include="Migrations\Model\ContactDto.cs" />

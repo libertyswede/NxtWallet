@@ -8,7 +8,7 @@ using NxtWallet.Repositories.Model;
 namespace NxtWallet.Core.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20160717210022_Initial")]
+    [Migration("20160723225117_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,9 @@ namespace NxtWallet.Core.Migrations
                         .HasAnnotation("MaxLength", 30);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NxtAddressRs")
+                        .IsUnique();
 
                     b.HasAnnotation("Relational:TableName", "Contact");
                 });

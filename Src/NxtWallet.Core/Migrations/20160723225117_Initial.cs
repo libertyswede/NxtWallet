@@ -57,6 +57,11 @@ namespace NxtWallet.Core.Migrations
                 {
                     table.PrimaryKey("PK_SettingDto", x => x.Id);
                 });
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactDto_NxtAddressRs",
+                table: "Contact",
+                column: "NxtAddressRs",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

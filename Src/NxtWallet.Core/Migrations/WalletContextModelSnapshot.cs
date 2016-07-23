@@ -30,6 +30,9 @@ namespace NxtWallet.Core.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("NxtAddressRs")
+                        .IsUnique();
+
                     b.HasAnnotation("Relational:TableName", "Contact");
                 });
 

@@ -33,6 +33,10 @@ namespace NxtWallet.Repositories.Model
                 .Property(c => c.NxtAddressRs)
                 .IsRequired()
                 .HasMaxLength(30);
+
+            modelBuilder.Entity<ContactDto>()
+                .HasIndex(c => c.NxtAddressRs)
+                .IsUnique();
         }
 
         private void OnLedgerEntryCreating(ModelBuilder modelBuilder)
