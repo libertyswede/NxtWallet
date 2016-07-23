@@ -71,7 +71,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -92,7 +92,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -113,7 +113,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -134,7 +134,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -181,7 +181,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -226,7 +226,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -314,7 +314,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
@@ -348,7 +348,7 @@ namespace NxtWallet.Core
             catch (HttpRequestException e)
             {
                 IsOnline = false;
-                throw new Exception("Error when connecting to nxt server", e);
+                throw;
             }
             catch (JsonReaderException e)
             {
