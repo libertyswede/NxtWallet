@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using NxtLib.Local;
+using NxtWallet.Core;
 using NxtWallet.Core.Repositories;
 using System.Threading.Tasks;
 
@@ -37,11 +38,16 @@ namespace NxtWallet.ViewModel
         {
             await Task.Run(async () =>
             {
-                await _accountLedgerRepository.DeleteAllLedgerEntriesAsync();
-                await _walletRepository.UpdateSecretPhraseAsync(SecretPhrase);
-                await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(Constants.GenesisBlockId);
-                await _walletRepository.UpdateBackupCompletedAsync(true);
+                await Task.WhenAll(new[]
+                {
+                    _accountLedgerRepository.DeleteAllLedgerEntriesAsync(),
+                    _walletRepository.UpdateSecretPhraseAsync(SecretPhrase),
+                    _walletRepository.UpdateLastLedgerEntryBlockIdAsync(Constants.GenesisBlockId),
+                    _walletRepository.UpdateBalanceAsync(0),
+                    _walletRepository.UpdateBackupCompletedAsync(true)
+                });
             });
+            MessengerInstance.Send(new SecretPhraseResetMessage());
             MessengerInstance.Send("ImportDone", this);
         }
     }

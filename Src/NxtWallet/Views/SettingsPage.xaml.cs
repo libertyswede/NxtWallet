@@ -10,8 +10,6 @@ namespace NxtWallet.Views
         public SettingsPage()
         {
             InitializeComponent();
-            ServiceLocator.Current.GetInstance<ImportSecretPhraseInfoDialog>(); // init dialog
-            ServiceLocator.Current.GetInstance<ImportSecretPhraseDialog>(); // init dialog
         }
     }
 }

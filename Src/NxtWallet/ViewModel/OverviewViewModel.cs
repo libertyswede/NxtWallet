@@ -34,11 +34,16 @@ namespace NxtWallet.ViewModel
         public OverviewViewModel(IWalletRepository walletRepository, IAccountLedgerRunner accountLedgerRunner)
         {
             _walletRepository = walletRepository;
-
-            NxtBalance = 0M;
-            NxtAddress = walletRepository.NxtAccount.AccountRs;
+            InitUiProperties();
 
             accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = balance.NqtToNxt());
+            MessengerInstance.Register<SecretPhraseResetMessage>(this, (message) => InitUiProperties());
+        }
+
+        private void InitUiProperties()
+        {
+            NxtBalance = 0M;
+            NxtAddress = _walletRepository.NxtAccount.AccountRs;
         }
 
         public void LoadFromRepository()

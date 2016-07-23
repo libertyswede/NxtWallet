@@ -58,7 +58,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisibilityConverter}}" Grid.Row="0" x:Name="TextBlock" 
-                       TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress}" FontSize="24" Grid.ColumnSpan="2" />
+                       TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress, Mode=OneWay}" FontSize="24" Grid.ColumnSpan="2" />
             <Border Grid.Row="1" Margin="0,5,0,0" Padding="0,0,0,10" BorderBrush="AliceBlue" BorderThickness="0,0,0,2">
                 <TextBlock x:Name="BalanceTextBlock" TextWrapping="NoWrap" FontSize="21.333">
                     <Run Text="Balance:" />

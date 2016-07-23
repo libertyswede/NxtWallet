@@ -7,6 +7,7 @@ using NxtWallet.Core;
 using GalaSoft.MvvmLight.Threading;
 using NxtWallet.Core.Repositories;
 using NxtWallet.Core.Models;
+using System;
 
 namespace NxtWallet.ViewModel
 {
@@ -44,6 +45,7 @@ namespace NxtWallet.ViewModel
                     LedgerEntries.Remove(LedgerEntries.Single(t => t.Equals(ledgerEntry)));
                 });
             };
+            MessengerInstance.Register<SecretPhraseResetMessage>(this, (message) => LedgerEntries.Clear());
 
             _accountLedgerRepository = accountLedgerRepository;
             _contactRepository = contactRepository;

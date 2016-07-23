@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight;
 using ZXing;
 using NxtWallet.Core.Repositories;
+using NxtWallet.Core;
 
 namespace NxtWallet.ViewModel
 {
@@ -54,8 +55,14 @@ namespace NxtWallet.ViewModel
             _accountLedgerRepository = accountLedgerRepository;
             _navigationService = navigationService;
 
-            NxtAddress = walletRepository.NxtAccount.AccountRs;
-            PublicKey = walletRepository.NxtAccountWithPublicKey?.PublicKey.ToHexString();
+            MessengerInstance.Register<SecretPhraseResetMessage>(this, (message) => InitUiProperties());
+            InitUiProperties();
+        }
+
+        private void InitUiProperties()
+        {
+            NxtAddress = _walletRepository.NxtAccount.AccountRs;
+            PublicKey = _walletRepository.NxtAccountWithPublicKey?.PublicKey.ToHexString();
 
             var writer = new BarcodeWriter
             {
@@ -67,13 +74,13 @@ namespace NxtWallet.ViewModel
                     Margin = 0
                 }
             };
-            NxtAddressQr = (WriteableBitmap) writer.Write(NxtAddress).ToBitmap();
+            NxtAddressQr = (WriteableBitmap)writer.Write(NxtAddress).ToBitmap();
         }
 
         public void OnNavigatedTo()
         {
             ShowNxtAddress = _walletRepository.BackupCompleted;
-            ShowPublicKey = ShowNxtAddress;// && !(await _accountLedgerRepository.HasOutgoingTransactionAsync());
+            ShowPublicKey = ShowNxtAddress;
 
             if (!ShowNxtAddress)
             {

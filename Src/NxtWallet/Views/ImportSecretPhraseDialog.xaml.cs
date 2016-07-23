@@ -6,8 +6,6 @@ namespace NxtWallet.Views
 {
     public sealed partial class ImportSecretPhraseDialog : ContentDialog
     {
-        private bool _showing;
-
         private ImportSecretPhraseDialogViewModel ViewModel => (ImportSecretPhraseDialogViewModel)DataContext;
 
         public ImportSecretPhraseDialog()

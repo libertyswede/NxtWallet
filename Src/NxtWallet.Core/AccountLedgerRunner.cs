@@ -8,6 +8,7 @@ using NxtLib.ServerInfo;
 using System.Linq;
 using System.Collections.Generic;
 using NxtLib.Local;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet.Core
 {
@@ -35,21 +36,41 @@ namespace NxtWallet.Core
         private readonly INxtServer _nxtServer;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
 
+        private CancellationTokenSource _cancellationTokenSource;
+
         public AccountLedgerRunner(IWalletRepository walletRepository, INxtServer nxtServer, 
             IAccountLedgerRepository accountLedgerRepository)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
             _accountLedgerRepository = accountLedgerRepository;
+
+            Messenger.Default.Register<SecretPhraseResetMessage>(this, (message) => _cancellationTokenSource.Cancel());
         }
 
-        public async Task Run(CancellationToken token)
+        public async Task Run(CancellationToken globalToken)
         {
-            while (!token.IsCancellationRequested)
+            var mergedToken = CreateMergedCancellationToken(globalToken);
+
+            while (!globalToken.IsCancellationRequested)
             {
-                await TryCheckAllLedgerEntries();
-                await Task.Delay(_walletRepository.SleepTime, token);
+                try
+                {
+                    await TryCheckAllLedgerEntries();
+                    await Task.Delay(_walletRepository.SleepTime, mergedToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    mergedToken = CreateMergedCancellationToken(globalToken);
+                }
             }
+        }
+
+        private CancellationToken CreateMergedCancellationToken(CancellationToken globalToken)
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            var mergedToken = CancellationTokenSource.CreateLinkedTokenSource(globalToken, _cancellationTokenSource.Token).Token;
+            return mergedToken;
         }
 
         public async Task TryCheckAllLedgerEntries()
@@ -83,12 +104,6 @@ namespace NxtWallet.Core
 
             await _accountLedgerRepository.RemoveLedgerEntriesAsync(deletedLedgerEntries);
             deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
-        }
-
-        private static IEnumerable<LedgerEntry> GetLostUnconfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, 
-            List<LedgerEntry> nrsUnconfirmedLedgerEntries)
-        {
-            return knownUnconfirmedEntries.Where(known => nrsUnconfirmedLedgerEntries.All(nrs => nrs.TransactionId != known.TransactionId));
         }
 
         private async Task<Tuple<BlockchainStatus, Block<ulong>>> SyncToLastCommonBlock()
@@ -152,6 +167,12 @@ namespace NxtWallet.Core
                 yield return confirmedEntry;
                 knownUnconfirmedEntries.RemoveAt(i);
             }
+        }
+
+        private static IEnumerable<LedgerEntry> GetLostUnconfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries,
+            List<LedgerEntry> nrsUnconfirmedLedgerEntries)
+        {
+            return knownUnconfirmedEntries.Where(known => nrsUnconfirmedLedgerEntries.All(nrs => nrs.TransactionId != known.TransactionId));
         }
 
         private void OnLedgerEntryAdded(LedgerEntry ledgerEntry)
