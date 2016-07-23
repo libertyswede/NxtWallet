@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Threading;
 
 namespace NxtWallet.IntegrationTest
 {
@@ -68,10 +69,11 @@ namespace NxtWallet.IntegrationTest
 
             _addedLedgerEntries.Clear();
             runner.LedgerEntryAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);
+            var cancellationSource = new CancellationTokenSource();
 
             try
             {
-                await runner.TryCheckAllLedgerEntries();
+                await runner.TryCheckAllLedgerEntries(cancellationSource.Token);
             }
             catch (Exception e)
             {
