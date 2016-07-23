@@ -48,7 +48,6 @@ namespace NxtWallet.ViewModel
                 });
             });
             MessengerInstance.Send(new SecretPhraseResetMessage());
-            MessengerInstance.Send("ImportDone", this);
         }
     }
 }

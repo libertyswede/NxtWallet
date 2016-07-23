@@ -56,7 +56,7 @@ namespace NxtWallet.Core
             {
                 try
                 {
-                    await TryCheckAllLedgerEntries();
+                    await TryCheckAllLedgerEntries(mergedToken);
                     await Task.Delay(_walletRepository.SleepTime, mergedToken);
                 }
                 catch (OperationCanceledException)
@@ -65,7 +65,6 @@ namespace NxtWallet.Core
                 }
             }
         }
-
         private CancellationToken CreateMergedCancellationToken(CancellationToken globalToken)
         {
             _cancellationTokenSource = new CancellationTokenSource();
@@ -73,7 +72,7 @@ namespace NxtWallet.Core
             return mergedToken;
         }
 
-        public async Task TryCheckAllLedgerEntries()
+        public async Task TryCheckAllLedgerEntries(CancellationToken cancellationToken)
         {
             var syncBlockInfo = await SyncToLastCommonBlock();
             var blockchainStatus = syncBlockInfo.Item1;
@@ -89,20 +88,20 @@ namespace NxtWallet.Core
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
             //   Log error, throw exception!
 
+            cancellationToken.ThrowIfCancellationRequested();
+            
             await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(blockchainStatus.LastBlockId);
             if (_walletRepository.NqtBalance != nrsUnconfirmedBalance)
             {
                 await _walletRepository.UpdateBalanceAsync(nrsUnconfirmedBalance);
-                OnBalanceUpdated(nrsUnconfirmedBalance);
             }
-
             await _accountLedgerRepository.AddLedgerEntriesAsync(nrsConfirmedLedgerEntries);
-            nrsConfirmedLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
-
             await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
-            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
-
             await _accountLedgerRepository.RemoveLedgerEntriesAsync(deletedLedgerEntries);
+
+            OnBalanceUpdated(nrsUnconfirmedBalance);
+            nrsConfirmedLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
+            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
             deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
         }
 
