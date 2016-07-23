@@ -9,7 +9,6 @@ using System;
 using NxtLib;
 using System.Linq;
 using NxtLib.Accounts;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet.ViewModel
 {
@@ -19,6 +18,7 @@ namespace NxtWallet.ViewModel
         private readonly IWalletRepository _walletRepository;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
         private readonly IContactRepository _contactRepository;
+        private readonly INavigationService _navigationService;
 
         private string _recipient;
         private string _amount;
@@ -74,12 +74,14 @@ namespace NxtWallet.ViewModel
         public RelayCommand SendMoneyCommand { get; }
 
         public SendMoneyViewModel(INxtServer nxtServer, IWalletRepository walletRepository,
-            IAccountLedgerRepository accountLedgerRepository, IContactRepository contactRepository)
+            IAccountLedgerRepository accountLedgerRepository, IContactRepository contactRepository, 
+            INavigationService navigationService)
         {
             _nxtServer = nxtServer;
             _walletRepository = walletRepository;
             _accountLedgerRepository = accountLedgerRepository;
             _contactRepository = contactRepository;
+            _navigationService = navigationService;
 
             SendMoneyCommand = new RelayCommand(SendMoney, () => CanSendMoney());
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
@@ -112,17 +114,14 @@ namespace NxtWallet.ViewModel
                 {
                     account = await _nxtServer.GetAccountAsync(Recipient);
                 }
-                catch (NxtException e)
+                catch (Exception)
                 {
-                    if (e.Message != "Unknown account")
-                    {
-                        throw;
-                    }
+                    // Ignore
                 }
                 contact = await _contactRepository.GetContactAsync(Recipient);
             });
 
-            if (account == null)
+            if (account == null && _nxtServer.IsOnline)
             {
                 RecipientInfo = "The recipient account is an unknown account, meaning it has never had an incoming or outgoing transaction.";
                 return;
@@ -155,7 +154,7 @@ namespace NxtWallet.ViewModel
 
         private async void SendMoney()
         {
-            Messenger.Default.Send(new SendMoneyDialogMessage { State = SendMoneyDialogMessage.DialogState.Progress });
+            var sendMoneyDialogViewModel = (SendMoneyDialogViewModel)_navigationService.ShowDialog(NavigationDialog.SendMoney);
 
             try
             {
@@ -168,17 +167,13 @@ namespace NxtWallet.ViewModel
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
                     // await Task.Delay(5000);
                 });
-                Messenger.Default.Send(new SendMoneyDialogMessage { State = SendMoneyDialogMessage.DialogState.Done });
+                sendMoneyDialogViewModel.SetDone();
             }
             catch (NxtException e)
             {
                 if (e.Message == "Not enough funds")
                 {
-                    Messenger.Default.Send(new SendMoneyDialogMessage
-                    {
-                        ErrorMessage = e.Message,
-                        State = SendMoneyDialogMessage.DialogState.Error
-                    });
+                    sendMoneyDialogViewModel.SetError(e.Message);
                 }
             }
         }

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using NxtWallet.Views;
 using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
@@ -11,7 +10,7 @@ namespace NxtWallet.ViewModel
     public class BackupConfirmViewModel : ViewModelBase
     {
         private readonly IWalletRepository _walletRepository;
-        private readonly IBackupDoneDialog _backupDoneDialog;
+        private readonly INavigationService _navigationService;
 
         private string _secretPhraseConfirmation;
 
@@ -23,10 +22,10 @@ namespace NxtWallet.ViewModel
 
         public ICommand ConfirmCommand { get; }
 
-        public BackupConfirmViewModel(IWalletRepository walletRepository, IBackupDoneDialog backupDoneDialog)
+        public BackupConfirmViewModel(IWalletRepository walletRepository, INavigationService navigationService)
         {
             _walletRepository = walletRepository;
-            _backupDoneDialog = backupDoneDialog;
+            _navigationService = navigationService;
             ConfirmCommand = new RelayCommand(ConfirmSecretPhrase);
         }
 
@@ -35,7 +34,7 @@ namespace NxtWallet.ViewModel
             if (string.Equals(_walletRepository.SecretPhrase, SecretPhraseConfirmation))
             {
                 await Task.Run(async () => await _walletRepository.UpdateBackupCompletedAsync(true));
-                await _backupDoneDialog.ShowAsync();
+                _navigationService.ShowDialog(NavigationDialog.BackupDone);
             }
         }
     }

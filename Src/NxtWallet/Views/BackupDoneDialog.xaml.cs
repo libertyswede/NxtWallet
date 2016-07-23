@@ -3,11 +3,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace NxtWallet.Views
 {
-    public interface IBackupDoneDialog : IDialog
-    {
-    }
-
-    public sealed partial class BackupDoneDialog : IBackupDoneDialog
+    public sealed partial class BackupDoneDialog
     {
         public BackupDoneDialog()
         {

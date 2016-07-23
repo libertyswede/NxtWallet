@@ -48,9 +48,6 @@ namespace NxtWallet
             SimpleIoc.Default.Register(() => MapperConfig.Setup().CreateMapper());
             SimpleIoc.Default.Register<IAccountLedgerRunner, AccountLedgerRunner>();
             SimpleIoc.Default.Register<INavigationService, NavigationService>();
-            SimpleIoc.Default.Register<ISendMoneyDialog, SendMoneyDialog>();
-            SimpleIoc.Default.Register<IBackupInfoDialog, BackupInfoDialog>();
-            SimpleIoc.Default.Register<IBackupDoneDialog, BackupDoneDialog>();
             SimpleIoc.Default.Register<IServiceFactory>(() => new ServiceFactory(repo.NxtServer));
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
@@ -63,8 +60,6 @@ namespace NxtWallet
             SimpleIoc.Default.Register<BackupConfirmViewModel>();
             SimpleIoc.Default.Register<SendMoneyDialogViewModel>();
             SimpleIoc.Default.Register<ImportSecretPhraseDialogViewModel>();
-            SimpleIoc.Default.Register<ImportSecretPhraseInfoDialog>();
-            SimpleIoc.Default.Register<ImportSecretPhraseDialog>();
         }
 
         public static void Register()

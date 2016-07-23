@@ -134,10 +134,8 @@
     <Compile Include="ViewModel\BackupSecretPhraseViewModel.cs" />
     <Compile Include="ViewModel\ContactsViewModel.cs" />
     <Compile Include="ViewModel\ImportSecretPhraseDialogViewModel.cs" />
-    <Compile Include="ViewModel\ImportSecretPhraseMessage.cs" />
     <Compile Include="ViewModel\OverviewViewModel.cs" />
     <Compile Include="ViewModel\ReceiveMoneyViewModel.cs" />
-    <Compile Include="ViewModel\SendMoneyDialogMessage.cs" />
     <Compile Include="ViewModel\SendMoneyDialogViewModel.cs" />
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />

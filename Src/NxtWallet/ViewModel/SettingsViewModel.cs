@@ -11,6 +11,8 @@ namespace NxtWallet.ViewModel
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
+        private readonly INavigationService _navigationService;
+
         private string _serverAddress;
         private string _readOnlyAddress;
         private bool? _isNotificationsEnabled;
@@ -43,14 +45,16 @@ namespace NxtWallet.ViewModel
         public RelayCommand SaveCommand { get; }
         public RelayCommand ImportSecretPhraseCommand { get; }
 
-        public SettingsViewModel(IWalletRepository walletRepository, INxtServer nxtServer, IAccountLedgerRepository accountLedgerRepository)
+        public SettingsViewModel(IWalletRepository walletRepository, INxtServer nxtServer, IAccountLedgerRepository accountLedgerRepository, 
+            INavigationService navigationService)
         {
             _walletRepository = walletRepository;
             _nxtServer = nxtServer;
             _accountLedgerRepository = accountLedgerRepository;
+            _navigationService = navigationService;
 
             SaveCommand = new RelayCommand(Save);
-            ImportSecretPhraseCommand = new RelayCommand(() => MessengerInstance.Send(new ImportSecretPhraseMessage()));
+            ImportSecretPhraseCommand = new RelayCommand(() => _navigationService.ShowDialog(NavigationDialog.ImportSecretPhraseInfo));
 
             ServerAddress = _walletRepository.NxtServer;
             IsNotificationsEnabled = _walletRepository.NotificationsEnabled;

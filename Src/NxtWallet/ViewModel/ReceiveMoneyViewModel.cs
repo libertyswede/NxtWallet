@@ -1,7 +1,5 @@
-﻿using System;
-using Windows.UI.Xaml.Media.Imaging;
+﻿using Windows.UI.Xaml.Media.Imaging;
 using GalaSoft.MvvmLight;
-using NxtWallet.Views;
 using ZXing;
 using NxtWallet.Core.Repositories;
 
@@ -10,8 +8,8 @@ namespace NxtWallet.ViewModel
     public class ReceiveMoneyViewModel : ViewModelBase
     {
         private readonly IWalletRepository _walletRepository;
-        private readonly IBackupInfoDialog _backupInfoDialog;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
+        private readonly INavigationService _navigationService;
 
         private string _nxtAddress;
         private string _publicKey;
@@ -49,12 +47,13 @@ namespace NxtWallet.ViewModel
             set { Set(ref _nxtAddressQr, value); }
         }
 
-        public ReceiveMoneyViewModel(IWalletRepository walletRepository, IBackupInfoDialog backupInfoDialog,
-            IAccountLedgerRepository accountLedgerRepository)
+        public ReceiveMoneyViewModel(IWalletRepository walletRepository, IAccountLedgerRepository accountLedgerRepository,
+            INavigationService navigationService)
         {
             _walletRepository = walletRepository;
-            _backupInfoDialog = backupInfoDialog;
             _accountLedgerRepository = accountLedgerRepository;
+            _navigationService = navigationService;
+
             NxtAddress = walletRepository.NxtAccount.AccountRs;
             PublicKey = walletRepository.NxtAccountWithPublicKey?.PublicKey.ToHexString();
 
@@ -71,14 +70,14 @@ namespace NxtWallet.ViewModel
             NxtAddressQr = (WriteableBitmap) writer.Write(NxtAddress).ToBitmap();
         }
 
-        public async void OnNavigatedTo()
+        public void OnNavigatedTo()
         {
             ShowNxtAddress = _walletRepository.BackupCompleted;
             ShowPublicKey = ShowNxtAddress;// && !(await _accountLedgerRepository.HasOutgoingTransactionAsync());
 
             if (!ShowNxtAddress)
             {
-                await _backupInfoDialog.ShowAsync();
+                _navigationService.ShowDialog(NavigationDialog.BackupInfo);
             }
         }
     }

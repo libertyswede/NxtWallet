@@ -42,7 +42,7 @@ namespace NxtWallet.ViewModel
                 await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(Constants.GenesisBlockId);
                 await _walletRepository.UpdateBackupCompletedAsync(true);
             });
-            MessengerInstance.Send(new ImportSecretPhraseMessage(ImportSecretPhraseMessage.State.Imported));
+            MessengerInstance.Send("ImportDone", this);
         }
     }
 }

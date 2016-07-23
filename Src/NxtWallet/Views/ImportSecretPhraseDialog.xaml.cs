@@ -13,33 +13,24 @@ namespace NxtWallet.Views
         public ImportSecretPhraseDialog()
         {
             InitializeComponent();
-            Messenger.Default.Register<ImportSecretPhraseMessage>(this, (message) => DoShow(message));
-        }
-
-        private void DoShow(ImportSecretPhraseMessage message)
-        {
-            if (message.MessageState == ImportSecretPhraseMessage.State.Import && _showing == false)
-            {
-                _showing = true;
-                var ignore = ShowAsync();
-            }
-            else if (message.MessageState == ImportSecretPhraseMessage.State.Imported && _showing == true)
-            {
-                _showing = false;
-                Hide();
-            }
-        }
-
-        private void CancelClick(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
             ViewModel.SecretPhrase = string.Empty;
-            _showing = false;
-            Hide();
+            Messenger.Default.Register<string>(this, ViewModel, (message) => Hide());
+        }
+
+        public new void Hide()
+        {
+            base.Hide();
+            Messenger.Default.Unregister<string>(this, ViewModel);
         }
 
         private void SecretPhrase_TextChanged(object sender, TextChangedEventArgs e)
         {
             ViewModel.SecretPhrase = ((TextBox)sender).Text;
+        }
+
+        private void CancelClick(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            Hide();
         }
     }
 }

@@ -10,39 +10,31 @@ namespace NxtWallet.ViewModel
         public bool IsDone
         {
             get { return _isDone; }
-            set { Set(ref _isDone, value); }
+            private set { Set(ref _isDone, value); }
         }
 
         public string Message
         {
             get { return _message; }
-            set { Set(ref _message, value); }
+            private set { Set(ref _message, value); }
         }
 
-        public SendMoneyDialogViewModel()
+        public void Init()
         {
             Message = "Please wait...";
             IsDone = false;
-
-            MessengerInstance.Register<SendMoneyDialogMessage>(this, (message) => OnMessage(message));
         }
 
-        private void OnMessage(SendMoneyDialogMessage message)
+        public void SetDone()
         {
-            if (message.State == SendMoneyDialogMessage.DialogState.Progress)
-            {
-                Message = "Please wait...";
-            }
-            else if (message.State == SendMoneyDialogMessage.DialogState.Done)
-            {
-                Message = "Success";
-            }
-            else if (message.State == SendMoneyDialogMessage.DialogState.Error)
-            {
-                Message = message.ErrorMessage;
-            }
+            Message = "Success";
+            IsDone = true;
+        }
 
-            IsDone = message.State != SendMoneyDialogMessage.DialogState.Progress;
+        public void SetError(string message)
+        {
+            Message = message;
+            IsDone = true;
         }
     }
 }

@@ -1,30 +1,26 @@
-﻿using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
+﻿using Windows.UI.Xaml.Controls;
 
 namespace NxtWallet.Views
 {
-    public interface IBackupInfoDialog : IDialog
+    public sealed partial class BackupInfoDialog
     {
-    }
+        private readonly INavigationService _navigationService;
 
-    public sealed partial class BackupInfoDialog : IBackupInfoDialog
-    {
-        public BackupInfoDialog()
+        public BackupInfoDialog(INavigationService navigationService)
         {
             InitializeComponent();
+            _navigationService = navigationService;
         }
 
         private void BackupButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             Hide();
-            var appShell = (AppShell)Window.Current.Content;
-            appShell.Navigate(NavigationPage.BackupSecretPhrasePage, null);
+            _navigationService.NavigateTo(NavigationPage.BackupSecretPhrasePage);
         }
 
         private void CancelButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            var appShell = (AppShell)Window.Current.Content;
-            appShell.AppFrame.GoBack();
+            _navigationService.NavigateBack();
         }
     }
 }

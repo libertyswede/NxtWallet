@@ -1,38 +1,25 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-using NxtWallet.ViewModel;
-using Windows.UI.Xaml.Controls;
+﻿using Windows.UI.Xaml.Controls;
 
 namespace NxtWallet.Views
 {
     public sealed partial class ImportSecretPhraseInfoDialog : ContentDialog
     {
-        bool _showing;
+        private readonly INavigationService _navigationService;
 
-        public ImportSecretPhraseInfoDialog()
+        public ImportSecretPhraseInfoDialog(INavigationService navigationService)
         {
-            Messenger.Default.Register<ImportSecretPhraseMessage>(this, (message) => DoShow(message));
+            _navigationService = navigationService;
             InitializeComponent();
-        }
-
-        private void DoShow(ImportSecretPhraseMessage message)
-        {
-            if (message.MessageState == ImportSecretPhraseMessage.State.ShowInfo && _showing == false)
-            {
-                _showing = true;
-                var ignore = ShowAsync();
-            }
         }
 
         private void ContinueButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            _showing = false;
             Hide();
-            Messenger.Default.Send(new ImportSecretPhraseMessage(ImportSecretPhraseMessage.State.Import));
+            _navigationService.ShowDialog(NavigationDialog.ImportSecretPhrase);
         }
 
         private void CancelButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            _showing = false;
             Hide();
         }
     }
