@@ -68,7 +68,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return blockchainStatus;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -89,7 +89,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return blockReply;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -110,7 +110,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return blockReply;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -131,7 +131,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return balanceResult.UnconfirmedBalance.Nqt;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -178,7 +178,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return ledgerEntries;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -223,7 +223,7 @@ namespace NxtWallet.Core
                 UpdateIsMyAddress(ledgerEntries);
                 IsOnline = true;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -311,7 +311,7 @@ namespace NxtWallet.Core
                 IsOnline = true;
                 return account;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
@@ -345,7 +345,7 @@ namespace NxtWallet.Core
                 ledgerEntry.IsConfirmed = false;
                 return ledgerEntry;
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException)
             {
                 IsOnline = false;
                 throw;
