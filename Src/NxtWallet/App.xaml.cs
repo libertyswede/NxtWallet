@@ -9,6 +9,7 @@ using GalaSoft.MvvmLight.Threading;
 using Microsoft.Practices.ServiceLocation;
 using NxtWallet.Core;
 using NxtWallet.Core.Repositories;
+using MetroLog;
 
 namespace NxtWallet
 {
@@ -24,6 +25,7 @@ namespace NxtWallet
 
             InitializeComponent();
             Suspending += OnSuspending;
+            GlobalCrashHandler.Configure();
             _walletRepository.LoadAsync().Wait();
         }
 
@@ -84,8 +86,11 @@ namespace NxtWallet
         /// </summary>
         /// <param name="sender">The Frame which failed navigation</param>
         /// <param name="e">Details about the navigation failure</param>
-        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        async void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
+            var log = (ILoggerAsync)LogManagerFactory.DefaultLogManager.GetLogger<Application>();
+            await log.FatalAsync($"Failed to load Page: {e.SourcePageType.FullName}", e.Exception);            
+
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 

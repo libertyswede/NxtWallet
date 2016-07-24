@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight;
 using ZXing;
 using NxtWallet.Core.Repositories;
 using NxtWallet.Core;
+using System;
 
 namespace NxtWallet.ViewModel
 {
@@ -81,6 +82,7 @@ namespace NxtWallet.ViewModel
         {
             ShowNxtAddress = _walletRepository.BackupCompleted;
             ShowPublicKey = ShowNxtAddress;
+            throw new Exception("Weee, I go down!");
 
             if (!ShowNxtAddress)
             {
