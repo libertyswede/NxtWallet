@@ -29,7 +29,10 @@ namespace NxtWallet.Core.Models
         public string ContactListAccountFrom { get; private set; }
         public string AccountTo { get; set; }
         public string ContactListAccountTo { get; private set; }
-        public string Message { get; set; }
+        public string PlainMessage { get; set; }
+        public string EncryptedMessage { get; set; }
+        public string NoteToSelfMessage { get; set; }
+        public string OverviewMessage { get; set; }
         public LedgerEntryType LedgerEntryType { get; set; }
         public Transaction Transaction { get; set; }
         public Attachment Attachment { get; set; }

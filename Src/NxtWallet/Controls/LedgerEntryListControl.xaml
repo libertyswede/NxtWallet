@@ -82,10 +82,10 @@
                             <ColumnDefinition Width="{Binding ElementName=FeeColumn, Path=Width}" />
                             <ColumnDefinition Width="{Binding ElementName=BalanceColumn, Path=Width}" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Message, Converter={StaticResource StringNewlineConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=MessageHeader, Path=FontSize}" VerticalAlignment="Center"
+                        <TextBlock Grid.Column="0" Text="{x:Bind PlainMessage, Converter={StaticResource StringNewlineConverter}}" TextWrapping="Wrap" FontFamily="Tw Cen MT" FontSize="{Binding ElementName=MessageHeader, Path=FontSize}" VerticalAlignment="Center"
                                    Visibility="{Binding ElementName=MessageHeader, Path=Visibility}"/>
                         <StackPanel Grid.Column="1" Orientation="Vertical">
-                            <TextBlock Text="{x:Bind Message, Converter={StaticResource StringNewlineConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="13.333" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
+                            <TextBlock Text="{x:Bind PlainMessage, Converter={StaticResource StringNewlineConverter}}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="13.333" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
                             <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
                         </StackPanel>
                         <TextBlock Grid.Column="2" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontFamily="Tw Cen MT" 

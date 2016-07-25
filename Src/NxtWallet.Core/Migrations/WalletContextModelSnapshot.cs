@@ -50,19 +50,23 @@ namespace NxtWallet.Core.Migrations
 
                     b.Property<long?>("BlockId");
 
+                    b.Property<string>("EncryptedMessage");
+
                     b.Property<int?>("Height");
 
                     b.Property<bool>("IsConfirmed")
                         .HasAnnotation("Relational:DefaultValue", "True")
                         .HasAnnotation("Relational:DefaultValueType", "System.Boolean");
 
-                    b.Property<string>("Message");
+                    b.Property<string>("NoteToSelfMessage");
 
                     b.Property<long>("NqtAmount");
 
                     b.Property<long>("NqtBalance");
 
                     b.Property<long>("NqtFee");
+
+                    b.Property<string>("PlainMessage");
 
                     b.Property<DateTime>("Timestamp");
 

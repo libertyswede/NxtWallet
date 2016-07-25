@@ -99,8 +99,8 @@
                 <TextBlock x:Name="TimestampLabelTextBlock" Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="TimestampValueTextBlock" Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" 
                            VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="MessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="MessageValueTextBlock" Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.Message}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="MessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Public message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="MessageValueTextBlock" Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.PlainMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
             </Grid>
         </Border>
     </Grid>

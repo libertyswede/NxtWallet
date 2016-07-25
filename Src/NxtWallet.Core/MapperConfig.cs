@@ -24,7 +24,8 @@ namespace NxtWallet.Core
                 cfg.CreateMap<LedgerEntryDto, LedgerEntry>()
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (ulong?)src.BlockId))
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => (ulong?)src.TransactionId))
-                    .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)src.TransactionType));
+                    .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)src.TransactionType))
+                    .ForMember(dest => dest.OverviewMessage, opt => opt.MapFrom(src => GetOverviewMessage(src)));
 
                 cfg.CreateMap<LedgerEntry, LedgerEntryDto>()
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (long?)src.BlockId))
@@ -40,7 +41,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.RecipientRs : string.Empty))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => GetLedgerEntryType(src)))
-                    .ForMember(dest => dest.Message, opt => opt.MapFrom(src => GetMessage(src)))
+                    .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
                     .ForMember(dest => dest.Attachment, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Attachment : null));
 
                 cfg.CreateMap<Transaction, LedgerEntry>()
@@ -50,19 +51,38 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Fee.Nqt))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.SenderRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
-                    .ForMember(dest => dest.Message, opt => opt.MapFrom(src => GetMessage(src)))
+                    .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
+                    .ForMember(dest => dest.OverviewMessage, opt => opt.MapFrom(src => GetOverviewMessage(src)))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)(int)src.SubType))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null));
-
             });
 
             return _configuration;
         }
 
-        private static string GetMessage(Transaction transaction)
+        private static string GetPlainMessage(Transaction transaction)
         {
+            return transaction.Message?.MessageText;
+        }
+
+        private static string GetPlainMessage(AccountLedgerEntry accountLedgerEntry)
+        {
+            if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null)
+            {
+                return accountLedgerEntry.Transaction.Message?.MessageText;
+            }
+            return null;
+        }
+
+        private static string GetOverviewMessage(LedgerEntryDto ledgerEntryDto)
+        {
+            if (!string.IsNullOrEmpty(ledgerEntryDto.PlainMessage))
+            {
+                return ledgerEntryDto.PlainMessage;
+            }
+            ledgerEntryDto.
             if (transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
-                 transaction.SubType == TransactionSubType.MessagingArbitraryMessage)
+                transaction.SubType == TransactionSubType.MessagingArbitraryMessage)
             {
                 return transaction.Message?.MessageText;
             }
@@ -70,7 +90,18 @@ namespace NxtWallet.Core
             return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
-        private static string GetMessage(AccountLedgerEntry accountLedgerEntry)
+        private static string GetOverviewMessage(Transaction transaction)
+        {
+            if (transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
+                transaction.SubType == TransactionSubType.MessagingArbitraryMessage)
+            {
+                return transaction.Message?.MessageText;
+            }
+            var input = "[" + (LedgerEntryType)(int)transaction.SubType + "]";
+            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+        }
+
+        private static string GetOverviewMessage(AccountLedgerEntry accountLedgerEntry)
         {
             if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null && 
                 (accountLedgerEntry.Transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||

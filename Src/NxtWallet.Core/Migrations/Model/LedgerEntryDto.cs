@@ -18,7 +18,9 @@ namespace NxtWallet.Core.Migrations.Model
         public long NqtFee { get; set; }
         public string AccountFrom { get; set; }
         public string AccountTo { get; set; }
-        public string Message { get; set; }
+        public string PlainMessage { get; set; }
+        public string EncryptedMessage { get; set; }
+        public string NoteToSelfMessage { get; set; }
         public bool IsConfirmed { get; set; }
         public int TransactionType { get; set; }
 
