@@ -32,8 +32,12 @@
                         <Setter Target="RecipientValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
                         <Setter Target="TimestampLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
                         <Setter Target="TimestampValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="MessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="MessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="PlainMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="PlainMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="EncryptedMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="EncryptedMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="NoteToSelfMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
+                        <Setter Target="NoteToSelfMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
@@ -62,6 +66,8 @@
         <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
             <Grid >
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -99,8 +105,13 @@
                 <TextBlock x:Name="TimestampLabelTextBlock" Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
                 <TextBlock x:Name="TimestampValueTextBlock" Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" 
                            VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="MessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Public message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="MessageValueTextBlock" Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.PlainMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="PlainMessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Public message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="PlainMessageValueTextBlock" Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.PlainMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
+                <TextBlock x:Name="EncryptedMessageLabelTextBlock" Grid.Row="7" Grid.Column="0" Text="Enctyped message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="EncryptedMessageValueTextBlock" Grid.Row="7" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.EncryptedMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="NoteToSelfMessageLabelTextBlock" Grid.Row="8" Grid.Column="0" Text="Note to self:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
+                <TextBlock x:Name="NoteToSelfMessageValueTextBlock" Grid.Row="8" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.NoteToSelfMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
             </Grid>
         </Border>
     </Grid>
