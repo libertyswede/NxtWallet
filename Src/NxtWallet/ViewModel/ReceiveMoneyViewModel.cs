@@ -82,7 +82,6 @@ namespace NxtWallet.ViewModel
         {
             ShowNxtAddress = _walletRepository.BackupCompleted;
             ShowPublicKey = ShowNxtAddress;
-            throw new Exception("Weee, I go down!");
 
             if (!ShowNxtAddress)
             {
