@@ -33,7 +33,7 @@ namespace NxtWallet
 
         private static void PopNewLedgerEntryToast(LedgerEntry ledgerEntry)
         {
-            var message = string.IsNullOrEmpty(ledgerEntry.PlainMessage) ? string.Empty : $"\nMessage: {ledgerEntry.PlainMessage}";
+            var message = string.IsNullOrEmpty(ledgerEntry.OverviewMessage) ? string.Empty : $"\nMessage: {ledgerEntry.OverviewMessage}";
             var from = ledgerEntry.ContactListAccountFrom ?? ledgerEntry.AccountFrom;
 
             var xmlToast =  "<toast launch=\"app-defined-string\">" +

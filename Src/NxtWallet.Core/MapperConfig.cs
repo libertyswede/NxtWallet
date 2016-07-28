@@ -5,17 +5,22 @@ using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
 using NxtLib.Accounts;
 using System;
+using NxtWallet.Core.Repositories;
+using NxtLib.Local;
 
 namespace NxtWallet.Core
 {
     public class MapperConfig
     {
         private static MapperConfiguration _configuration;
+        private static IWalletRepository _walletRepository;
 
-        public static MapperConfiguration Setup()
+        public static MapperConfiguration Setup(IWalletRepository walletRepository)
         {
             if (_configuration != null)
                 return _configuration;
+
+            _walletRepository = walletRepository;
 
             _configuration = new MapperConfiguration(cfg =>
             {
@@ -25,7 +30,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (ulong?)src.BlockId))
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => (ulong?)src.TransactionId))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)src.TransactionType))
-                    .ForMember(dest => dest.OverviewMessage, opt => opt.MapFrom(src => GetOverviewMessage(src)));
+                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
 
                 cfg.CreateMap<LedgerEntry, LedgerEntryDto>()
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (long?)src.BlockId))
@@ -42,7 +47,10 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => GetLedgerEntryType(src)))
                     .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
-                    .ForMember(dest => dest.Attachment, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Attachment : null));
+                    .ForMember(dest => dest.EncryptedMessage, opt => opt.MapFrom(src => GetEncryptedMessage(src)))
+                    .ForMember(dest => dest.NoteToSelfMessage, opt => opt.MapFrom(src => GetNoteToSelfMessage(src)))
+                    .ForMember(dest => dest.Attachment, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Attachment : null))
+                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
 
                 cfg.CreateMap<Transaction, LedgerEntry>()
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))
@@ -51,66 +59,93 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Fee.Nqt))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.SenderRs))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.RecipientRs))
-                    .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
-                    .ForMember(dest => dest.OverviewMessage, opt => opt.MapFrom(src => GetOverviewMessage(src)))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)(int)src.SubType))
-                    .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null));
+                    .ForMember(dest => dest.IsConfirmed, opt => opt.MapFrom(src => src.Confirmations != null))
+                    .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
+                    .ForMember(dest => dest.EncryptedMessage, opt => opt.MapFrom(src => GetEncryptedMessage(src)))
+                    .ForMember(dest => dest.NoteToSelfMessage, opt => opt.MapFrom(src => GetNoteToSelfMessage(src)))
+                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
             });
 
             return _configuration;
         }
 
-        private static string GetPlainMessage(Transaction transaction)
+        private static string GetEncryptedMessage(AccountLedgerEntry accountLedgerEntry)
         {
-            return transaction.Message?.MessageText;
+            if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null)
+            {
+                return GetEncryptedMessage(accountLedgerEntry.Transaction);
+            }
+            return null;
+        }
+
+        private static object GetNoteToSelfMessage(AccountLedgerEntry accountLedgerEntry)
+        {
+            if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null)
+            {
+                return GetNoteToSelfMessage(accountLedgerEntry.Transaction);
+            }
+            return null;
         }
 
         private static string GetPlainMessage(AccountLedgerEntry accountLedgerEntry)
         {
             if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null)
             {
-                return accountLedgerEntry.Transaction.Message?.MessageText;
+                return GetPlainMessage(accountLedgerEntry.Transaction);
             }
             return null;
         }
 
-        private static string GetOverviewMessage(LedgerEntryDto ledgerEntryDto)
+        private static string GetOverviewMessage(LedgerEntry ledgerEntry)
         {
-            if (!string.IsNullOrEmpty(ledgerEntryDto.PlainMessage))
+            if (!string.IsNullOrEmpty(ledgerEntry.NoteToSelfMessage))
             {
-                return ledgerEntryDto.PlainMessage;
+                return ledgerEntry.NoteToSelfMessage;
             }
-            ledgerEntryDto.
-            if (transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
-                transaction.SubType == TransactionSubType.MessagingArbitraryMessage)
+            if (!string.IsNullOrEmpty(ledgerEntry.EncryptedMessage))
             {
-                return transaction.Message?.MessageText;
+                return ledgerEntry.EncryptedMessage;
             }
-            var input = "[" + (LedgerEntryType)(int)transaction.SubType + "]";
+            if (!string.IsNullOrEmpty(ledgerEntry.PlainMessage))
+            {
+                return ledgerEntry.PlainMessage;
+            }
+            var input = "[" + ledgerEntry.LedgerEntryType + "]";
             return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
-        private static string GetOverviewMessage(Transaction transaction)
+        private static string GetEncryptedMessage(Transaction transaction)
         {
-            if (transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
-                transaction.SubType == TransactionSubType.MessagingArbitraryMessage)
+            if (transaction.EncryptedMessage != null && transaction.RecipientRs == _walletRepository.NxtAccountWithPublicKey.AccountRs)
             {
-                return transaction.Message?.MessageText;
+                var messageService = new LocalMessageService();
+                var message = transaction.EncryptedMessage;
+                var decryptedText = messageService.DecryptTextFrom(transaction.SenderPublicKey, message.Data, message.Nonce, message.IsCompressed, _walletRepository.SecretPhrase);
+                return decryptedText;
             }
-            var input = "[" + (LedgerEntryType)(int)transaction.SubType + "]";
-            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+            return null;
         }
 
-        private static string GetOverviewMessage(AccountLedgerEntry accountLedgerEntry)
+        private static object GetNoteToSelfMessage(Transaction transaction)
         {
-            if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null && 
-                (accountLedgerEntry.Transaction.SubType == TransactionSubType.PaymentOrdinaryPayment ||
-                 accountLedgerEntry.Transaction.SubType == TransactionSubType.MessagingArbitraryMessage))
+            if (transaction.EncryptToSelfMessage != null && transaction.SenderRs == _walletRepository.NxtAccountWithPublicKey.AccountRs)
             {
-                return accountLedgerEntry.Transaction.Message?.MessageText;
+                var messageService = new LocalMessageService();
+                var message = transaction.EncryptToSelfMessage;
+                var decryptedText = messageService.DecryptTextFrom(transaction.SenderPublicKey, message.Data, message.Nonce, message.IsCompressed, _walletRepository.SecretPhrase);
+                return decryptedText;
             }
-            var input = "[" + GetLedgerEntryType(accountLedgerEntry) + "]";
-            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+            return null;
+        }
+
+        private static string GetPlainMessage(Transaction transaction)
+        {
+            if (transaction.Message != null)
+            {
+                return transaction.Message.MessageText;
+            }
+            return null;
         }
 
         private static LedgerEntryType GetLedgerEntryType(AccountLedgerEntry accountLedgerEntry)

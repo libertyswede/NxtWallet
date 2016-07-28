@@ -17,7 +17,6 @@ namespace NxtWallet.IntegrationTest
     public class AccountLedgerRunnerTest
     {
         private List<LedgerEntry> _addedLedgerEntries = new List<LedgerEntry>();
-        private static IMapper _mapper = MapperConfig.Setup().CreateMapper();
         private const string _testnetFile = "known_testnet_addresses";
         private const string _mainnetFile = "known_mainnet_addresses";
         private readonly HashSet<string> ignoreAccounts = new HashSet<string> { "NXT-6MVF-XTDR-MDTK-DPHEU" };
@@ -60,8 +59,9 @@ namespace NxtWallet.IntegrationTest
             walletRepository.BackupCompleted = true;
             walletRepository.NotificationsEnabled = false;
 
+            var mapper = MapperConfig.Setup(walletRepository).CreateMapper();
             var serviceFactory = new NxtLib.ServiceFactory(walletRepository.NxtServer);
-            var nxtServer = new NxtServer(walletRepository, _mapper, serviceFactory);
+            var nxtServer = new NxtServer(walletRepository, mapper, serviceFactory);
             var accountLedgerRepository = new FakeAccountLedgerRepository();
             var contactRepository = new FakeContactRepository();
 
