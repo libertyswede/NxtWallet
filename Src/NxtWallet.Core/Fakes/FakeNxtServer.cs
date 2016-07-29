@@ -49,7 +49,8 @@ namespace NxtWallet.Core.Fakes
             return GetAccountLedgerEntriesAsync(DateTime.UtcNow);
         }
 
-        public Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string message)
+        public Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string plainMessage, 
+            string encryptedMessage, string noteToSelfMessage)
         {
             return Task.FromResult(new LedgerEntry());
         }
