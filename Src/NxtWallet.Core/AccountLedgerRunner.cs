@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NxtLib.Local;
 using GalaSoft.MvvmLight.Messaging;
+using System.Net.Http;
 
 namespace NxtWallet.Core
 {
@@ -57,6 +58,13 @@ namespace NxtWallet.Core
                 try
                 {
                     await TryCheckAllLedgerEntries(mergedToken);
+                }
+                catch (HttpRequestException)
+                {
+                    // Ignore and try again later
+                }
+                try
+                {
                     await Task.Delay(_walletRepository.SleepTime, mergedToken);
                 }
                 catch (OperationCanceledException)
