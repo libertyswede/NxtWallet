@@ -49,15 +49,15 @@
             </StackPanel>
             
             <TextBlock Grid.Column="0" Grid.Row="4" Text="Public message:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0" />
-            <TextBox Grid.Column="1" Grid.Row="4" Width="300" Height="80" MaxLength="1000" HorizontalAlignment="Left" Text="{x:Bind ViewModel.PlainMessage, Mode=TwoWay}" 
+            <TextBox Grid.Column="1" Grid.Row="4" Width="300" Height="80" MaxLength="10000" HorizontalAlignment="Left" Text="{x:Bind ViewModel.PlainMessage, Mode=TwoWay}" 
 				Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2"/>
 
             <TextBlock Grid.Column="0" Grid.Row="5" Text="Encrypted message:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0" />
-            <TextBox Grid.Column="1" Grid.Row="5" Width="300" Height="80" MaxLength="1000" HorizontalAlignment="Left" Text="{x:Bind ViewModel.EncryptedMessage, Mode=TwoWay}" 
+            <TextBox Grid.Column="1" Grid.Row="5" Width="300" Height="80" MaxLength="10000" HorizontalAlignment="Left" Text="{x:Bind ViewModel.EncryptedMessage, Mode=TwoWay}" 
 				Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2" IsEnabled="{x:Bind ViewModel.EncryptedMessageEnabled, Mode=OneWay}"/>
 
             <TextBlock Grid.Column="0" Grid.Row="6" Text="Note to self:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0" />
-            <TextBox Grid.Column="1" Grid.Row="6" Width="300" Height="80" MaxLength="1000" HorizontalAlignment="Left" Text="{x:Bind ViewModel.NoteToSelfMessage, Mode=TwoWay}" 
+            <TextBox Grid.Column="1" Grid.Row="6" Width="300" Height="80" MaxLength="160" HorizontalAlignment="Left" Text="{x:Bind ViewModel.NoteToSelfMessage, Mode=TwoWay}" 
 				Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2"/>
 
             <TextBlock Grid.Column="0" Grid.Row="7" Text="Fee:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,13" />

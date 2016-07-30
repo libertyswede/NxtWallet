@@ -9,6 +9,7 @@ using System;
 using NxtLib;
 using System.Linq;
 using NxtLib.Accounts;
+using NxtLib.Local;
 
 namespace NxtWallet.ViewModel
 {
@@ -26,6 +27,7 @@ namespace NxtWallet.ViewModel
         private string _encryptedMessage;
         private string _noteToSelfMessage;
         private string _recipientInfo;
+        private string _fee;
         private bool _encryptedMessageEnabled;
         private BinaryHexString _recipientPublicKey;
 
@@ -57,15 +59,27 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        public string Fee { get; set; } = "1 NXT";
+        public string Fee
+        {
+            get { return _fee; }
+            set
+            {
+                SetProperty(ref _fee, value);
+                SendMoneyCommand.RaiseCanExecuteChanged();
+            }
+        }
 
         public string PlainMessage
         {
             get { return _plainMessage; }
             set
             {
-                SetProperty(ref _plainMessage, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
+                if (!string.Equals(_plainMessage, value))
+                {
+                    SetProperty(ref _plainMessage, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                    CalculateFee();
+                }
             }
         }
 
@@ -74,15 +88,27 @@ namespace NxtWallet.ViewModel
             get { return _encryptedMessage; }
             set
             {
-                SetProperty(ref _encryptedMessage, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
+                if (!string.Equals(_encryptedMessage, value))
+                {
+                    SetProperty(ref _encryptedMessage, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                    CalculateFee();
+                }
             }
         }
 
         public bool EncryptedMessageEnabled
         {
             get { return _encryptedMessageEnabled; }
-            set { SetProperty(ref _encryptedMessageEnabled, value); }
+            set
+            {
+                if (_encryptedMessageEnabled != value)
+                {
+                    SetProperty(ref _encryptedMessageEnabled, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                    CalculateFee();
+                }
+            }
         }
 
         public string NoteToSelfMessage
@@ -90,8 +116,12 @@ namespace NxtWallet.ViewModel
             get { return _noteToSelfMessage; }
             set
             {
-                SetProperty(ref _noteToSelfMessage, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
+                if (!string.Equals(_noteToSelfMessage, value))
+                {
+                    SetProperty(ref _noteToSelfMessage, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                    CalculateFee();
+                }
             }
         }
 
@@ -168,36 +198,78 @@ namespace NxtWallet.ViewModel
             {
                 recipientInfo += $", {name}";
             }
-            recipientInfo += $" has a balance of {account.Balance.Nxt.ToFormattedStringTwoDecimals()} NXT";
+            recipientInfo += $" has a balance of {account.Balance.Nxt.ToFormattedString(2)} NXT";
             RecipientInfo = recipientInfo;
         }
 
-        private decimal CalculateFee()
+        private void CalculateFee()
         {
             var fee = 1M;
 
+            var plainMessage = GetPlainMessage();
+            if (plainMessage != null)
+            {
+                // 0 NXT for first 1023 bytes data
+                // After that, 0.1 NXT per 1024 byte data
+                fee += (plainMessage.Message.Length / 1024) * 0.1M;
+            }
+            
+            var encryptedMessage = GetEncryptedMessage();
+            if (encryptedMessage != null)
+            {
+                // 0 NXT for first 1024 bytes
+                // After that, 0.1 NXT per 1024 byte encrypted data
+                fee += ((encryptedMessage.Message.ToBytes().Count() - 1) / 1024) * 0.1M;
+            }
+            
+            var encryptedNoteToSelf = GetEncryptedNoteToSelfMessage();
+            if (encryptedNoteToSelf != null)
+            {
+                // 1 NXT for first 48 bytes of encrypted data (32 actual data + 16 bytes compression stuff)
+                // 1 NXT for each additional encrypted 32 byte data
+                fee += 1;
+                fee += ((encryptedNoteToSelf.Message.ToBytes().ToArray().Length - 16 - 1) / 32) * 1M;
+            }
+
+            Fee = fee.ToFormattedString(1) + " NXT";
+        }
+
+        private CreateTransactionParameters.UnencryptedMessage GetPlainMessage()
+        {
             if (!string.IsNullOrEmpty(PlainMessage))
             {
-                // 0 NXT + 0.1 NXT per 1024 byte data
-                fee += (PlainMessage.Length / 1024) * 0.1M;
+                var plainMessage = new CreateTransactionParameters.UnencryptedMessage(PlainMessage, true);
+                return plainMessage;
             }
+            return null;
+        }
 
+        private CreateTransactionParameters.AlreadyEncryptedMessage GetEncryptedMessage()
+        {
             if (EncryptedMessageEnabled && !string.IsNullOrEmpty(EncryptedMessage))
             {
-                
-                // 0 NXT + 0.1 NXT per 1024 byte encrypted data (16 byte nonce is not included)
+                var localMessageService = new LocalMessageService();
+                var nonce = localMessageService.CreateNonce();
+                var encrypted = localMessageService.EncryptTextTo(_recipientPublicKey, EncryptedMessage, nonce,
+                    true, _walletRepository.SecretPhrase);
+                var encryptedMessage = new CreateTransactionParameters.AlreadyEncryptedMessage(encrypted, nonce, true, true, true);
+                return encryptedMessage;
             }
+            return null;
+        }
 
+        private CreateTransactionParameters.AlreadyEncryptedMessageToSelf GetEncryptedNoteToSelfMessage()
+        {
             if (!string.IsNullOrEmpty(NoteToSelfMessage))
             {
-                // From AbstractEncryptedMessage.ENCRYPTED_MESSAGE_FEE
-                // 1 NXT in constant fee
-                // 1 NXT for each additional encrypted 32 byte data
-                // Nonce is not included (16 bytes)
+                var localMessageService = new LocalMessageService();
+                var nonce = localMessageService.CreateNonce();
+                var encryptedToSelf = localMessageService.EncryptTextTo(_walletRepository.NxtAccountWithPublicKey.PublicKey,
+                    NoteToSelfMessage, nonce, true, _walletRepository.SecretPhrase);
+                var encryptedMessageToSelf = new CreateTransactionParameters.AlreadyEncryptedMessageToSelf(encryptedToSelf, nonce, true, true);
+                return encryptedMessageToSelf;
             }
-
-            throw new NotImplementedException();
-            return fee;
+            return null;
         }
 
         public void OnNavigatedTo(Contact contact)
@@ -209,6 +281,7 @@ namespace NxtWallet.ViewModel
             EncryptedMessage = string.Empty;
             NoteToSelfMessage = string.Empty;
             EncryptedMessageEnabled = true;
+            Fee = "1.0 NXT";
 
             Errors.IsValidationEnabled = true;
             if (contact != null)
@@ -226,7 +299,9 @@ namespace NxtWallet.ViewModel
                 await Task.Run(async () =>
                 {
                     var amount = NxtLib.Amount.CreateAmountFromNxt(decimal.Parse(Amount));
-                    var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, amount, PlainMessage, EncryptedMessage, NoteToSelfMessage);
+                    var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, amount, GetPlainMessage(), 
+                        GetEncryptedMessage(), GetEncryptedNoteToSelfMessage());
+
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);

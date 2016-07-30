@@ -8,9 +8,10 @@
             return formatted;
         }
 
-        public static string ToFormattedStringTwoDecimals(this decimal amount)
+        public static string ToFormattedString(this decimal amount, int decimalCount)
         {
-            var formatted = amount.ToString("#,##0.00;;");
+            var decimals = new string('0', decimalCount);
+            var formatted = amount.ToString($"#,##0.{decimals};;");
             return formatted;
         }
 

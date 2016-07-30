@@ -32,7 +32,11 @@ namespace NxtWallet.Core
         Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync();
         Task<List<LedgerEntry>> GetUnconfirmedAccountLedgerEntriesAsync();
         Task<AccountReply> GetAccountAsync(string recipient);
-        Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string plainMessage, string encryptedMessage, string noteToSelfMessage);
+        Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount,
+            CreateTransactionParameters.UnencryptedMessage plainMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessage encryptedMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessageToSelf noteToSelfMessage);
+
         void UpdateNxtServer(string newServerAddress);
     }
 
@@ -323,8 +327,10 @@ namespace NxtWallet.Core
             }
         }
 
-        public async Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, string plainMessage, 
-            string encryptedMessage, string noteToSelfMessage)
+        public async Task<LedgerEntry> SendMoneyAsync(Account recipient, Amount amount, 
+            CreateTransactionParameters.UnencryptedMessage plainMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessage encryptedMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessageToSelf noteToSelfMessage)
         {
             try
             {
@@ -362,32 +368,18 @@ namespace NxtWallet.Core
             _serviceFactory = new ServiceFactory(newServerAddress);
         }
 
-        private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount, string plainMessage,
-            string encryptedMessage, string noteToSelfMessage)
+        private async Task<TransactionCreatedReply> CreateUnsignedSendMoneyReply(Account recipient, Amount amount,
+            CreateTransactionParameters.UnencryptedMessage plainMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessage encryptedMessage,
+            CreateTransactionParameters.AlreadyEncryptedMessageToSelf noteToSelfMessage)
         {
             var accountService = _serviceFactory.CreateAccountService();
             var createTransactionByPublicKey = new CreateTransactionByPublicKey(1440, Amount.Zero, _walletRepository.NxtAccountWithPublicKey.PublicKey);
-            if (!string.IsNullOrEmpty(plainMessage))
-            {
-                createTransactionByPublicKey.Message = new CreateTransactionParameters.UnencryptedMessage(plainMessage, true);
-            }
-            if (!string.IsNullOrEmpty(encryptedMessage))
-            {
-                var localMessageService = new LocalMessageService();
-                var nonce = localMessageService.CreateNonce();
-                var accountPublicKeyReply = await accountService.GetAccountPublicKey(recipient);
-                var encrypted = localMessageService.EncryptTextTo(accountPublicKeyReply.PublicKey, encryptedMessage, nonce,
-                    true, _walletRepository.SecretPhrase);
-                createTransactionByPublicKey.EncryptedMessage = new CreateTransactionParameters.AlreadyEncryptedMessage(encrypted, nonce, true, true, true);
-            }
-            if (!string.IsNullOrEmpty(noteToSelfMessage))
-            {
-                var localMessageService = new LocalMessageService();
-                var nonce = localMessageService.CreateNonce();
-                var encryptedToSelf = localMessageService.EncryptTextTo(_walletRepository.NxtAccountWithPublicKey.PublicKey, 
-                    noteToSelfMessage, nonce, true, _walletRepository.SecretPhrase);
-                createTransactionByPublicKey.EncryptedMessageToSelf = new CreateTransactionParameters.AlreadyEncryptedMessageToSelf(encryptedToSelf, nonce, true, true);
-            }
+
+            createTransactionByPublicKey.Message = plainMessage;
+            createTransactionByPublicKey.EncryptedMessage = encryptedMessage;
+            createTransactionByPublicKey.EncryptedMessageToSelf = noteToSelfMessage;
+
             var sendMoneyReply = await accountService.SendMoney(createTransactionByPublicKey, recipient, amount);
             return sendMoneyReply;
         }
