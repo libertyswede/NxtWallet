@@ -38,7 +38,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => (int)src.LedgerEntryType));
 
                 cfg.CreateMap<AccountLedgerEntry, LedgerEntry>()
-                    .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.IsTransactionEvent ? (ulong?)src.EventId : null))
+                    .ForMember(dest => dest.TransactionId, opt => opt.ResolveUsing(src => src.IsTransactionEvent ? (ulong?)src.EventId : null))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Change))
                     .ForMember(dest => dest.NqtBalance, opt => opt.MapFrom(src => src.Balance))
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Fee.Nqt : 0))
@@ -68,6 +68,15 @@ namespace NxtWallet.Core
             });
 
             return _configuration;
+        }
+
+        private static ulong? GetTransactionId(AccountLedgerEntry source)
+        {
+            if (source.IsTransactionEvent)
+            {
+                return source.EventId;
+            }
+            return null;
         }
 
         private static string GetEncryptedMessage(AccountLedgerEntry accountLedgerEntry)
