@@ -88,7 +88,7 @@ namespace NxtWallet.Core
             return null;
         }
 
-        private static object GetNoteToSelfMessage(AccountLedgerEntry accountLedgerEntry)
+        private static string GetNoteToSelfMessage(AccountLedgerEntry accountLedgerEntry)
         {
             if (accountLedgerEntry.IsTransactionEvent && accountLedgerEntry.Transaction != null)
             {
@@ -136,7 +136,7 @@ namespace NxtWallet.Core
             return null;
         }
 
-        private static object GetNoteToSelfMessage(Transaction transaction)
+        private static string GetNoteToSelfMessage(Transaction transaction)
         {
             if (transaction.EncryptToSelfMessage != null && transaction.SenderRs == _walletRepository.NxtAccountWithPublicKey.AccountRs)
             {

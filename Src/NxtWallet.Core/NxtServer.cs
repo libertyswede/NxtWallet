@@ -169,7 +169,7 @@ namespace NxtWallet.Core
 
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(filteredTransactions);
 
-                UpdateIsMyAddress(ledgerEntries);
+                await PostProcessEntries(ledgerEntries);
                 foreach (var ledgerEntry in ledgerEntries)
                 {
                     if (ledgerEntry.UserIsSender)
@@ -224,7 +224,7 @@ namespace NxtWallet.Core
                 accountLedgerEntries = GroupLedgerEntries(accountLedgerEntries);
 
                 ledgerEntries.AddRange(_mapper.Map<List<LedgerEntry>>(accountLedgerEntries));
-                UpdateIsMyAddress(ledgerEntries);
+                await PostProcessEntries(ledgerEntries);
                 IsOnline = true;
             }
             catch (HttpRequestException)
@@ -238,6 +238,26 @@ namespace NxtWallet.Core
                 throw new Exception("Error when parsing response", e);
             }
             return ledgerEntries;
+        }
+
+        private async Task PostProcessEntries(List<LedgerEntry> ledgerEntries)
+        {
+            UpdateIsMyAddress(ledgerEntries);
+            await UpdateEncryptedMessage(ledgerEntries);
+        }
+
+        private async Task UpdateEncryptedMessage(List<LedgerEntry> ledgerEntries)
+        {
+            foreach (var ledgerEntry in ledgerEntries.Where(e => e?.Transaction?.EncryptedMessage != null && e.UserIsSender))
+            {
+                var messageService = new LocalMessageService();
+                var encryptedMessage = ledgerEntry.Transaction.EncryptedMessage;
+                var recipienctPublicKey = await GetAccountPublicKeyAsync(ledgerEntry.AccountTo);
+
+                var sharedKey = messageService.GetSharedKey(recipienctPublicKey, encryptedMessage.Nonce, _walletRepository.SecretPhrase);
+                var unencrypted = messageService.DecryptText(encryptedMessage.Data, encryptedMessage.Nonce, encryptedMessage.IsCompressed, sharedKey);
+                ledgerEntry.EncryptedMessage = unencrypted;
+            }
         }
 
         private static DateTime AdjustIfGenesisBlock(DateTime lastTimestamp)
@@ -304,6 +324,27 @@ namespace NxtWallet.Core
         public Task<List<LedgerEntry>> GetAccountLedgerEntriesAsync()
         {
             return GetAccountLedgerEntriesAsync(new DateTime(2013, 11, 24, 12, 0, 0, DateTimeKind.Utc));
+        }
+
+        private async Task<string> GetAccountPublicKeyAsync(string recipient)
+        {
+            try
+            {
+                var accountService = _serviceFactory.CreateAccountService();
+                var accountPublicKeyReply = await accountService.GetAccountPublicKey(recipient);
+                IsOnline = true;
+                return accountPublicKeyReply.PublicKey;
+            }
+            catch (HttpRequestException)
+            {
+                IsOnline = false;
+                throw;
+            }
+            catch (JsonReaderException e)
+            {
+                IsOnline = true;
+                throw new Exception("Error when parsing response", e);
+            }
         }
 
         public async Task<AccountReply> GetAccountAsync(string recipient)

@@ -302,6 +302,7 @@ namespace NxtWallet.ViewModel
                     var ledgerEntry = await _nxtServer.SendMoneyAsync(Recipient, amount, GetPlainMessage(), 
                         GetEncryptedMessage(), GetEncryptedNoteToSelfMessage());
 
+                    ledgerEntry.EncryptedMessage = EncryptedMessage;
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
