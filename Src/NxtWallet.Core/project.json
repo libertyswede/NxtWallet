@@ -5,7 +5,7 @@
     "EntityFramework.Sqlite": "7.0.0-rc1-final",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
     "MvvmLight": "5.3.0",
-    "NxtLib": "1.1.18"
+    "NxtLib": "1.1.20"
   },
   "frameworks": {
     "uap10.0": {}
