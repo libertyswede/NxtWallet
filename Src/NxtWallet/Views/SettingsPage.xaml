@@ -6,7 +6,30 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     DataContext="{Binding SettingsViewModel, Source={StaticResource Ioc}}">
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10,20,0,0">
+    <Grid x:Name="Grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.Setters>
+                        <Setter Target="Header.(FrameworkElement.Margin)">
+                            <Setter.Value>
+                                <Thickness>50,5,10,20</Thickness>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin0}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin540">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin540}}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -20,9 +43,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Server address:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.ServerAddress, Mode=TwoWay}" Margin="0,5,0,0" />
-        <CheckBox Grid.Row="1" Grid.Column="0" Content="Notifications:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" 
+        <TextBlock x:Name="Header" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Wallet Settings" Margin="10,5,10,20" FontSize="26.667" FontWeight="Bold" />
+        
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Server address:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.ServerAddress, Mode=TwoWay}" IsSpellCheckEnabled="False" 
+                 Width="350" HorizontalAlignment="Left" Margin="0,5,0,0" />
+        <CheckBox Grid.Row="2" Grid.Column="0" Content="Notifications:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" 
                   FlowDirection="RightToLeft" IsChecked="{x:Bind ViewModel.IsNotificationsEnabled, Mode=TwoWay}" FontFamily="Tw Cen MT" >
             <CheckBox.Template>
                 <ControlTemplate TargetType="CheckBox">
@@ -30,12 +56,9 @@
                 </ControlTemplate>
             </CheckBox.Template>
         </CheckBox>
-        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{x:Bind ViewModel.IsNotificationsEnabled, Mode=TwoWay}" />
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Secret Phrase:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
-        <!--<PasswordBox Grid.Row="2" Grid.Column="1" Password="{x:Bind ViewModel.SecretPhrase, Mode=TwoWay}" Margin="0,5,0,0" />-->
-        <Button Grid.Row="2" Content="Import" Command="{x:Bind Path=ViewModel.ImportSecretPhraseCommand}" Grid.Column="1" Margin="0,5,0,0" />
-        <!--<TextBlock Grid.Row="3" Grid.Column="0" Text="Read only account:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.ReadOnlyAddress, Mode=TwoWay}" Margin="0,5,0,0" />-->
-        <Button Grid.Row="4" Grid.Column="1" Content="Save" Command="{x:Bind ViewModel.SaveCommand}" Margin="0,10,0,0" />
+        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{x:Bind ViewModel.IsNotificationsEnabled, Mode=TwoWay}" />
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Import account:" HorizontalAlignment="Right" Margin="0,10,5,0" VerticalAlignment="Top" />
+        <Button Grid.Row="3" Content="Import" Command="{x:Bind Path=ViewModel.ImportSecretPhraseCommand}" Grid.Column="1" Margin="0,5,0,0" />
+        <Button Grid.Row="4" Grid.Column="1" Content="Save Changes" Command="{x:Bind ViewModel.SaveCommand}" Margin="0,20,0,0" />
     </Grid>
 </Page>

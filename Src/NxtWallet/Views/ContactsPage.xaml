@@ -18,12 +18,12 @@
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateMin0">
                     <VisualState.Setters>
-                        <Setter Target="RelativePanel.(FrameworkElement.Margin)">
+                        <Setter Target="DetailsColumn.Width" Value="Auto" />
+                        <Setter Target="Header.(FrameworkElement.Margin)">
                             <Setter.Value>
-                                <Thickness>10,50,10,10</Thickness>
+                                <Thickness>50,0,0,10</Thickness>
                             </Setter.Value>
                         </Setter>
-                        <Setter Target="DetailsColumn.Width" Value="Auto" />
                     </VisualState.Setters>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{Binding Mode=OneWay, Source={StaticResource VisualStateMin0}}"/>
@@ -40,13 +40,13 @@
             <ColumnDefinition Width="*" x:Name="MasterColumn"/>
             <ColumnDefinition Width="*" x:Name="DetailsColumn"/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="RelativePanel" Margin="10">
+        <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
+            <TextBlock x:Name="Header" Grid.Row="0" Text="Contacts" FontSize="24" FontWeight="Bold" Margin="10,0,0,10" />
             <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.Contacts, Mode=OneWay}" SelectionMode="Single" 
                       SelectedValue="{x:Bind ViewModel.SelectedContact, Mode=TwoWay, Converter={StaticResource NoopConverter}}">
                 <ListView.ItemTemplate>

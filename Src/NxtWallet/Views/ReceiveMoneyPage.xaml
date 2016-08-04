@@ -21,9 +21,9 @@
                         <Setter Target="PublicKeyLabel.(TextBlock.FontSize)" Value="14.667"/>
                         <Setter Target="PublicKey.(TextBlock.FontSize)" Value="14.667"/>
                         <Setter Target="QrCodeLabel.(TextBlock.FontSize)" Value="14.667"/>
-                        <Setter Target="Grid.(Grid.BorderThickness)">
+                        <Setter Target="Header.(FrameworkElement.Margin)">
                             <Setter.Value>
-                                <Thickness>0,50,0,0</Thickness>
+                                <Thickness>50,5,10,20</Thickness>
                             </Setter.Value>
                         </Setter>
                     </VisualState.Setters>
@@ -48,8 +48,8 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Receive Money" Margin="10,5,10,20" FontSize="26.667" FontWeight="Bold" />
+
+        <TextBlock x:Name="Header" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Receive NXT" Margin="10,5,10,20" FontSize="26.667" FontWeight="Bold" />
 
         <TextBlock x:Name="AddressLabel" Grid.Row="1" Grid.Column="0" Text="Nxt Address:" HorizontalAlignment="Right" Margin="10,5" FontSize="18.667" />
         <controls:SelectableTextBlock x:Name="Address" Grid.Row="1" Grid.Column="1" Margin="0" FontSize="18.667" 
