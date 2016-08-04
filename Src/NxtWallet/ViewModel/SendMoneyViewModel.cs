@@ -280,7 +280,7 @@ namespace NxtWallet.ViewModel
             PlainMessage = string.Empty;
             EncryptedMessage = string.Empty;
             NoteToSelfMessage = string.Empty;
-            EncryptedMessageEnabled = true;
+            EncryptedMessageEnabled = false;
             Fee = "1.0 NXT";
 
             Errors.IsValidationEnabled = true;
