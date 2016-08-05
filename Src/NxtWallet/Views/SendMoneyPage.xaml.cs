@@ -49,6 +49,14 @@ namespace NxtWallet.Views
         private void RecipientBox_LostFocus(object sender, RoutedEventArgs e)
         {
             RecipientValidation.Visibility = Visibility.Visible;
+            ViewModel.EnableValidation();
+            ViewModel.ValidateProperty(nameof(ViewModel.RecipientAddress));
+            ViewModel.UpdateRecipientInfo();
+        }
+
+        private void RecipientBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ViewModel.DisableValidation();
         }
     }
 }

@@ -28,6 +28,8 @@ namespace NxtWallet.ViewModel
         private string _noteToSelfMessage;
         private string _info;
         private string _fee;
+        private bool? _addMessage;
+        private bool? _addNoteToSelfMessage;
         private bool _isMessageEncryptionEnabled;
         private bool? _encryptMessage;
         private BinaryHexString _recipientPublicKey;
@@ -42,7 +44,6 @@ namespace NxtWallet.ViewModel
                 if (!string.Equals(_recipientAddress, value))
                 {
                     SetProperty(ref _recipientAddress, value);
-                    UpdateRecipientInfo();
                 }
             }
         }
@@ -55,8 +56,11 @@ namespace NxtWallet.ViewModel
             get { return _amount; }
             set
             {
-                SetProperty(ref _amount, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
+                if (!string.Equals(_amount, value))
+                {
+                    SetProperty(ref _amount, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                }
             }
         }
 
@@ -65,8 +69,23 @@ namespace NxtWallet.ViewModel
             get { return _fee; }
             set
             {
-                SetProperty(ref _fee, value);
-                SendMoneyCommand.RaiseCanExecuteChanged();
+                if (!string.Equals(_fee, value))
+                {
+                    SetProperty(ref _fee, value);
+                    SendMoneyCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        public bool? AddMessage
+        {
+            get { return _addMessage; }
+            set
+            {
+                if (_addMessage != value)
+                {
+                    SetProperty(ref _addMessage, value);
+                }
             }
         }
 
@@ -108,6 +127,19 @@ namespace NxtWallet.ViewModel
             }
         }
 
+        public bool? AddNoteToSelfMessage
+        {
+            get { return _addNoteToSelfMessage; }
+            set
+            {
+                if (_addNoteToSelfMessage != value)
+                {
+                    SetProperty(ref _addNoteToSelfMessage, value);
+                }
+            }
+        }
+
+
         public string NoteToSelfMessage
         {
             get { return _noteToSelfMessage; }
@@ -143,11 +175,12 @@ namespace NxtWallet.ViewModel
             SendMoneyCommand = new RelayCommand(SendMoney, () => CanSendMoney());
             nxtServer.PropertyChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
             ErrorsChanged += (sender, args) => SendMoneyCommand.RaiseCanExecuteChanged();
+            ClearFields();
         }
 
-        public void OnNavigatedTo(Contact contact)
+        private void ClearFields()
         {
-            Errors.IsValidationEnabled = false;
+            DisableValidation();
             IsMessageEncryptionEnabled = false;
             EncryptMessage = true;
             RecipientAddress = string.Empty;
@@ -155,8 +188,13 @@ namespace NxtWallet.ViewModel
             Message = string.Empty;
             NoteToSelfMessage = string.Empty;
             Fee = "1.0 NXT";
+            AddMessage = false;
+            AddNoteToSelfMessage = false;
+            EnableValidation();
+        }
 
-            Errors.IsValidationEnabled = true;
+        public void OnNavigatedTo(Contact contact)
+        {
             if (contact != null)
             {
                 RecipientAddress = contact.NxtAddressRs;
@@ -178,7 +216,17 @@ namespace NxtWallet.ViewModel
             return await _contactRepository.SearchContactsWithNameContainingText(text);
         }
 
-        private async void UpdateRecipientInfo()
+        internal void DisableValidation()
+        {
+            Errors.IsValidationEnabled = false;
+        }
+
+        internal void EnableValidation()
+        {
+            Errors.IsValidationEnabled = true;
+        }
+
+        internal async void UpdateRecipientInfo()
         {
             if (string.IsNullOrEmpty(RecipientAddress) || Errors[nameof(RecipientAddress)].Any())
             {
@@ -205,12 +253,14 @@ namespace NxtWallet.ViewModel
             {
                 Info = "Unable to get information about recipient in offline mode.";
                 IsMessageEncryptionEnabled = false;
+                EncryptMessage = false;
                 return;
             }
             if (account == null)
             {
                 Info = "The recipient account is an unknown account, meaning it has never had an incoming or outgoing transaction.";
                 IsMessageEncryptionEnabled = false;
+                EncryptMessage = false;
                 return;
             }
             _recipientPublicKey = account.PublicKey;
@@ -309,7 +359,10 @@ namespace NxtWallet.ViewModel
                     var ledgerEntry = await _nxtServer.SendMoneyAsync(RecipientAddress, amount, GetPlainMessage(), 
                         GetEncryptedMessage(), GetEncryptedNoteToSelfMessage());
 
-                    ledgerEntry.EncryptedMessage = Message;
+                    if ((IsMessageEncryptionEnabled && EncryptMessage.Value) && !string.IsNullOrEmpty(Message))
+                    {
+                        ledgerEntry.EncryptedMessage = Message;
+                    }   
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
@@ -323,6 +376,7 @@ namespace NxtWallet.ViewModel
                     sendMoneyDialogViewModel.SetError(e.Message);
                 }
             }
+            ClearFields();
         }
     }
 }

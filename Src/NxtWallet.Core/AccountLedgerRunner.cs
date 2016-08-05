@@ -108,9 +108,9 @@ namespace NxtWallet.Core
             await _accountLedgerRepository.RemoveLedgerEntriesAsync(deletedLedgerEntries);
 
             OnBalanceUpdated(nrsUnconfirmedBalance);
+            deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
             nrsConfirmedLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
             updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
-            deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
         }
 
         private async Task<Tuple<BlockchainStatus, Block<ulong>>> SyncToLastCommonBlock()

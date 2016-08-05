@@ -17,7 +17,7 @@ namespace NxtWallet.Core.Fakes
 
             if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
             {
-                UseDesignTimeData();
+                Contacts = GetDesignTimeData();
             }
         }
 
@@ -63,12 +63,12 @@ namespace NxtWallet.Core.Fakes
 
         public Task<List<Contact>> SearchContactsWithNameContainingText(string text)
         {
-            return Task.FromResult(Contacts.Where(c => c.Name.Contains(text)).ToList());
+            return Task.FromResult(GetDesignTimeData().Where(c => c.Name.Contains(text)).ToList());
         }
 
-        private void UseDesignTimeData()
+        private List<Contact> GetDesignTimeData()
         {
-            Contacts = new List<Contact>
+            return new List<Contact>
             {
                 new Contact {Name = "MrV777", NxtAddressRs = "NXT-BK2J-ZMY4-93UY-8EM9V"},
                 new Contact {Name = "bitcoinpaul", NxtAddressRs = "NXT-M5JR-2L5Z-CFBP-8X7P3"},

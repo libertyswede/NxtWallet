@@ -55,7 +55,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="140" />
             </Grid.ColumnDefinitions>
@@ -63,9 +63,9 @@
             
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Recipient:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0" />
             <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,5" Grid.ColumnSpan="2" Orientation="Horizontal">
-                <AutoSuggestBox x:Name="RecipientBox" Width="300" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
+                <AutoSuggestBox x:Name="RecipientBox" Width="350" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
                                 TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" 
-                                SuggestionChosen="RecipientBox_SuggestionChosen" LostFocus="RecipientBox_LostFocus"
+                                SuggestionChosen="RecipientBox_SuggestionChosen" LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
                                 Text="{x:Bind Path=ViewModel.RecipientAddress, Mode=TwoWay}"/>
                 <TextBlock x:Name="RecipientValidation" Foreground="Red" HorizontalAlignment="Right" Margin="5,7,0,0" 
                            Text="{Binding Path=Errors[RecipientAddress][0]}" Visibility="Collapsed" />
@@ -73,15 +73,15 @@
 
             <TextBlock Grid.Column="0" Grid.Row="2" Text="Amount:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,13" />
             <StackPanel Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0,0,5" Orientation="Horizontal">
-                <TextBox Width="300" MaxLength="20" HorizontalAlignment="Left" PlaceholderText="Amount in NXT" Text="{x:Bind ViewModel.Amount, Mode=TwoWay}"/>
+                <TextBox Width="200" MaxLength="20" HorizontalAlignment="Left" PlaceholderText="Amount in NXT" Text="{x:Bind ViewModel.Amount, Mode=TwoWay}"/>
                 <TextBlock Text="{Binding Path=Errors[Amount][0]}" Foreground="Red" HorizontalAlignment="Right" Margin="5,7,0,0" />
             </StackPanel>
 
-            <CheckBox x:Name="AddMessageCheckBox" Grid.Column="1" Grid.Row="3" Content="Add Message" IsChecked="False" />
+            <CheckBox x:Name="AddMessageCheckBox" Grid.Column="1" Grid.Row="3" Content="Add Message" IsChecked="{x:Bind Path=ViewModel.AddMessage, Mode=TwoWay}" />
 
             <TextBlock Grid.Column="0" Grid.Row="4" Text="Message:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0"
                        Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisiblityConverter}, ElementName=AddMessageCheckBox}"/>
-            <TextBox Grid.Column="1" Grid.Row="4" Width="300" Height="80" MaxLength="10000" HorizontalAlignment="Left" 
+            <TextBox Grid.Column="1" Grid.Row="4" Width="350" Height="80" MaxLength="10000" HorizontalAlignment="Left" 
                      Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2" 
                      Text="{x:Bind ViewModel.Message, Mode=TwoWay}" 
                      Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisiblityConverter}, ElementName=AddMessageCheckBox}" />
@@ -92,11 +92,11 @@
                       IsEnabled="{x:Bind Path=ViewModel.IsMessageEncryptionEnabled, Mode=OneWay}"
                       Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisiblityConverter}, ElementName=AddMessageCheckBox}" />
 
-            <CheckBox x:Name="AddNoteToSelfCheckBox" Grid.Column="1" Grid.Row="6" Content="Add Note To Self" IsChecked="False"/>
+            <CheckBox x:Name="AddNoteToSelfCheckBox" Grid.Column="1" Grid.Row="6" Content="Add Note To Self" IsChecked="{x:Bind Path=ViewModel.AddNoteToSelfMessage, Mode=TwoWay}"/>
             <TextBlock Grid.Column="0" Grid.Row="7" Text="Note to self:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,7,10,0"
                        Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisiblityConverter}, ElementName=AddNoteToSelfCheckBox}"/>
-            <TextBox Grid.Column="1" Grid.Row="7" Width="300" Height="80" MaxLength="160" HorizontalAlignment="Left" 
-                     Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap"
+            <TextBox Grid.Column="1" Grid.Row="7" Width="350" Height="80" MaxLength="160" HorizontalAlignment="Left" 
+                     Margin="0,0,0,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.ColumnSpan="2" 
                      Text="{x:Bind ViewModel.NoteToSelfMessage, Mode=TwoWay}"
                      Visibility="{Binding IsChecked, Converter={StaticResource BoolToVisiblityConverter}, ElementName=AddNoteToSelfCheckBox}"/>
 
