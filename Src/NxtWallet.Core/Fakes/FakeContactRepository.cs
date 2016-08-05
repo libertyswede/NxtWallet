@@ -61,6 +61,11 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(contact);
         }
 
+        public Task<List<Contact>> SearchContactsWithNameContainingText(string text)
+        {
+            return Task.FromResult(Contacts.Where(c => c.Name.Contains(text)).ToList());
+        }
+
         private void UseDesignTimeData()
         {
             Contacts = new List<Contact>

@@ -1,8 +1,9 @@
 ﻿using GalaSoft.MvvmLight;
+using System;
 
 namespace NxtWallet.Core.Models
 {
-    public class Contact : ObservableObject
+    public class Contact : ObservableObject, IComparable<Contact>
     {
         private string _name;
         private string _nxtAddressRs;
@@ -19,6 +20,16 @@ namespace NxtWallet.Core.Models
         {
             get { return _nxtAddressRs; }
             set { Set(ref _nxtAddressRs, value); }
+        }
+
+        public int CompareTo(Contact other)
+        {
+            return Name.CompareTo(other?.Name);
+        }
+
+        public override string ToString()
+        {
+            return Name + " " + NxtAddressRs;
         }
     }
 }
