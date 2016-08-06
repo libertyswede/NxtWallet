@@ -28,8 +28,6 @@ namespace NxtWallet.ViewModel
         private string _noteToSelfMessage;
         private string _info;
         private string _fee;
-        private bool? _addMessage;
-        private bool? _addNoteToSelfMessage;
         private bool _isMessageEncryptionEnabled;
         private bool? _encryptMessage;
         private BinaryHexString _recipientPublicKey;
@@ -77,18 +75,6 @@ namespace NxtWallet.ViewModel
             }
         }
 
-        public bool? AddMessage
-        {
-            get { return _addMessage; }
-            set
-            {
-                if (_addMessage != value)
-                {
-                    SetProperty(ref _addMessage, value);
-                }
-            }
-        }
-
         public string Message
         {
             get { return _message; }
@@ -126,19 +112,6 @@ namespace NxtWallet.ViewModel
                 }
             }
         }
-
-        public bool? AddNoteToSelfMessage
-        {
-            get { return _addNoteToSelfMessage; }
-            set
-            {
-                if (_addNoteToSelfMessage != value)
-                {
-                    SetProperty(ref _addNoteToSelfMessage, value);
-                }
-            }
-        }
-
 
         public string NoteToSelfMessage
         {
@@ -188,8 +161,6 @@ namespace NxtWallet.ViewModel
             Message = string.Empty;
             NoteToSelfMessage = string.Empty;
             Fee = "1.0 NXT";
-            AddMessage = false;
-            AddNoteToSelfMessage = false;
             EnableValidation();
         }
 
