@@ -161,7 +161,7 @@ namespace NxtWallet.Core
 
         private static IEnumerable<LedgerEntry> GetConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries)
         {
-            for (int i = 0; i < knownUnconfirmedEntries.Count - 1; i++)
+            for (int i = 0; i < knownUnconfirmedEntries.Count; i++)
             {
                 var unconfirmedEntry = knownUnconfirmedEntries[i];
                 var confirmedEntry = newLedgerEntries.SingleOrDefault(e => e.TransactionId == unconfirmedEntry.TransactionId);
