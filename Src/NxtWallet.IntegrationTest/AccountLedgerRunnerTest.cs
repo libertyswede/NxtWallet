@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet.IntegrationTest
 {
@@ -68,7 +69,13 @@ namespace NxtWallet.IntegrationTest
             var runner = new AccountLedgerRunner(walletRepository, nxtServer, accountLedgerRepository);
 
             _addedLedgerEntries.Clear();
-            runner.LedgerEntryAdded += (sender, ledgerEntry) => _addedLedgerEntries.Add(ledgerEntry);
+            Messenger.Default.Register<LedgerEntryMessage>(this, (message) => 
+            {
+                if (message.Action == LedgerEntryMessageAction.Added)
+                {
+                    _addedLedgerEntries.Add(message.LedgerEntry);
+                }
+            });
             var cancellationSource = new CancellationTokenSource();
 
             try

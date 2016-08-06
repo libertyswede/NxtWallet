@@ -108,11 +108,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountLedgerRunner.cs" />
+    <Compile Include="BalanceUpdatedMessage.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Fakes\FakeAccountLedgerRepository.cs" />
     <Compile Include="Fakes\FakeContactRepository.cs" />
     <Compile Include="Fakes\FakeNxtServer.cs" />
     <Compile Include="Fakes\FakeWalletRepository.cs" />
+    <Compile Include="LedgerEntryMessage.cs" />
     <Compile Include="MapperConfig.cs" />
     <Compile Include="Migrations\20160725041358_Initial.cs" />
     <Compile Include="Migrations\20160725041358_Initial.designer.cs">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GalaSoft.MvvmLight;
 using NxtLib;
+using System.Text.RegularExpressions;
 
 namespace NxtWallet.Core.Models
 {
@@ -130,6 +131,27 @@ namespace NxtWallet.Core.Models
         public void SetBalance(long balance)
         {
             NqtBalance = balance;
+        }
+
+        public void UpdateOverviewMessage()
+        {
+            if (!string.IsNullOrEmpty(NoteToSelfMessage))
+            {
+                OverviewMessage = NoteToSelfMessage;
+            }
+            else if (!string.IsNullOrEmpty(EncryptedMessage))
+            {
+                OverviewMessage = EncryptedMessage;
+            }
+            else if (!string.IsNullOrEmpty(PlainMessage))
+            {
+                OverviewMessage = PlainMessage;
+            }
+            else
+            {
+                var input = "[" + LedgerEntryType + "]";
+                OverviewMessage = Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+            }
         }
 
         private bool UserIsAmountRecipientCalculation()

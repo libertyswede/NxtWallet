@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using AutoMapper;
+﻿using AutoMapper;
 using NxtLib;
 using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
@@ -30,7 +29,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (ulong?)src.BlockId))
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => (ulong?)src.TransactionId))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => (LedgerEntryType)src.TransactionType))
-                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
+                    .AfterMap((src, dest) => dest.UpdateOverviewMessage());
 
                 cfg.CreateMap<LedgerEntry, LedgerEntryDto>()
                     .ForMember(dest => dest.BlockId, opt => opt.MapFrom(src => (long?)src.BlockId))
@@ -45,12 +44,13 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.SenderRs : string.Empty))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.RecipientRs : string.Empty))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
+                    .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Timestamp : src.Timestamp))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => GetLedgerEntryType(src)))
                     .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
                     .ForMember(dest => dest.EncryptedMessage, opt => opt.MapFrom(src => GetEncryptedMessage(src)))
                     .ForMember(dest => dest.NoteToSelfMessage, opt => opt.MapFrom(src => GetNoteToSelfMessage(src)))
                     .ForMember(dest => dest.Attachment, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Attachment : null))
-                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
+                    .AfterMap((src, dest) => dest.UpdateOverviewMessage());
 
                 cfg.CreateMap<Transaction, LedgerEntry>()
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))
@@ -64,7 +64,7 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
                     .ForMember(dest => dest.EncryptedMessage, opt => opt.MapFrom(src => GetEncryptedMessage(src)))
                     .ForMember(dest => dest.NoteToSelfMessage, opt => opt.MapFrom(src => GetNoteToSelfMessage(src)))
-                    .AfterMap((src, dest) => dest.OverviewMessage = GetOverviewMessage(dest));
+                    .AfterMap((src, dest) => dest.UpdateOverviewMessage());
             });
 
             return _configuration;
@@ -104,24 +104,6 @@ namespace NxtWallet.Core
                 return GetPlainMessage(accountLedgerEntry.Transaction);
             }
             return null;
-        }
-
-        private static string GetOverviewMessage(LedgerEntry ledgerEntry)
-        {
-            if (!string.IsNullOrEmpty(ledgerEntry.NoteToSelfMessage))
-            {
-                return ledgerEntry.NoteToSelfMessage;
-            }
-            if (!string.IsNullOrEmpty(ledgerEntry.EncryptedMessage))
-            {
-                return ledgerEntry.EncryptedMessage;
-            }
-            if (!string.IsNullOrEmpty(ledgerEntry.PlainMessage))
-            {
-                return ledgerEntry.PlainMessage;
-            }
-            var input = "[" + ledgerEntry.LedgerEntryType + "]";
-            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
         private static string GetEncryptedMessage(Transaction transaction)

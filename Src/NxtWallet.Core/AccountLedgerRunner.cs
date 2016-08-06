@@ -13,26 +13,13 @@ using System.Net.Http;
 
 namespace NxtWallet.Core
 {
-    public delegate void AccountLedgerHandler(IAccountLedgerRunner sender, LedgerEntry ledgerEntry);
-    public delegate void BalanceHandler(IAccountLedgerRunner sender, long nqtBalance);
-
     public interface IAccountLedgerRunner
     {
         Task Run(CancellationToken token);
-
-        event AccountLedgerHandler LedgerEntryAdded;
-        event AccountLedgerHandler LedgerEntryRemoved;
-        event AccountLedgerHandler LedgerEntryConfirmationUpdated;
-        event BalanceHandler BalanceUpdated;
     }
 
     public class AccountLedgerRunner : IAccountLedgerRunner
     {
-        public event AccountLedgerHandler LedgerEntryAdded;
-        public event AccountLedgerHandler LedgerEntryRemoved;
-        public event AccountLedgerHandler LedgerEntryConfirmationUpdated;
-        public event BalanceHandler BalanceUpdated;
-
         private readonly IWalletRepository _walletRepository;
         private readonly INxtServer _nxtServer;
         private readonly IAccountLedgerRepository _accountLedgerRepository;
@@ -108,10 +95,10 @@ namespace NxtWallet.Core
             await _accountLedgerRepository.UpdateLedgerEntriesAsync(updatedLedgerEntries);
             await _accountLedgerRepository.RemoveLedgerEntriesAsync(deletedLedgerEntries);
 
-            OnBalanceUpdated(nrsUnconfirmedBalance);
-            deletedLedgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
-            nrsConfirmedLedgerEntries.ForEach(e => OnLedgerEntryAdded(e));
-            updatedLedgerEntries.ForEach(e => OnLedgerEntryConfirmationUpdated(e));
+            Messenger.Default.Send(new BalanceUpdatedMessage(nrsUnconfirmedBalance));
+            deletedLedgerEntries.ForEach(e => Messenger.Default.Send(new LedgerEntryMessage(e, LedgerEntryMessageAction.Removed)));
+            nrsConfirmedLedgerEntries.ForEach(e => Messenger.Default.Send(new LedgerEntryMessage(e, LedgerEntryMessageAction.Added)));
+            updatedLedgerEntries.ForEach(e => Messenger.Default.Send(new LedgerEntryMessage(e, LedgerEntryMessageAction.ConfirmationUpdated)));
         }
 
         private async Task<Tuple<BlockchainStatus, Block<ulong>>> SyncToLastCommonBlock()
@@ -157,7 +144,7 @@ namespace NxtWallet.Core
             }
             await _walletRepository.UpdateLastLedgerEntryBlockIdAsync(lastLedgerEntryBlockId);
             await _accountLedgerRepository.RemoveLedgerEntriesOnBlockAsync(lastLedgerEntryBlockId);
-            ledgerEntries.ForEach(e => OnLedgerEntryRemoved(e));
+            ledgerEntries.ForEach(e => Messenger.Default.Send(new LedgerEntryMessage(e, LedgerEntryMessageAction.Removed)));
         }
 
         private static IEnumerable<LedgerEntry> GetConfirmedEntries(List<LedgerEntry> knownUnconfirmedEntries, List<LedgerEntry> newLedgerEntries)
@@ -181,26 +168,6 @@ namespace NxtWallet.Core
             List<LedgerEntry> nrsUnconfirmedLedgerEntries)
         {
             return knownUnconfirmedEntries.Where(known => nrsUnconfirmedLedgerEntries.All(nrs => nrs.TransactionId != known.TransactionId));
-        }
-
-        private void OnLedgerEntryAdded(LedgerEntry ledgerEntry)
-        {
-            LedgerEntryAdded?.Invoke(this, ledgerEntry);
-        }
-
-        private void OnLedgerEntryConfirmationUpdated(LedgerEntry ledgerEntry)
-        {
-            LedgerEntryConfirmationUpdated?.Invoke(this, ledgerEntry);
-        }
-
-        private void OnLedgerEntryRemoved(LedgerEntry ledgerEntry)
-        {
-            LedgerEntryRemoved?.Invoke(this, ledgerEntry);
-        }
-
-        private void OnBalanceUpdated(long nqtBalance)
-        {
-            BalanceUpdated?.Invoke(this, nqtBalance);
         }
     }
 }

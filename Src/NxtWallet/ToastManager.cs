@@ -3,6 +3,7 @@ using Windows.UI.Notifications;
 using NxtWallet.Core;
 using NxtWallet.Core.Repositories;
 using NxtWallet.Core.Models;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet
 {
@@ -24,11 +25,13 @@ namespace NxtWallet
 
         public void Register()
         {
-            _accountLedgerRunner.LedgerEntryAdded += (sender, ledgerEntry) =>
+            Messenger.Default.Register<LedgerEntryMessage>(this, (message) => 
             {
-                if (ledgerEntry.UserIsRecipient && _walletRepository.NotificationsEnabled)
-                    PopNewLedgerEntryToast(ledgerEntry);
-            };
+                if (message.Action == LedgerEntryMessageAction.Added && message.LedgerEntry.UserIsRecipient && _walletRepository.NotificationsEnabled)
+                {
+                    PopNewLedgerEntryToast(message.LedgerEntry);
+                }
+            });
         }
 
         private static void PopNewLedgerEntryToast(LedgerEntry ledgerEntry)

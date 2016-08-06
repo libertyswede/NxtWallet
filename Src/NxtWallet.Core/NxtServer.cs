@@ -257,6 +257,7 @@ namespace NxtWallet.Core
                 var sharedKey = messageService.GetSharedKey(recipienctPublicKey, encryptedMessage.Nonce, _walletRepository.SecretPhrase);
                 var unencrypted = messageService.DecryptText(encryptedMessage.Data, encryptedMessage.Nonce, encryptedMessage.IsCompressed, sharedKey);
                 ledgerEntry.EncryptedMessage = unencrypted;
+                ledgerEntry.UpdateOverviewMessage();
             }
         }
 
@@ -389,6 +390,7 @@ namespace NxtWallet.Core
                 ledgerEntry.TransactionId = broadcastReply.TransactionId;
                 ledgerEntry.NqtFee *= -1;
                 ledgerEntry.NqtAmount *= -1;
+                ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                 ledgerEntry.IsConfirmed = false;
                 return ledgerEntry;
             }

@@ -26,25 +26,25 @@ namespace NxtWallet.ViewModel
         public LedgerEntryListViewModel(IAccountLedgerRepository accountLedgerRepository, IAccountLedgerRunner accountLedgerRunner,
             IContactRepository contactRepository)
         {
-            accountLedgerRunner.LedgerEntryAdded += (sender, ledgerEntry) =>
-            {
-                DispatcherHelper.CheckBeginInvokeOnUI(() => InsertLedgerEntry(ledgerEntry));
-            };
-            accountLedgerRunner.LedgerEntryConfirmationUpdated += (sender, ledgerEntry) =>
+            MessengerInstance.Register<LedgerEntryMessage>(this, (message) => 
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    var existingLedgerEntry = LedgerEntries.Single(t => t.Equals(ledgerEntry));
-                    existingLedgerEntry.IsConfirmed = ledgerEntry.IsConfirmed;
+                    if (message.Action == LedgerEntryMessageAction.Added)
+                    {
+                        InsertLedgerEntry(message.LedgerEntry);
+                    }
+                    else if (message.Action == LedgerEntryMessageAction.ConfirmationUpdated)
+                    {
+                        var existingLedgerEntry = LedgerEntries.Single(t => t.Equals(message.LedgerEntry));
+                        existingLedgerEntry.IsConfirmed = message.LedgerEntry.IsConfirmed;
+                    }
+                    else if (message.Action == LedgerEntryMessageAction.Removed)
+                    {
+                        LedgerEntries.Remove(LedgerEntries.Single(t => t.Equals(message.LedgerEntry)));
+                    }
                 });
-            };
-            accountLedgerRunner.LedgerEntryRemoved += (sender, ledgerEntry) =>
-            {
-                DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                {
-                    LedgerEntries.Remove(LedgerEntries.Single(t => t.Equals(ledgerEntry)));
-                });
-            };
+            });
             MessengerInstance.Register<SecretPhraseResetMessage>(this, (message) => LedgerEntries.Clear());
 
             _accountLedgerRepository = accountLedgerRepository;

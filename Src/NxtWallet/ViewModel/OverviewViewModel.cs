@@ -36,7 +36,10 @@ namespace NxtWallet.ViewModel
             _walletRepository = walletRepository;
             InitUiProperties();
 
-            accountLedgerRunner.BalanceUpdated += (sender, balance) => DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = balance.NqtToNxt());
+            MessengerInstance.Register<BalanceUpdatedMessage>(this, (message) =>
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(() => NxtBalance = message.NqtBalance.NqtToNxt());
+            });
             MessengerInstance.Register<SecretPhraseResetMessage>(this, (message) => InitUiProperties());
         }
 

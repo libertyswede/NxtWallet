@@ -11,6 +11,7 @@ using System.Linq;
 using NxtLib.Accounts;
 using NxtLib.Local;
 using System.Collections.Generic;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace NxtWallet.ViewModel
 {
@@ -333,11 +334,13 @@ namespace NxtWallet.ViewModel
                     if ((IsMessageEncryptionEnabled && EncryptMessage.Value) && !string.IsNullOrEmpty(Message))
                     {
                         ledgerEntry.EncryptedMessage = Message;
+                        ledgerEntry.UpdateOverviewMessage();
                     }   
-                    ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
-                    //TODO: Send message with new ledger entry
+
+                    Messenger.Default.Send(new BalanceUpdatedMessage(ledgerEntry.NqtBalance));
+                    Messenger.Default.Send(new LedgerEntryMessage(ledgerEntry, LedgerEntryMessageAction.Added));
                 });
                 sendMoneyDialogViewModel.SetDone();
             }
