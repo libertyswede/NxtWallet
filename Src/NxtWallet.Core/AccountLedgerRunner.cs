@@ -89,9 +89,10 @@ namespace NxtWallet.Core
             var knownUnconfirmedEntries = await _accountLedgerRepository.GetUnconfirmedLedgerEntriesAsync();
             var nrsUnconfirmedLedgerEntries = await _nxtServer.GetUnconfirmedAccountLedgerEntriesAsync();
             var nrsConfirmedLedgerEntries = await _nxtServer.GetAccountLedgerEntriesAsync(lastKnownBlock.Timestamp);
+            var nrsLedgerEntries = nrsUnconfirmedLedgerEntries.Union(nrsConfirmedLedgerEntries).ToList();
             var nrsUnconfirmedBalance = await _nxtServer.GetUnconfirmedNqtBalanceAsync();
             var updatedLedgerEntries = GetConfirmedEntries(knownUnconfirmedEntries, nrsConfirmedLedgerEntries).ToList();
-            var deletedLedgerEntries = GetLostUnconfirmedEntries(knownUnconfirmedEntries, nrsUnconfirmedLedgerEntries).ToList();
+            var deletedLedgerEntries = GetLostUnconfirmedEntries(knownUnconfirmedEntries, nrsLedgerEntries).ToList();
 
             // If NRS.unconfirmedBalance != last ledger entry balance + sum(unconfirmed transaction amounts)
             //   Log error, throw exception!
