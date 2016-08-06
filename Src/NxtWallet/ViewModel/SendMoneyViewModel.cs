@@ -337,6 +337,7 @@ namespace NxtWallet.ViewModel
                     ledgerEntry.NqtBalance = _walletRepository.NqtBalance + ledgerEntry.NqtAmount + ledgerEntry.NqtFee;
                     await _accountLedgerRepository.AddLedgerEntryAsync(ledgerEntry);
                     await _walletRepository.UpdateBalanceAsync(ledgerEntry.NqtBalance);
+                    //TODO: Send message with new ledger entry
                 });
                 sendMoneyDialogViewModel.SetDone();
             }
