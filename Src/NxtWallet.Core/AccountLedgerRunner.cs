@@ -173,7 +173,7 @@ namespace NxtWallet.Core
                 confirmedEntry.Id = unconfirmedEntry.Id;
                 newLedgerEntries.Remove(confirmedEntry);
                 yield return confirmedEntry;
-                knownUnconfirmedEntries.RemoveAt(i);
+                knownUnconfirmedEntries.RemoveAt(i--);
             }
         }
 
