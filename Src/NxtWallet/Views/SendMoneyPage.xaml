@@ -54,7 +54,7 @@
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="10">
                 <TextBlock Text="Recipient:" />
                 <StackPanel Orientation="Horizontal">
-                    <AutoSuggestBox x:Name="RecipientBox" Width="350" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
+                    <AutoSuggestBox x:Name="RecipientBox" Width="450" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
                                 TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" 
                                 SuggestionChosen="RecipientBox_SuggestionChosen" LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
                                 Text="{x:Bind Path=ViewModel.RecipientAddress, Mode=TwoWay}"/>
@@ -68,7 +68,7 @@
                 </StackPanel>
 
                 <TextBlock Text="Message:"  Margin="0,5,0,0" />
-                <TextBox Width="350" Height="80" MaxLength="10000" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left"
+                <TextBox Width="450" Height="80" MaxLength="10000" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left"
                          Text="{x:Bind ViewModel.Message, Mode=TwoWay}" />
 
                 <CheckBox x:Name="EncryptMessageCheckBox" Content="Encrypt Message"
@@ -76,7 +76,7 @@
                       IsEnabled="{x:Bind Path=ViewModel.IsMessageEncryptionEnabled, Mode=OneWay}" />
 
                 <TextBlock Text="Note to self:" Margin="0,5,0,0" />
-                <TextBox Width="350" Height="80" MaxLength="160" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left"
+                <TextBox Width="450" Height="80" MaxLength="160" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left"
                      Text="{x:Bind ViewModel.NoteToSelfMessage, Mode=TwoWay}" />
 
                 <TextBlock Text="Fee:" Margin="0,5,0,0" />
@@ -85,7 +85,7 @@
                 <Button Content="Send" Margin="0,20,0,0" Command="{x:Bind ViewModel.SendMoneyCommand}" />
 
                 <StackPanel HorizontalAlignment="Left" Margin="0,10,0,0" Background="#FF8FD3F1" Padding="10"
-                        Width="300"  Visibility="{x:Bind ViewModel.Info, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}">
+                        Width="450"  Visibility="{x:Bind ViewModel.Info, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}">
                     <TextBlock Text="{x:Bind ViewModel.Info, Mode=OneWay}" TextWrapping="WrapWholeWords" />
                 </StackPanel>
             </StackPanel>
