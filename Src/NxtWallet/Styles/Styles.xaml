@@ -94,25 +94,12 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PageTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="TextWrapping" Value="NoWrap"/>
-        <Setter Property="CharacterSpacing" Value="75"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="Margin" Value="12, 14, 12, 4"/>
-    </Style>
-
     <Style x:Key="NavMenuItemContainerStyle" TargetType="ListViewItem">
         <Setter Property="MinWidth" Value="{StaticResource SplitViewCompactPaneThemeLength}"/>
         <Setter Property="Height" Value="48"/>
         <Setter Property="Padding" Value="0"/>
     </Style>
-
-    <LinearGradientBrush x:Key="NxtGradientBackground" EndPoint="0.7,1" StartPoint="0.5,0">
-        <GradientStop Color="#FF0078A3" Offset="0"/>
-        <GradientStop Color="#FF002E43" Offset="1"/>
-    </LinearGradientBrush>
+    
     <x:Double x:Key="VisualStateMin720">720</x:Double>
     <x:Double x:Key="VisualStateMin540">540</x:Double>
     <x:Double x:Key="VisualStateMin0">0</x:Double>
