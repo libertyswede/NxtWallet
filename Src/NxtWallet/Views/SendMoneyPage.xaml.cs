@@ -33,17 +33,16 @@ namespace NxtWallet.Views
         
         private async void RecipientBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if (args.ChosenSuggestion == null)
+            var chosenContact = args.ChosenSuggestion as Contact;
+            if (chosenContact != null)
+            {
+                sender.Text = chosenContact.NxtAddressRs;
+            }
+            else
             {
                 var matchingContacts = await ViewModel.GetMatchingRecipients(args.QueryText);
                 sender.ItemsSource = matchingContacts.ToList();
             }
-        }
-        
-        private void RecipientBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            var contact = args.SelectedItem as Contact;
-            sender.Text = contact.NxtAddressRs;
         }
 
         private void RecipientBox_LostFocus(object sender, RoutedEventArgs e)

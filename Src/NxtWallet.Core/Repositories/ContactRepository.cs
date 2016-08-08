@@ -18,7 +18,7 @@ namespace NxtWallet.Core.Repositories
         Task DeleteContactAsync(Contact contact);
         Task<List<Contact>> GetContactsAsync(IEnumerable<string> nxtRsAddresses);
         Task<Contact> GetContactAsync(string rsAddress);
-        Task<List<Contact>> SearchContactsWithNameContainingText(string text);
+        Task<List<Contact>> SearchContactsContainingNameOrAddressText(string text);
     }
 
     public class ContactRepository : IContactRepository
@@ -78,12 +78,14 @@ namespace NxtWallet.Core.Repositories
             }
         }
 
-        public async Task<List<Contact>> SearchContactsWithNameContainingText(string text)
+        public async Task<List<Contact>> SearchContactsContainingNameOrAddressText(string text)
         {
             using (var context = new WalletContext())
             {
-                var contacts = await context.Contacts.Where(c => c.Name.Contains(text)).ToListAsync();
-                return _mapper.Map<List<Contact>>(contacts);
+                var contacts = await context.Contacts.Where(c => c.Name.Contains(text) || c.NxtAddressRs.Contains(text))
+                    .Distinct()
+                    .ToListAsync();
+                return _mapper.Map<List<Contact>>(contacts).OrderBy(c => c.Name).ToList();
             }
         }
 

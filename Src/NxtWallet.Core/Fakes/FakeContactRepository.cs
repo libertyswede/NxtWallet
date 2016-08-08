@@ -61,9 +61,12 @@ namespace NxtWallet.Core.Fakes
             return Task.FromResult(contact);
         }
 
-        public Task<List<Contact>> SearchContactsWithNameContainingText(string text)
+        public Task<List<Contact>> SearchContactsContainingNameOrAddressText(string text)
         {
-            return Task.FromResult(GetDesignTimeData().Where(c => c.Name.Contains(text)).ToList());
+            return Task.FromResult(GetDesignTimeData()
+                .Where(c => c.Name.Contains(text) || c.NxtAddressRs.Contains(text))
+                .OrderBy(c => c.Name)
+                .ToList());
         }
 
         private List<Contact> GetDesignTimeData()

@@ -185,7 +185,7 @@ namespace NxtWallet.ViewModel
 
         internal async Task<IEnumerable<Contact>> GetMatchingRecipients(string text)
         {
-            return await _contactRepository.SearchContactsWithNameContainingText(text);
+            return await _contactRepository.SearchContactsContainingNameOrAddressText(text);
         }
 
         internal void DisableValidation()

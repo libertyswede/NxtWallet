@@ -56,7 +56,7 @@
                 <StackPanel Orientation="Horizontal">
                     <AutoSuggestBox x:Name="RecipientBox" Width="450" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
                                 TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" 
-                                SuggestionChosen="RecipientBox_SuggestionChosen" LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
+                                LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
                                 Text="{x:Bind Path=ViewModel.RecipientAddress, Mode=TwoWay}"/>
                     <TextBlock x:Name="RecipientValidation" Foreground="Red" Visibility="Collapsed" Text="{Binding Path=Errors[RecipientAddress][0]}" />
                 </StackPanel>
