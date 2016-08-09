@@ -250,14 +250,21 @@ namespace NxtWallet.Core
         {
             foreach (var ledgerEntry in ledgerEntries.Where(e => e?.Transaction?.EncryptedMessage != null && e.UserIsSender))
             {
-                var messageService = new LocalMessageService();
-                var encryptedMessage = ledgerEntry.Transaction.EncryptedMessage;
-                var recipienctPublicKey = await GetAccountPublicKeyAsync(ledgerEntry.AccountTo);
+                try
+                {
+                    var messageService = new LocalMessageService();
+                    var encryptedMessage = ledgerEntry.Transaction.EncryptedMessage;
+                    var recipienctPublicKey = await GetAccountPublicKeyAsync(ledgerEntry.AccountTo);
 
-                var sharedKey = messageService.GetSharedKey(recipienctPublicKey, encryptedMessage.Nonce, _walletRepository.SecretPhrase);
-                var unencrypted = messageService.DecryptText(encryptedMessage.Data, encryptedMessage.Nonce, encryptedMessage.IsCompressed, sharedKey);
-                ledgerEntry.EncryptedMessage = unencrypted;
-                ledgerEntry.UpdateOverviewMessage();
+                    var sharedKey = messageService.GetSharedKey(recipienctPublicKey, encryptedMessage.Nonce, _walletRepository.SecretPhrase);
+                    var unencrypted = messageService.DecryptText(encryptedMessage.Data, encryptedMessage.Nonce, encryptedMessage.IsCompressed, sharedKey);
+                    ledgerEntry.EncryptedMessage = unencrypted;
+                    ledgerEntry.UpdateOverviewMessage();
+                }
+                catch (Exception e)
+                {
+                    ledgerEntry.EncryptedMessage = "Unable to decrypt message";
+                }
             }
         }
 
