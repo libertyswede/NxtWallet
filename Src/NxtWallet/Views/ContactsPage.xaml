@@ -52,36 +52,32 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="model:Contact">
                         <StackPanel Margin="0,5">
-                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="24" />
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="21.333" />
                             <TextBlock Text="{x:Bind NxtAddressRs, Mode=OneWay}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                <Button Content="Add" Command="{x:Bind ViewModel.AddCommand}" Margin="10" />
-                <Button Content="Delete" Command="{x:Bind ViewModel.DeleteCommand}" Margin="10" />
-                <Button Content="Send NXT" Command="{x:Bind ViewModel.SendMoneyCommand}" Margin="10" />
+                <CommandBar>
+                    <AppBarButton Label="Add" Icon="Add" Command="{x:Bind ViewModel.AddCommand}" />
+                    <AppBarButton Label="Delete" Icon="Delete" Command="{x:Bind ViewModel.DeleteCommand}" />
+                    <AppBarButton Label="Send NXT" Command="{x:Bind ViewModel.SendMoneyCommand}">
+                        <BitmapIcon UriSource="ms-appx:///Assets/Menu/send-money-48x48.png" />
+                    </AppBarButton>
+                </CommandBar>
             </StackPanel>
         </Grid>
-        <Grid Grid.Column="1" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Contact Details" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" />
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="10" Text="Name:" HorizontalAlignment="Right"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.Name, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
-            <TextBlock Grid.Row="2" Grid.Column="0" Margin="10" Text="Nxt Address:" HorizontalAlignment="Right"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.SelectedContact.NxtAddressRs, Mode=TwoWay}" IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
-            <Button Grid.Row="3" Grid.Column="1" Content="Save" Height="30" Margin="10" Width="128" Command="{x:Bind ViewModel.SaveSelectedContact}"/>
-        </Grid>
+        <StackPanel Grid.Column="1" Margin="10">
+            <TextBlock Text="Contact Details" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" />
+            <TextBlock Text="Name:" />
+            <TextBox Text="{x:Bind ViewModel.SelectedContact.Name, Mode=TwoWay}" 
+                     IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
+            <TextBlock Text="Nxt Address:" Margin="0,5,0,0" />
+            <TextBox Text="{x:Bind ViewModel.SelectedContact.NxtAddressRs, Mode=TwoWay}" 
+                     IsEnabled="{x:Bind ViewModel.SelectedContact, Mode=OneWay, Converter={StaticResource IsEnabledConverter}}"/>
+            <Button Content="Save" Height="30" Width="128" Margin="0,10,0,0"
+                    Command="{x:Bind ViewModel.SaveSelectedContact}" />
+        </StackPanel>
     </Grid>
 </Page>
