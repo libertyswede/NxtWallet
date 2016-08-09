@@ -55,16 +55,30 @@
                 <TextBlock Text="Recipient:" />
                 <StackPanel Orientation="Horizontal">
                     <AutoSuggestBox x:Name="RecipientBox" Width="450" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
-                                TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" SuggestionChosen="RecipientBox_SuggestionChosen"
+                                TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted"
                                 LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
                                 Text="{x:Bind Path=ViewModel.Recipient, Mode=TwoWay}"/>
-                    <TextBlock x:Name="RecipientValidation" Foreground="Red" Visibility="Collapsed" Text="{Binding Path=Errors[Recipient][0]}" />
+                    <Ellipse Fill="Red" Stroke="Red" Height="10" Width="10" Margin="5,0,0,0" 
+                             Visibility="{Binding Errors[Recipient][0], Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}, FallbackValue=Collapsed}" >
+                        <ToolTipService.ToolTip>
+                            <ToolTip Placement="Mouse">
+                                <TextBlock Text="{Binding Path=Errors[Recipient][0]}" />
+                            </ToolTip>
+                        </ToolTipService.ToolTip>
+                    </Ellipse>
                 </StackPanel>
 
                 <TextBlock Text="Amount:" Margin="0,5,0,0" />
                 <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
-                    <TextBox Width="200" MaxLength="20" PlaceholderText="Amount in NXT" Text="{x:Bind ViewModel.Amount, Mode=TwoWay}"/>
-                    <TextBlock Text="{Binding Path=Errors[Amount][0]}" Foreground="Red" />
+                    <TextBox x:Name="AmountTextBox" Width="200" MaxLength="20" PlaceholderText="Amount in NXT" LostFocus="AmountTextBox_LostFocus" Text="{x:Bind ViewModel.Amount, Mode=TwoWay}"/>
+                    <Ellipse Fill="Red" Stroke="Red" Height="10" Width="10" Margin="5,0,0,0" 
+                             Visibility="{Binding Errors[Amount][0], Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}, FallbackValue=Collapsed}" >
+                        <ToolTipService.ToolTip>
+                            <ToolTip Placement="Mouse">
+                                <TextBlock Text="{Binding Path=Errors[Amount][0]}" />
+                            </ToolTip>
+                        </ToolTipService.ToolTip>
+                    </Ellipse>
                 </StackPanel>
 
                 <TextBlock Text="Message:"  Margin="0,5,0,0" />

@@ -167,6 +167,7 @@ namespace NxtWallet.ViewModel
 
         public void OnNavigatedTo(Contact contact)
         {
+            Errors.Errors.Clear();
             if (contact != null)
             {
                 Recipient = contact.ToString();
