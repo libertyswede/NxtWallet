@@ -84,9 +84,8 @@ namespace NxtWallet.ViewModel
             if (SelectedContact == null)
                 return;
 
-            Contacts.Remove(SelectedContact);
             await _contactRepository.DeleteContactAsync(SelectedContact);
-            SelectedContact = null;
+            Contacts.Remove(SelectedContact);
         }
     }
 }
