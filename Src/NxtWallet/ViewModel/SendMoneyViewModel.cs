@@ -23,7 +23,7 @@ namespace NxtWallet.ViewModel
         private readonly IContactRepository _contactRepository;
         private readonly INavigationService _navigationService;
 
-        private string _recipientAddress;
+        private string _recipient;
         private string _amount;
         private string _message;
         private string _noteToSelfMessage;
@@ -35,14 +35,14 @@ namespace NxtWallet.ViewModel
 
         [Required(ErrorMessage = "Recipient address is required")]
         [NxtRsAddress(ErrorMessage = "Incorrect recipient address")]
-        public string RecipientAddress
+        public string Recipient
         {
-            get { return _recipientAddress; }
+            get { return _recipient; }
             set
             {
-                if (!string.Equals(_recipientAddress, value))
+                if (!string.Equals(_recipient, value))
                 {
-                    SetProperty(ref _recipientAddress, value);
+                    SetProperty(ref _recipient, value);
                 }
             }
         }
@@ -157,7 +157,7 @@ namespace NxtWallet.ViewModel
             DisableValidation();
             IsMessageEncryptionEnabled = false;
             EncryptMessage = true;
-            RecipientAddress = string.Empty;
+            Recipient = string.Empty;
             Amount = string.Empty;
             Message = string.Empty;
             NoteToSelfMessage = string.Empty;
@@ -169,7 +169,7 @@ namespace NxtWallet.ViewModel
         {
             if (contact != null)
             {
-                RecipientAddress = contact.NxtAddressRs;
+                Recipient = contact.ToString();
             }
         }
 
@@ -180,7 +180,7 @@ namespace NxtWallet.ViewModel
 
         private bool FormHasValues()
         {
-            return !string.IsNullOrEmpty(RecipientAddress) && !string.IsNullOrEmpty(Amount);
+            return !string.IsNullOrEmpty(Recipient) && !string.IsNullOrEmpty(Amount);
         }
 
         internal async Task<IEnumerable<Contact>> GetMatchingRecipients(string text)
@@ -200,7 +200,7 @@ namespace NxtWallet.ViewModel
 
         internal async void UpdateRecipientInfo()
         {
-            if (string.IsNullOrEmpty(RecipientAddress) || Errors[nameof(RecipientAddress)].Any())
+            if (string.IsNullOrEmpty(Recipient) || Errors[nameof(Recipient)].Any())
             {
                 Info = string.Empty;
                 return;
@@ -208,18 +208,19 @@ namespace NxtWallet.ViewModel
 
             AccountReply account = null;
             Contact contact = null;
+            var recipientAddress = Contact.GetAddressOrInput(Recipient);
             await Task.Run(async () =>
             {
                 try
                 {
                     _recipientPublicKey = null;
-                    account = await _nxtServer.GetAccountAsync(RecipientAddress);
+                    account = await _nxtServer.GetAccountAsync(recipientAddress);
                 }
                 catch (Exception)
                 {
                     // Ignore
                 }
-                contact = await _contactRepository.GetContactAsync(RecipientAddress);
+                contact = await _contactRepository.GetContactAsync(recipientAddress);
             });
             if (!_nxtServer.IsOnline)
             {
@@ -328,7 +329,7 @@ namespace NxtWallet.ViewModel
                 await Task.Run(async () =>
                 {
                     var amount = NxtLib.Amount.CreateAmountFromNxt(decimal.Parse(Amount));
-                    var ledgerEntry = await _nxtServer.SendMoneyAsync(RecipientAddress, amount, GetPlainMessage(), 
+                    var ledgerEntry = await _nxtServer.SendMoneyAsync(Contact.GetAddressOrInput(Recipient), amount, GetPlainMessage(), 
                         GetEncryptedMessage(), GetEncryptedNoteToSelfMessage());
 
                     if ((IsMessageEncryptionEnabled && EncryptMessage.Value) && !string.IsNullOrEmpty(Message))

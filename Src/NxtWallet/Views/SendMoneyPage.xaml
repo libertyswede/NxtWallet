@@ -55,10 +55,10 @@
                 <TextBlock Text="Recipient:" />
                 <StackPanel Orientation="Horizontal">
                     <AutoSuggestBox x:Name="RecipientBox" Width="450" HorizontalAlignment="Left" PlaceholderText="Enter recipient address" QueryIcon="Contact"
-                                TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" 
+                                TextChanged="RecipientBox_TextChanged" QuerySubmitted="RecipientBox_QuerySubmitted" SuggestionChosen="RecipientBox_SuggestionChosen"
                                 LostFocus="RecipientBox_LostFocus" GotFocus="RecipientBox_GotFocus"
-                                Text="{x:Bind Path=ViewModel.RecipientAddress, Mode=TwoWay}"/>
-                    <TextBlock x:Name="RecipientValidation" Foreground="Red" Visibility="Collapsed" Text="{Binding Path=Errors[RecipientAddress][0]}" />
+                                Text="{x:Bind Path=ViewModel.Recipient, Mode=TwoWay}"/>
+                    <TextBlock x:Name="RecipientValidation" Foreground="Red" Visibility="Collapsed" Text="{Binding Path=Errors[Recipient][0]}" />
                 </StackPanel>
 
                 <TextBlock Text="Amount:" Margin="0,5,0,0" />

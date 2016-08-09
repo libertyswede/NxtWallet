@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
+using System.Text.RegularExpressions;
 
 namespace NxtWallet.Core.Models
 {
@@ -27,9 +28,15 @@ namespace NxtWallet.Core.Models
             return Name.CompareTo(other?.Name);
         }
 
+        public static string GetAddressOrInput(string input)
+        {
+            var match = Regex.Match(input, "\\((.*)\\)$");
+            return match.Success ? match.Groups[1].Value : input;
+        }
+
         public override string ToString()
         {
-            return Name + " " + NxtAddressRs;
+            return $"{Name} ({NxtAddressRs})";
         }
     }
 }

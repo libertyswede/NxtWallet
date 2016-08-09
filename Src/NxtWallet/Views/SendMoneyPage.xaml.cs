@@ -30,15 +30,11 @@ namespace NxtWallet.Views
                 sender.ItemsSource = matchingContacts.ToList();
             }
         }
-        
+
         private async void RecipientBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             var chosenContact = args.ChosenSuggestion as Contact;
-            if (chosenContact != null)
-            {
-                sender.Text = chosenContact.NxtAddressRs;
-            }
-            else
+            if (chosenContact == null)
             {
                 var matchingContacts = await ViewModel.GetMatchingRecipients(args.QueryText);
                 sender.ItemsSource = matchingContacts.ToList();
@@ -49,7 +45,7 @@ namespace NxtWallet.Views
         {
             RecipientValidation.Visibility = Visibility.Visible;
             ViewModel.EnableValidation();
-            ViewModel.ValidateProperty(nameof(ViewModel.RecipientAddress));
+            ViewModel.ValidateProperty(nameof(ViewModel.Recipient));
             ViewModel.UpdateRecipientInfo();
         }
 
