@@ -2,6 +2,7 @@
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using NxtWallet.ViewModel;
+using NxtWallet.Core.Models;
 
 namespace NxtWallet.Views
 {
@@ -25,7 +26,8 @@ namespace NxtWallet.Views
         {
             if (selectionChangedEventArgs.AddedItems.Any())
             {
-                Frame.Navigate(typeof(LedgerEntryDetailPage), selectionChangedEventArgs.AddedItems.Single());
+                var selectedLedgerEntry = selectionChangedEventArgs.AddedItems.Single() as LedgerEntry;
+                ViewModel.SelectedLedgerEntry = selectedLedgerEntry;
             }
         }
     }

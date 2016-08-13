@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using NxtWallet.Core;
+using NxtWallet.Core.Models;
 using NxtWallet.Core.Repositories;
 
 namespace NxtWallet.ViewModel
@@ -12,6 +13,8 @@ namespace NxtWallet.ViewModel
         private decimal _nxtBalance;
         private string _nxtAddress;
         private bool _showAddress;
+        private LedgerEntry _selectedLedgerEntry;
+        private string _selectedLedgerEntryLink;
 
         public string NxtAddress
         {
@@ -31,6 +34,27 @@ namespace NxtWallet.ViewModel
             set { Set(ref _showAddress, value); }
         }
 
+        public LedgerEntry SelectedLedgerEntry
+        {
+            get { return _selectedLedgerEntry; }
+            set
+            {
+                Set(ref _selectedLedgerEntry, value);
+                UpdateTransactionLink();
+            }
+        }
+
+        public string SelectedLedgerEntryLink
+        {
+            get { return _selectedLedgerEntryLink; }
+            set { Set(ref _selectedLedgerEntryLink, value); }
+        }
+
+        private void UpdateTransactionLink()
+        {
+            SelectedLedgerEntryLink = $"https://nxtportal.org/transactions/{SelectedLedgerEntry?.TransactionId}";
+        }
+
         public OverviewViewModel(IWalletRepository walletRepository, IAccountLedgerRunner accountLedgerRunner)
         {
             _walletRepository = walletRepository;
@@ -47,6 +71,7 @@ namespace NxtWallet.ViewModel
         {
             NxtBalance = 0M;
             NxtAddress = _walletRepository.NxtAccount.AccountRs;
+            UpdateTransactionLink();
         }
 
         public void LoadFromRepository()
