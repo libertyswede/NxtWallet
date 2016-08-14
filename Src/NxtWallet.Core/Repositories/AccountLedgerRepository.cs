@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using System;
 using NxtWallet.Repositories.Model;
 using System.Linq;
-using Microsoft.Data.Entity;
 using AutoMapper;
 using NxtWallet.Core.Migrations.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace NxtWallet.Core.Repositories
 {

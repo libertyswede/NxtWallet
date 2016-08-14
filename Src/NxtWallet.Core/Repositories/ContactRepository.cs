@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.Data.Entity;
 using NxtWallet.Core.Models;
 using NxtWallet.Core.Migrations.Model;
 using NxtWallet.Repositories.Model;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace NxtWallet.Core.Repositories
 {

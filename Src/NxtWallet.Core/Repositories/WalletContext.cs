@@ -1,6 +1,5 @@
-﻿using System;
-using Microsoft.Data.Entity;
-using NxtWallet.Core.Migrations.Model;
+﻿using NxtWallet.Core.Migrations.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace NxtWallet.Repositories.Model
 {

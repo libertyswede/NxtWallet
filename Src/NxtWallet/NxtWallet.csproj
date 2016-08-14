@@ -96,6 +96,9 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="NxtWallet_TemporaryKey.pfx" />
     <None Include="project.json" />
   </ItemGroup>

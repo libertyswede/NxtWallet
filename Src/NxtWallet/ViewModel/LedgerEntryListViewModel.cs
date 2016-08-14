@@ -98,7 +98,8 @@ namespace NxtWallet.ViewModel
 
         private LedgerEntry GetPreviousLedgerEntry(LedgerEntry ledgerEntry)
         {
-            return LedgerEntries.FirstOrDefault(t => t.TransactionTimestamp.CompareTo(ledgerEntry.TransactionTimestamp) < 0);
+            return LedgerEntries.FirstOrDefault(t => t.TransactionTimestamp.CompareTo(ledgerEntry.TransactionTimestamp) < 0 &&
+                                                     t.BlockTimestamp.CompareTo(ledgerEntry.BlockTimestamp) < 0);
         }
 
         private int? GetPreviousLedgerEntryIndex(LedgerEntry ledgerEntry)

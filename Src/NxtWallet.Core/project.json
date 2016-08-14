@@ -1,8 +1,8 @@
 ﻿{
   "dependencies": {
     "AutoMapper": "5.1.1",
-    "EntityFramework.Commands": "7.0.0-rc1-final",
-    "EntityFramework.Sqlite": "7.0.0-rc1-final",
+    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0",
+    "Microsoft.EntityFrameworkCore.Tools": "1.0.0-preview2-final",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
     "MvvmLight": "5.3.0",
     "NxtLib": "1.1.20",

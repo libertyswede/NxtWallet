@@ -104,6 +104,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -116,8 +119,13 @@
     <Compile Include="Fakes\FakeWalletRepository.cs" />
     <Compile Include="LedgerEntryMessage.cs" />
     <Compile Include="MapperConfig.cs" />
+    <Compile Include="Migrations\20160814211709_Initial.cs" />
+    <Compile Include="Migrations\20160814211709_Initial.designer.cs">
+      <DependentUpon>20160814211709_Initial.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Model\LedgerEntryDto.cs" />
     <Compile Include="Migrations\Model\ContactDto.cs" />
+    <Compile Include="Migrations\WalletContextModelSnapshot.cs" />
     <Compile Include="Models\LedgerEntryType.cs" />
     <Compile Include="Repositories\AccountLedgerRepository.cs" />
     <Compile Include="Repositories\ContactRepository.cs" />

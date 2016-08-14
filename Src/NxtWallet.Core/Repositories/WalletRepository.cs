@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Entity;
 using NxtLib;
 using NxtLib.Accounts;
 using NxtLib.Local;
 using NxtWallet.Core.Migrations.Model;
 using NxtWallet.Repositories.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace NxtWallet.Core.Repositories
 {
