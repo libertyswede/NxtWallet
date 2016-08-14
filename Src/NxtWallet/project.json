@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "AutoMapper": "5.0.2",
+    "AutoMapper": "5.1.1",
     "EntityFramework.Commands": "7.0.0-rc1-final",
     "EntityFramework.Sqlite": "7.0.0-rc1-final",
     "MetroLog": "1.0.1",
@@ -10,7 +10,7 @@
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
     "MvvmLight": "5.3.0",
     "NxtLib": "1.1.20",
-    "Prism.Windows": "6.0.1",
+    "Prism.Windows": "6.0.2",
     "ZXing.Net": "0.14.0.1"
   },
   "frameworks": {

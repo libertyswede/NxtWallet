@@ -1,8 +1,9 @@
 ﻿{
   "dependencies": {
-    "AutoMapper": "5.0.2",
+    "AutoMapper": "5.1.1",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
-    "NxtLib": "1.1.20"
+    "NxtLib": "1.1.20",
+    "Prism.Windows": "6.0.2"
   },
   "frameworks": {
     "uap10.0": {}
