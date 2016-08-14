@@ -40,7 +40,8 @@ namespace NxtWallet.Core.Repositories
             {
                 var ledgerEntryDtos = await context.LedgerEntries
                     .Where(e => e.IsConfirmed == false)
-                    .OrderByDescending(entry => entry.Timestamp)
+                    .OrderByDescending(entry => entry.BlockTimestamp)
+                    .ThenByDescending(entry => entry.TransactionTimestamp)
                     .ToListAsync();
 
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);
@@ -54,7 +55,8 @@ namespace NxtWallet.Core.Repositories
             using (var context = new WalletContext())
             {
                 var ledgerEntryDtos = await context.LedgerEntries
-                    .OrderByDescending(entry => entry.Timestamp)
+                    .OrderByDescending(entry => entry.BlockTimestamp)
+                    .ThenByDescending(entry => entry.TransactionTimestamp)
                     .ToListAsync();
 
                 var ledgerEntries = _mapper.Map<List<LedgerEntry>>(ledgerEntryDtos);

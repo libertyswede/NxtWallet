@@ -44,7 +44,8 @@ namespace NxtWallet.Core
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.SenderRs : string.Empty))
                     .ForMember(dest => dest.AccountTo, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.RecipientRs : string.Empty))
                     .ForMember(dest => dest.IsConfirmed, opt => opt.UseValue(true))
-                    .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Timestamp : src.Timestamp))
+                    .ForMember(dest => dest.TransactionTimestamp, opt => opt.MapFrom(src => src.Transaction != null ? src.Transaction.Timestamp : src.Timestamp))
+                    .ForMember(dest => dest.BlockTimestamp, opt => opt.MapFrom(src => src.Timestamp))
                     .ForMember(dest => dest.LedgerEntryType, opt => opt.MapFrom(src => GetLedgerEntryType(src)))
                     .ForMember(dest => dest.PlainMessage, opt => opt.MapFrom(src => GetPlainMessage(src)))
                     .ForMember(dest => dest.EncryptedMessage, opt => opt.MapFrom(src => GetEncryptedMessage(src)))
@@ -54,7 +55,7 @@ namespace NxtWallet.Core
 
                 cfg.CreateMap<Transaction, LedgerEntry>()
                     .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))
-                    .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(src => src.Timestamp))
+                    .ForMember(dest => dest.TransactionTimestamp, opt => opt.MapFrom(src => src.Timestamp))
                     .ForMember(dest => dest.NqtAmount, opt => opt.MapFrom(src => src.Amount.Nqt))
                     .ForMember(dest => dest.NqtFee, opt => opt.MapFrom(src => src.Fee.Nqt))
                     .ForMember(dest => dest.AccountFrom, opt => opt.MapFrom(src => src.SenderRs))

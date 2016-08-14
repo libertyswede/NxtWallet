@@ -12,7 +12,8 @@ namespace NxtWallet.Core.Migrations.Model
         public long? TransactionId { get; set; }
         public int? Height { get; set; }
         public long? BlockId { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTime BlockTimestamp { get; set; }
+        public DateTime TransactionTimestamp { get; set; }
         public long NqtBalance { get; set; }
         public long NqtAmount { get; set; }
         public long NqtFee { get; set; }

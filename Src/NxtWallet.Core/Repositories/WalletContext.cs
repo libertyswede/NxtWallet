@@ -42,7 +42,7 @@ namespace NxtWallet.Repositories.Model
         private void OnLedgerEntryCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LedgerEntryDto>()
-                .Property(t => t.Timestamp)
+                .Property(t => t.TransactionTimestamp)
                 .IsRequired();
 
             modelBuilder.Entity<LedgerEntryDto>()

@@ -87,9 +87,9 @@
                                    Visibility="{Binding ElementName=MessageHeader, Path=Visibility}"/>
                         <StackPanel Grid.Column="1" Orientation="Vertical">
                             <TextBlock Text="{x:Bind OverviewMessage, Converter={StaticResource StringNewlineConverter}}" TextWrapping="NoWrap" FontSize="13.333" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
-                            <TextBlock Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
+                            <TextBlock Text="{x:Bind TransactionTimestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" FontSize="10" Visibility="{Binding ElementName=AltMessageHeader, Path=Visibility}" />
                         </StackPanel>
-                        <TextBlock Grid.Column="2" Text="{x:Bind Timestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" 
+                        <TextBlock Grid.Column="2" Text="{x:Bind TransactionTimestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd'}" TextWrapping="NoWrap" 
                                    FontSize="{Binding ElementName=DateHeader, Path=FontSize}" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=DateHeader, Path=Visibility}" />
                         <TextBlock Grid.Column="3" Text="{x:Bind NxtAmount, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00}'}" TextWrapping="NoWrap" FontSize="{Binding ElementName=AmountHeader, Path=FontSize}" 
                                    VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding ElementName=AmountHeader, Path=Visibility}" />

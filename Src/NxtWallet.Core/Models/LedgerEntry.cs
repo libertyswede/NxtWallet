@@ -19,7 +19,8 @@ namespace NxtWallet.Core.Models
         public ulong? TransactionId { get; set; }
         public int? Height { get; set; }
         public ulong? BlockId { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTime BlockTimestamp { get; set; }
+        public DateTime TransactionTimestamp { get; set; }
         public long NqtAmount { get; set; }
         public decimal NxtAmount => (NqtAmount / 100000000M);
         public long NqtFee { get; set; }
@@ -121,11 +122,6 @@ namespace NxtWallet.Core.Models
         public long GetFee()
         {
             return NqtFee;
-        }
-
-        public long GetOrder()
-        {
-            return Timestamp.Ticks;
         }
 
         public void SetBalance(long balance)
