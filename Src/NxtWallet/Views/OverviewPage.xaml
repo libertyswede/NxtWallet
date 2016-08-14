@@ -9,6 +9,7 @@
     mc:Ignorable="d"
     DataContext="{Binding Path=OverviewViewModel, Source={StaticResource Ioc}}">
     <Page.Resources>
+        <nxtWallet:HasTextToVisiblityConverter x:Key="HasTextToVisiblityConverter"/>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisibilityConverter" />
         <nxtWallet:StringFormatConverter x:Key="StringFormatConverter" />
         <nxtWallet:NullToVisiblityConverter x:Key="NullToVisiblityConverter" />
@@ -23,7 +24,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="TextBlock.(TextBlock.FontSize)" Value="18.667"/>
-                        <Setter Target="InnerGrid.(FrameworkElement.Margin)">
+                        <Setter Target="MasterColumn.(FrameworkElement.Margin)">
                             <Setter.Value>
                                 <Thickness>15,50,15,0</Thickness>
                             </Setter.Value>
@@ -51,7 +52,7 @@
             <ColumnDefinition x:Name="MasterColumn" Width="*"/>
             <ColumnDefinition x:Name="DetailsColumn" Width="0" />
         </Grid.ColumnDefinitions>
-        <Grid x:Name="InnerGrid" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="15,10,15,10" >
+        <Grid x:Name="MasterPanel" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="15,10,15,10" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -76,82 +77,76 @@
             <TextBlock Grid.Row="2" x:Name="AccountLedgerTextBlock" Text="Account Ledger" FontSize="21.333" Margin="0,20,0,0" />
             <controls:LedgerEntryListControl Grid.Row="3" x:Name="AccountLedgerList" Margin="0,10,0,0" />
         </Grid>
-
-        <StackPanel Grid.Row="1" Grid.Column="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10" 
+        <StackPanel x:Name="DetailsPanel" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Padding="10" 
                     Visibility="{Binding Path=ViewModel.SelectedLedgerEntry, Mode=OneWay, Converter={StaticResource NullToVisiblityConverter}}" >
-            <TextBlock x:Name="HeaderTextBlock" 
-                       Visibility="{x:Bind ViewModel.SelectedLedgerEntry.TransactionId.HasValue, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
-                <Run Text="Transaction:" />
-                <Hyperlink NavigateUri="{x:Bind ViewModel.SelectedLedgerEntryLink, Mode=OneWay}" >
-                    <Run Text="{x:Bind ViewModel.SelectedLedgerEntry.TransactionId.Value, Mode=OneWay}" />
-                </Hyperlink>
+            <TextBlock x:Name="HeaderTextBlock" Margin="0,85,0,10" FontSize="21.333"
+                       Visibility="{x:Bind ViewModel.SelectedLedgerEntry.TransactionId.HasValue, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"   >
+                    <!--<Run Text="Transaction" />-->
+                    <Hyperlink NavigateUri="{x:Bind ViewModel.SelectedLedgerEntryLink, Mode=OneWay}" >
+                        <Run Text="{x:Bind ViewModel.SelectedLedgerEntry.TransactionId.Value, Mode=OneWay}" />
+                    </Hyperlink>
             </TextBlock>
-            <Border BorderBrush="LightGray" BorderThickness="1">
-                <Grid >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="AmountLabelTextBlock" Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="AmountValueTextBlock" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" >
-                        <Run Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtAmount, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                        <Run Text="NXT" />
-                    </TextBlock>
-                    <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                    <TextBlock x:Name="FeeLabelTextBlock" Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" >
-                        <Run Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtFee, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                        <Run Text="NXT" />
-                    </TextBlock>
-                    <TextBlock x:Name="BalanceLabelTextBlock" Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="BalanceValueTextBlock" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" >
-                        <Run Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtBalance, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                        <Run Text="NXT" />
-                    </TextBlock>
-                    <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                    <TextBlock x:Name="SenderLabelTextBlock" Grid.Row="3" Grid.Column="0" Text="Sender:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="SenderValueTextBlock" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.ContactListAccountFrom, Mode=OneWay}" />
-                    <TextBlock x:Name="RecipientLabelTextBlock" Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="RecipientValueTextBlock" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.ContactListAccountTo, Mode=OneWay}" />
-                    <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                    <TextBlock x:Name="TimestampLabelTextBlock" Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="TimestampValueTextBlock" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.Timestamp, Mode=OneWay, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" />
-                    <TextBlock x:Name="PlainMessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Public message:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="PlainMessageValueTextBlock" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.PlainMessage, Mode=OneWay}" />
-                    <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                    <TextBlock x:Name="EncryptedMessageLabelTextBlock" Grid.Row="7" Grid.Column="0" Text="Enctyped message:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="EncryptedMessageValueTextBlock" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.EncryptedMessage, Mode=OneWay}" />
-                    <TextBlock x:Name="NoteToSelfMessageLabelTextBlock" Grid.Row="8" Grid.Column="0" Text="Note to self:" FontWeight="Bold" 
-                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                    <TextBlock x:Name="NoteToSelfMessageValueTextBlock" Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5"
-                               Text="{x:Bind ViewModel.SelectedLedgerEntry.NoteToSelfMessage, Mode=OneWay}" />
-                </Grid>
-            </Border>
-        </StackPanel>
+            <StackPanel>
 
+                <Border BorderBrush="#FF7A7A7A" Margin="0,5" BorderThickness="1" Padding="3" Background="Gainsboro">
+                    <StackPanel>
+                        <TextBlock x:Name="SenderLabelTextBlock" Text="Sender:" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SenderValueTextBlock" Text="{x:Bind ViewModel.SelectedLedgerEntry.ContactListAccountFrom, Mode=OneWay}"  />
+                        <TextBlock x:Name="RecipientLabelTextBlock" Text="Recipient:" FontWeight="SemiBold"  
+                                   Visibility="{x:Bind ViewModel.SelectedLedgerEntry.AccountTo, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}" />
+                        <TextBlock x:Name="RecipientValueTextBlock" Text="{x:Bind ViewModel.SelectedLedgerEntry.ContactListAccountTo, Mode=OneWay}" 
+                                   Visibility="{x:Bind ViewModel.SelectedLedgerEntry.AccountTo, Mode=OneWay, Converter={StaticResource HasTextToVisiblityConverter}}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border BorderBrush="#FF7A7A7A" Margin="0,5" BorderThickness="1" Padding="3" Background="Gainsboro">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="AmountLabelTextBlock" Text="Amount:" FontWeight="SemiBold"  />
+                        <TextBlock x:Name="AmountValueTextBlock" Grid.Column="1"
+                                   Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtAmount, ConverterParameter=\{0:#\,##0.00######\}, Converter={StaticResource StringFormatConverter}, Mode=OneWay}" HorizontalAlignment="Right" />
+                        <TextBlock Text="NXT" Grid.Column="2" HorizontalAlignment="Left" Margin="3,0,0,0" />
+
+                        <TextBlock x:Name="FeeLabelTextBlock" Text="Fee:" FontWeight="SemiBold" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,3,0" />
+                        <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1"
+                                   Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtFee, ConverterParameter=\{0:#\,##0.00######\}, Converter={StaticResource StringFormatConverter}, Mode=OneWay}" HorizontalAlignment="Right" />
+                        <TextBlock Text="NXT" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="3,0,0,0" />
+
+                        <TextBlock x:Name="BalanceLabelTextBlock" Text="Balance:" FontWeight="SemiBold" Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,3,0" />
+                        <TextBlock x:Name="BalanceValueTextBlock" Grid.Row="2" Grid.Column="1"
+                                   Text="{x:Bind ViewModel.SelectedLedgerEntry.NxtBalance, ConverterParameter=\{0:#\,##0.00######\}, Converter={StaticResource StringFormatConverter}, Mode=OneWay}" HorizontalAlignment="Right" />
+                        <TextBlock Text="NXT" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="3,0,0,0" />
+                    </Grid>
+                </Border>
+
+                <Border BorderBrush="#FF7A7A7A" Margin="0,5" BorderThickness="1" Padding="3" Background="Gainsboro">
+                    <StackPanel>
+                        <TextBlock x:Name="TimestampLabelTextBlock" Text="Timestamp:" FontWeight="SemiBold" />
+                        <TextBlock x:Name="TimestampValueTextBlock" Text="{x:Bind ViewModel.SelectedLedgerEntry.TransactionTimestamp, ConverterParameter=yyyy-MM-dd HH:mm:ss, Converter={StaticResource DateTimeConverter}, Mode=OneWay}" />
+                        <TextBlock x:Name="PlainMessageLabelTextBlock" Text="Public message:" FontWeight="SemiBold" 
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.PlainMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}" />
+                        <TextBlock x:Name="PlainMessageValueTextBlock"  TextWrapping="Wrap" Text="{x:Bind ViewModel.SelectedLedgerEntry.PlainMessage, Mode=OneWay}"
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.PlainMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}"/>
+                        <TextBlock x:Name="EncryptedMessageLabelTextBlock" Text="Enctyped message:" FontWeight="SemiBold"
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.EncryptedMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}"/>
+                        <TextBlock x:Name="EncryptedMessageValueTextBlock"  TextWrapping="Wrap" Text="{x:Bind ViewModel.SelectedLedgerEntry.EncryptedMessage, Mode=OneWay}" 
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.EncryptedMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}"/>
+                        <TextBlock x:Name="NoteToSelfMessageLabelTextBlock" Text="Note to self:" FontWeight="SemiBold" 
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.NoteToSelfMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}"/>
+                        <TextBlock x:Name="NoteToSelfMessageValueTextBlock"  TextWrapping="Wrap" Text="{x:Bind ViewModel.SelectedLedgerEntry.NoteToSelfMessage, Mode=OneWay}" 
+                               Visibility="{x:Bind ViewModel.SelectedLedgerEntry.NoteToSelfMessage, Converter={StaticResource HasTextToVisiblityConverter}, Mode=OneWay}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>
