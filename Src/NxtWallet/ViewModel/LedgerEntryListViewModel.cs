@@ -7,7 +7,6 @@ using NxtWallet.Core;
 using GalaSoft.MvvmLight.Threading;
 using NxtWallet.Core.Repositories;
 using NxtWallet.Core.Models;
-using System;
 
 namespace NxtWallet.ViewModel
 {
@@ -16,11 +15,18 @@ namespace NxtWallet.ViewModel
         private readonly IAccountLedgerRepository _accountLedgerRepository;
         private readonly IContactRepository _contactRepository;
         private ObservableCollection<LedgerEntry> _ledgerEntries;
+        private LedgerEntry _selectedEntry;
 
         public ObservableCollection<LedgerEntry> LedgerEntries
         {
             get { return _ledgerEntries; }
             set { Set(ref _ledgerEntries, value); }
+        }
+
+        public LedgerEntry SelectedEntry
+        {
+            get { return _selectedEntry; }
+            set { Set(ref _selectedEntry, value); }
         }
 
         public LedgerEntryListViewModel(IAccountLedgerRepository accountLedgerRepository, IAccountLedgerRunner accountLedgerRunner,

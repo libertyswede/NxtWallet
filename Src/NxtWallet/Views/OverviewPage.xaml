@@ -11,6 +11,7 @@
     <Page.Resources>
         <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisibilityConverter" />
         <nxtWallet:StringFormatConverter x:Key="StringFormatConverter" />
+        <nxtWallet:NullToVisiblityConverter x:Key="NullToVisiblityConverter" />
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -48,7 +49,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="MasterColumn" Width="*"/>
-            <ColumnDefinition x:Name="DetailsColumn" Width="320" />
+            <ColumnDefinition x:Name="DetailsColumn" Width="0" />
         </Grid.ColumnDefinitions>
         <Grid x:Name="InnerGrid" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="15,10,15,10" >
             <Grid.RowDefinitions>
@@ -76,7 +77,8 @@
             <controls:LedgerEntryListControl Grid.Row="3" x:Name="AccountLedgerList" Margin="0,10,0,0" />
         </Grid>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
+        <StackPanel Grid.Row="1" Grid.Column="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10" 
+                    Visibility="{Binding Path=ViewModel.SelectedLedgerEntry, Mode=OneWay, Converter={StaticResource NullToVisiblityConverter}}" >
             <TextBlock x:Name="HeaderTextBlock" 
                        Visibility="{x:Bind ViewModel.SelectedLedgerEntry.TransactionId.HasValue, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
                 <Run Text="Transaction:" />

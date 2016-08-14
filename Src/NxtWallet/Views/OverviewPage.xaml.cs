@@ -3,6 +3,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using NxtWallet.ViewModel;
 using NxtWallet.Core.Models;
+using Windows.UI.Xaml;
 
 namespace NxtWallet.Views
 {
@@ -28,6 +29,7 @@ namespace NxtWallet.Views
             {
                 var selectedLedgerEntry = selectionChangedEventArgs.AddedItems.Single() as LedgerEntry;
                 ViewModel.SelectedLedgerEntry = selectedLedgerEntry;
+                DetailsColumn.Width = new GridLength(320); // TODO: Can this be declared in XAML?
             }
         }
     }

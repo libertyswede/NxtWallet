@@ -64,8 +64,9 @@
             <TextBlock Grid.Column="4" Text="Fee" x:Name="FeeHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
             <TextBlock Grid.Column="5" Text="Balance" x:Name="BalanceHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
         </Grid>
-        <controls:LedgerEntryListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.LedgerEntries}" EvenRowBackground="#FFF4F4F4" OddRowBackground="White" UnconfirmedForeground="Gray"
-                                         SelectionChanged="Selector_OnSelectionChanged">
+        <controls:LedgerEntryListView Grid.Row="1" EvenRowBackground="#FFF4F4F4" OddRowBackground="White" UnconfirmedForeground="Gray" 
+                                      SelectionChanged="Selector_OnSelectionChanged" ItemsSource="{x:Bind ViewModel.LedgerEntries}" 
+                                      SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
