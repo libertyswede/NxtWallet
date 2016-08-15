@@ -117,6 +117,7 @@
     <Compile Include="Controls\SelectableTextBlock.cs" />
     <Compile Include="Controls\LedgerEntryListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
+    <Compile Include="ControlWidthTrigger.cs" />
     <Compile Include="DateTimeConverter.cs" />
     <Compile Include="DecimalAttribute.cs" />
     <Compile Include="HasTextToVisiblityConverter.cs" />

@@ -24,10 +24,10 @@
         </Grid.RowDefinitions>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
-        		<VisualState x:Name="VisualStateMin0">
-        			<VisualState.StateTriggers>
-        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
-        			</VisualState.StateTriggers>
+                <VisualState x:Name="VisualStateMin0">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
+                    </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="MessageHeader.(UIElement.Visibility)" Value="Collapsed"/>
                         <Setter Target="MessageColumn.Width" Value="0" />
@@ -38,15 +38,15 @@
                         <Setter Target="AmountHeader.FontSize" Value="12" />
                         <Setter Target="AmountColumn.Width" Value="Auto" />
                         <Setter Target="FeeColumn.Width" Value="0" />
-        				<Setter Target="BalanceColumn.Width" Value="0" />
+                        <Setter Target="BalanceColumn.Width" Value="0" />
                     </VisualState.Setters>
-        		</VisualState>
-        		<VisualState x:Name="VisualStateMin540">
-        			<VisualState.StateTriggers>
-        				<AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
-        			</VisualState.StateTriggers>
-        		</VisualState>
-        	</VisualStateGroup>
+                </VisualState>
+                <VisualState x:Name="VisualStateListViewMin720">
+                    <VisualState.StateTriggers>
+                        <nxtWallet:ControlWidthTrigger MinWidth="720" Element="{Binding ElementName=ledgerEntryListView}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid Grid.Row="0" Margin="0,0,0,0" Background="#FFD7E6E9" Padding="12">
             <Grid.ColumnDefinitions>
@@ -64,7 +64,7 @@
             <TextBlock Grid.Column="4" Text="Fee" x:Name="FeeHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
             <TextBlock Grid.Column="5" Text="Balance" x:Name="BalanceHeader" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Visibility="Visible" />
         </Grid>
-        <controls:LedgerEntryListView Grid.Row="1" EvenRowBackground="#FFF4F4F4" OddRowBackground="White" UnconfirmedForeground="Gray" 
+        <controls:LedgerEntryListView x:Name="ledgerEntryListView" Grid.Row="1" EvenRowBackground="#FFF4F4F4" OddRowBackground="White" UnconfirmedForeground="Gray" 
                                       SelectionChanged="Selector_OnSelectionChanged" ItemsSource="{x:Bind ViewModel.LedgerEntries}" 
                                       SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" >
             <ListView.ItemContainerStyle>

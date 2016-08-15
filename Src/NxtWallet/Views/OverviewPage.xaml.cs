@@ -25,11 +25,25 @@ namespace NxtWallet.Views
 
         private void OnSelectedLedgerEntryChanged(object source, SelectionChangedEventArgs selectionChangedEventArgs)
         {
-            if (selectionChangedEventArgs.AddedItems.Any())
+            var selectedLedgerEntry = selectionChangedEventArgs.AddedItems.SingleOrDefault() as LedgerEntry;
+            ViewModel.SelectedLedgerEntry = selectedLedgerEntry;
+            UpdateDetailsVisualState();
+        }
+
+        private void VisualStateGroup_CurrentStateChanged(object sender, VisualStateChangedEventArgs e)
+        {
+            UpdateDetailsVisualState();
+        }
+
+        private void UpdateDetailsVisualState()
+        {
+            if (VisualStateGroup.CurrentState == VisualStateMin720 && ViewModel.SelectedLedgerEntry != null && DetailsColumn.Width.Value != 260)
             {
-                var selectedLedgerEntry = selectionChangedEventArgs.AddedItems.Single() as LedgerEntry;
-                ViewModel.SelectedLedgerEntry = selectedLedgerEntry;
-                DetailsColumn.Width = new GridLength(260); // TODO: Can this be declared in XAML?
+                DetailsColumn.Width = new GridLength(260); //TODO I'd reeeaaally like to have this in markup..
+            }
+            else if ((VisualStateGroup.CurrentState == VisualStateMin540 || VisualStateGroup.CurrentState == VisualStateMin0) && ViewModel.SelectedLedgerEntry != null)
+            {
+                // Navigate!
             }
         }
     }
