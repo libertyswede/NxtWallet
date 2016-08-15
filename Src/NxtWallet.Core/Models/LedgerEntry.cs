@@ -59,8 +59,6 @@ namespace NxtWallet.Core.Models
             }
         }
 
-        public bool UserIsAmountRecipient => UserIsAmountRecipientCalculation();
-
         public bool IsConfirmed
         {
             get { return _isConfirmed; }
@@ -109,26 +107,6 @@ namespace NxtWallet.Core.Models
             return other?.TransactionId == TransactionId && other?.LedgerEntryType == LedgerEntryType;
         }
 
-        public long GetAmount()
-        {
-            return NqtAmount;
-        }
-
-        public long GetBalance()
-        {
-            return NqtBalance;
-        }
-
-        public long GetFee()
-        {
-            return NqtFee;
-        }
-
-        public void SetBalance(long balance)
-        {
-            NqtBalance = balance;
-        }
-
         public void UpdateOverviewMessage()
         {
             if (!string.IsNullOrEmpty(NoteToSelfMessage))
@@ -148,21 +126,6 @@ namespace NxtWallet.Core.Models
                 var input = "[" + LedgerEntryType + "]";
                 OverviewMessage = Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
             }
-        }
-
-        private bool UserIsAmountRecipientCalculation()
-        {
-            if (LedgerEntryType == LedgerEntryType.AssetDividendPayment)
-            {
-                return !UserIsSender;
-            }
-            if (LedgerEntryType == LedgerEntryType.CurrencyUndoCrowdfunding ||
-                LedgerEntryType == LedgerEntryType.CurrencyReserveClaim ||
-                LedgerEntryType == LedgerEntryType.CurrencyExchangeSell)
-            {
-                return true;
-            }
-            return UserIsRecipient != (LedgerEntryType == LedgerEntryType.DigitalGoodsDelivery);
         }
     }
 }
