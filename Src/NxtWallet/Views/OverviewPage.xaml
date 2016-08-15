@@ -15,7 +15,7 @@
         <nxtWallet:NullToVisiblityConverter x:Key="NullToVisiblityConverter" />
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Padding="10,0,0,0">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateMin0">
@@ -23,14 +23,14 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="TextBlock.(TextBlock.FontSize)" Value="18.667"/>
-                        <Setter Target="MasterColumn.(FrameworkElement.Margin)">
-                            <Setter.Value>
-                                <Thickness>15,50,15,0</Thickness>
-                            </Setter.Value>
-                        </Setter>
+                        <Setter Target="NxtAddressTextBlock.(TextBlock.FontSize)" Value="18.667"/>
                         <Setter Target="BalanceTextBlock.(TextBlock.FontSize)" Value="16"/>
                         <Setter Target="AccountLedgerTextBlock.(TextBlock.FontSize)" Value="16"/>
+                        <Setter Target="NxtAddressTextBlock.(FrameworkElement.Margin)">
+                            <Setter.Value>
+                                <Thickness>50,0,0,0</Thickness>
+                            </Setter.Value>
+                        </Setter>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateMin540">
@@ -38,24 +38,23 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="TextBlock.(TextBlock.FontSize)" Value="24"/>
+                        <Setter Target="NxtAddressTextBlock.(TextBlock.FontSize)" Value="24"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="MasterColumn" Width="*"/>
             <ColumnDefinition x:Name="DetailsColumn" Width="0" />
         </Grid.ColumnDefinitions>
-        <RelativePanel Grid.Row="0" Grid.ColumnSpan="2">
-            <TextBlock Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisibilityConverter}}" x:Name="TextBlock" 
+        <RelativePanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,12,0,0">
+            <TextBlock Visibility="{x:Bind ViewModel.ShowAddress, Converter={StaticResource BoolToVisibilityConverter}}" x:Name="NxtAddressTextBlock" 
                        TextWrapping="NoWrap" Text="{x:Bind ViewModel.NxtAddress, Mode=OneWay}" FontSize="24" />
             <controls:NetworkIndicatorControl RelativePanel.AlignRightWithPanel="True" Margin="0,0,15,0" />
         </RelativePanel>
