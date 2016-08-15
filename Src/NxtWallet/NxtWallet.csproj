@@ -111,6 +111,9 @@
     </Compile>
     <Compile Include="BoolInverseConverter.cs" />
     <Compile Include="BoolToVisiblityConverter.cs" />
+    <Compile Include="Controls\LedgerEntryDetailsControl.xaml.cs">
+      <DependentUpon>LedgerEntryDetailsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SelectableTextBlock.cs" />
     <Compile Include="Controls\LedgerEntryListView.cs" />
     <Compile Include="Controls\NavMenuListView.cs" />
@@ -233,6 +236,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="AppShell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LedgerEntryDetailsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
