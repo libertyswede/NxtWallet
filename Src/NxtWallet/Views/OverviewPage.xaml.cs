@@ -29,7 +29,7 @@ namespace NxtWallet.Views
             {
                 var selectedLedgerEntry = selectionChangedEventArgs.AddedItems.Single() as LedgerEntry;
                 ViewModel.SelectedLedgerEntry = selectedLedgerEntry;
-                DetailsColumn.Width = new GridLength(320); // TODO: Can this be declared in XAML?
+                DetailsColumn.Width = new GridLength(260); // TODO: Can this be declared in XAML?
             }
         }
     }
