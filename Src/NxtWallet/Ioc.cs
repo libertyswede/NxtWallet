@@ -15,7 +15,6 @@ namespace NxtWallet
         public SendMoneyViewModel SendMoneyViewModel => ServiceLocator.Current.GetInstance<SendMoneyViewModel>();
         public SendMoneyDialogViewModel SendMoneyDialogViewModel => ServiceLocator.Current.GetInstance<SendMoneyDialogViewModel>();
         public LedgerEntryDetailViewModel LedgerEntryDetailViewModel => ServiceLocator.Current.GetInstance<LedgerEntryDetailViewModel>();
-        public LedgerEntryListViewModel LedgerEntryListViewModel => ServiceLocator.Current.GetInstance<LedgerEntryListViewModel>();
         public SettingsViewModel SettingsViewModel => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public ReceiveMoneyViewModel ReceiveMoneyViewModel => ServiceLocator.Current.GetInstance<ReceiveMoneyViewModel>();
         public ContactsViewModel ContactsViewModel => ServiceLocator.Current.GetInstance<ContactsViewModel>();
@@ -51,7 +50,6 @@ namespace NxtWallet
             SimpleIoc.Default.Register<IServiceFactory>(() => new ServiceFactory(repo.NxtServer));
             SimpleIoc.Default.Register<OverviewViewModel>();
             SimpleIoc.Default.Register<SendMoneyViewModel>();
-            SimpleIoc.Default.Register<LedgerEntryListViewModel>();
             SimpleIoc.Default.Register<LedgerEntryDetailViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<ReceiveMoneyViewModel>();

@@ -148,7 +148,6 @@
     <Compile Include="ViewModel\SendMoneyViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\LedgerEntryDetailViewModel.cs" />
-    <Compile Include="ViewModel\LedgerEntryListViewModel.cs" />
     <Compile Include="Views\BackupConfirmPage.xaml.cs">
       <DependentUpon>BackupConfirmPage.xaml</DependentUpon>
     </Compile>
@@ -188,9 +187,6 @@
     </Compile>
     <Compile Include="Views\LedgerEntryDetailPage.xaml.cs">
       <DependentUpon>LedgerEntryDetailPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\LedgerEntryListControl.xaml.cs">
-      <DependentUpon>LedgerEntryListControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -301,10 +297,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LedgerEntryDetailPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\LedgerEntryListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

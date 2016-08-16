@@ -17,5 +17,13 @@ namespace NxtWallet.Views
         {
             ViewModel.LedgerEntry = (LedgerEntry) e.Parameter;
         }
+
+        private void VisualStateGroup_CurrentStateChanged(object sender, Windows.UI.Xaml.VisualStateChangedEventArgs e)
+        {
+            if (e.NewState == VisualStateMin720)
+            {
+                Frame.Navigate(typeof(OverviewPage), ViewModel.LedgerEntry);
+            }
+        }
     }
 }

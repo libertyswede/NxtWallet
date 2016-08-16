@@ -10,7 +10,7 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="VisualStateGroup">
+            <VisualStateGroup x:Name="VisualStateGroup" CurrentStateChanged="VisualStateGroup_CurrentStateChanged">
                 <VisualState x:Name="VisualStateMin0">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource ResourceKey=VisualStateMin0}"/>
@@ -26,6 +26,11 @@
                 <VisualState x:Name="VisualStateMin540">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin540}"/>
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin720">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin720}"/>
                     </VisualState.StateTriggers>
                 </VisualState>
             </VisualStateGroup>
