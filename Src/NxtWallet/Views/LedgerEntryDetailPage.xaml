@@ -4,44 +4,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:nxtWallet="using:NxtWallet"
-    mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="400"
+    xmlns:controls="using:NxtWallet.Controls"
+    mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="400"
     DataContext="{Binding Path=LedgerEntryDetailViewModel, Source={StaticResource Ioc}}">
-    <Page.Resources>
-        <x:Double x:Key="TextBlockFontNormalSize">16</x:Double>
-        <x:Double x:Key="TextBlockFontSmallSize">12</x:Double>
-        <nxtWallet:BoolToVisiblityConverter x:Key="BoolToVisiblityConverter" />
-        <nxtWallet:StringFormatConverter x:Key="StringFormatConverter" />
-    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
                 <VisualState x:Name="VisualStateMin0">
-                    <VisualState.Setters>
-                        <Setter Target="HeaderTextBlock.(TextBlock.FontSize)" Value="16"/>
-                        <Setter Target="AmountLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="AmountValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="FeeLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="FeeValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="BalanceLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="BalanceValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="SenderLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="SenderValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="RecipientLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="RecipientValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="TimestampLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="TimestampValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="PlainMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="PlainMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="EncryptedMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="EncryptedMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="NoteToSelfMessageLabelTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                        <Setter Target="NoteToSelfMessageValueTextBlock.(TextBlock.FontSize)" Value="{StaticResource TextBlockFontSmallSize}"/>
-                    </VisualState.Setters>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource VisualStateMin0}"/>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource ResourceKey=VisualStateMin0}"/>
                     </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ledgerEntryDetailsControl.(FrameworkElement.Margin)">
+                            <Setter.Value>
+                                <Thickness>0,50,0,0</Thickness>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="VisualStateMin540">
                     <VisualState.StateTriggers>
@@ -50,69 +30,8 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <TextBlock x:Name="HeaderTextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{x:Bind ViewModel.LedgerEntry.TransactionId.HasValue, Converter={StaticResource BoolToVisiblityConverter}}" Margin="0,40,0,20" FontSize="21.333" >
-            <Run Text="Transaction:" />
-            <Hyperlink NavigateUri="{x:Bind ViewModel.LedgerEntryLink}" ><Run Text="{x:Bind ViewModel.LedgerEntry.TransactionId.Value}" /></Hyperlink>
-        </TextBlock>
-        <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1">
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="AmountLabelTextBlock" Grid.Row="0" Grid.Column="0" Text="Amount:" FontWeight="Bold" FontSize="{StaticResource TextBlockFontNormalSize}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" />
-                <TextBlock x:Name="AmountValueTextBlock" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtAmount, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                    <Run Text="NXT" />
-                </TextBlock>
-                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                <TextBlock x:Name="FeeLabelTextBlock" Grid.Row="1" Grid.Column="0" Text="Fee:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="FeeValueTextBlock" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtFee, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                    <Run Text="NXT" />
-                </TextBlock>
-                <TextBlock x:Name="BalanceLabelTextBlock" Grid.Row="2" Grid.Column="0" Text="Balance:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="BalanceValueTextBlock" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" >
-                    <Run Text="{x:Bind ViewModel.LedgerEntry.NxtBalance, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:#,##0.00######}'}" />
-                    <Run Text="NXT" />
-                </TextBlock>
-                <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                <TextBlock x:Name="SenderLabelTextBlock" Grid.Row="3" Grid.Column="0" Text="Sender:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="SenderValueTextBlock" Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.ContactListAccountFrom}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="RecipientLabelTextBlock" Grid.Row="4" Grid.Column="0" Text="Recipient:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="RecipientValueTextBlock" Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.ContactListAccountTo}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                <TextBlock x:Name="TimestampLabelTextBlock" Grid.Row="5" Grid.Column="0" Text="Timestamp:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="TimestampValueTextBlock" Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.TransactionTimestamp, Converter={StaticResource DateTimeConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" 
-                           VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="PlainMessageLabelTextBlock" Grid.Row="6" Grid.Column="0" Text="Public message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="PlainMessageValueTextBlock" Grid.Row="6" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.PlainMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Background="#FFF4F4F4" />
-                <TextBlock x:Name="EncryptedMessageLabelTextBlock" Grid.Row="7" Grid.Column="0" Text="Enctyped message:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="EncryptedMessageValueTextBlock" Grid.Row="7" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.EncryptedMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="NoteToSelfMessageLabelTextBlock" Grid.Row="8" Grid.Column="0" Text="Note to self:" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-                <TextBlock x:Name="NoteToSelfMessageValueTextBlock" Grid.Row="8" Grid.Column="1" Text="{x:Bind ViewModel.LedgerEntry.NoteToSelfMessage}" VerticalAlignment="Center" Margin="0,5,10,5" FontSize="{StaticResource TextBlockFontNormalSize}" />
-            </Grid>
-        </Border>
+        <ScrollViewer>
+            <controls:LedgerEntryDetailsControl x:Name="ledgerEntryDetailsControl" DataContext="{Binding LedgerEntry, Mode=TwoWay}" />
+        </ScrollViewer>
     </Grid>
 </Page>

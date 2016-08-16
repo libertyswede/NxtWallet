@@ -19,8 +19,15 @@ namespace NxtWallet.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            ViewModel.SelectedLedgerEntry = null;
             ViewModel.LoadFromRepository();
             Bindings.Update();
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            AccountLedgerList.SelectedLedgerEntryChanged -= OnSelectedLedgerEntryChanged;
+            base.OnNavigatingFrom(e);
         }
 
         private void OnSelectedLedgerEntryChanged(object source, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -43,7 +50,8 @@ namespace NxtWallet.Views
             }
             else if ((VisualStateGroup.CurrentState == VisualStateMin540 || VisualStateGroup.CurrentState == VisualStateMin0) && ViewModel.SelectedLedgerEntry != null)
             {
-                // Navigate!
+                Frame.Navigate(typeof(LedgerEntryDetailPage), ViewModel.SelectedLedgerEntry);
+                ViewModel.SelectedLedgerEntry = null;
             }
         }
     }

@@ -39,8 +39,11 @@ namespace NxtWallet.ViewModel
             get { return _selectedLedgerEntry; }
             set
             {
-                Set(ref _selectedLedgerEntry, value);
-                UpdateTransactionLink();
+                if (_selectedLedgerEntry != value)
+                {
+                    Set(ref _selectedLedgerEntry, value);
+                    UpdateTransactionLink();
+                }
             }
         }
 
